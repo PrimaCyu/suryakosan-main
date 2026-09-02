@@ -25,7 +25,11 @@ class HomeController extends Controller
             return Testimoni::orderByDesc('created_at')->get();
         });
 
-        return view('frontend.index', compact('kamarList', 'testimonis'));
+        $artikels = Cache::remember('home_latest_artikels', 3600, function () {
+            return Artikel::orderByDesc('created_at')->take(3)->get();
+        });
+
+        return view('frontend.index', compact('kamarList', 'testimonis', 'artikels'));
     }
 
     public function kosanIndex(Request $request)
@@ -62,14 +66,14 @@ class HomeController extends Controller
 
     public function kamarDetail($product_kamar_kosan = null)
     {
-        $kamar = null;
-        if ($product_kamar_kosan) {
-            $kamar = ProductKamarKosan::with(['productKosan', 'productKamarImageKosan', 'priceKamar'])->find($product_kamar_kosan);
-            if ($kamar) {
-                $kamar->increment('views');
-                Cache::forget('home_kamar_list');
-            }
+        if (!$product_kamar_kosan) {
+            return redirect()->route('kosan.index');
         }
+
+        $kamar = ProductKamarKosan::with(['productKosan', 'productKamarImageKosan', 'priceKamar'])->findOrFail($product_kamar_kosan);
+        $kamar->increment('views');
+        Cache::forget('home_kamar_list');
+
         return view('frontend.kosan.kamar.detail-kamar', compact('kamar'));
     }
 

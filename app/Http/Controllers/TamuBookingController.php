@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\BookingConfirmationMail;
 use App\Models\Tamu;
 use App\Service\ProcessBookingDate;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class TamuBookingController extends Controller
 {
@@ -34,7 +38,7 @@ class TamuBookingController extends Controller
             return back()->with('failed', $bookingDate['message']);
         }
 
-        DB::transaction(function () use($product_kamar_kosan, $bookingDate, $request) {
+        $tamu = DB::transaction(function () use($product_kamar_kosan, $bookingDate, $request) {
 
             $data = [
                 'product_kamar_kosan_id' => $product_kamar_kosan,
@@ -53,17 +57,21 @@ class TamuBookingController extends Controller
                 $data['proof_of_transfer'] = $path;
             }
 
-            $tamu = Tamu::create($data);
-
+            return Tamu::create($data);
         });
 
-        // return response()->json([
-        //     'message' => 'success booking',
-        //     'data'    => $tamu
-        // ]);
+        // Generate PDF dan kirim email konfirmasi
+        try {
+            $tamu->load(['productKamarKosan.productKosan']);
+            $pdf = Pdf::loadView('pdf.booking_invoice', compact('tamu'));
+            $pdfOutput = $pdf->output();
 
-        return to_route('home')->with('success','Booking Success');
+            Mail::to($tamu->email)->send(new BookingConfirmationMail($tamu, $pdfOutput));
+        } catch (\Exception $e) {
+            Log::error('Gagal mengirim email konfirmasi booking / generate PDF: ' . $e->getMessage());
+        }
+
+        return to_route('home')->with('success','Booking Berhasil! Bukti booking telah dikirimkan ke email Anda.');
     }
-
-
 }
+

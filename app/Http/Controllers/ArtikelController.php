@@ -81,6 +81,8 @@ class ArtikelController extends Controller
             'view'      => 0,
         ]);
 
+        Cache::forget('home_latest_artikels');
+
         return redirect()->back()->with('success', 'Artikel berhasil ditambahkan!');
     }
 
@@ -112,6 +114,7 @@ class ArtikelController extends Controller
         Cache::forget("artikel_detail_{$oldSlug}");
         Cache::forget("artikel_detail_{$artikel->slug}");
         Cache::forget("artikel_berita_lainnya_{$artikel->id}");
+        Cache::forget('home_latest_artikels');
 
         return redirect()->back()->with('success', 'Artikel berhasil diperbarui!');
     }
@@ -124,6 +127,7 @@ class ArtikelController extends Controller
 
         Cache::forget("artikel_detail_{$slug}");
         Cache::forget("artikel_berita_lainnya_{$id}");
+        Cache::forget('home_latest_artikels');
 
         return redirect()->back()->with('success', 'Artikel berhasil dihapus!');
     }

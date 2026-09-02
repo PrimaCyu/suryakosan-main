@@ -62,6 +62,15 @@ class KosanController extends Controller
 
     public function insert(Request $request)
     {
+        $request->validate([
+            'title'       => 'required|string|max:255',
+            'wilayah'     => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'tersedia'    => 'nullable|numeric',
+            'view'        => 'nullable|numeric',
+            'gmaps'       => 'nullable|string',
+        ]);
+
         $fasilitas = $request->fasilitas;
         if (is_array($fasilitas)) {
             $fasilitas = implode(', ', $fasilitas);
@@ -70,11 +79,11 @@ class KosanController extends Controller
         $data = [
             'title'       => $request->title,
             'slug'        => $this->generateUniqueSlug($request->title),
-            'description' => $request->description,
-            'fasilitas'   => $fasilitas,
-            'wilayah'     => $request->wilayah,
-            'tersedia'    => $request->tersedia,
-            'view'        => $request->view,
+            'description' => $request->description ?? '',
+            'fasilitas'   => $fasilitas ?? '',
+            'wilayah'     => $request->wilayah ?? 'Bali',
+            'tersedia'    => $request->tersedia ?? 0,
+            'view'        => $request->view ?? 0,
             'gmaps'       => $request->gmaps
         ];
 
@@ -88,6 +97,15 @@ class KosanController extends Controller
     {
         $productKosan = ProductKosan::findOrFail($product_kosan);
 
+        $request->validate([
+            'title'       => 'required|string|max:255',
+            'wilayah'     => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'tersedia'    => 'nullable|numeric',
+            'view'        => 'nullable|numeric',
+            'gmaps'       => 'nullable|string',
+        ]);
+
         $fasilitas = $request->fasilitas;
         if (is_array($fasilitas)) {
             $fasilitas = implode(', ', $fasilitas);
@@ -96,11 +114,11 @@ class KosanController extends Controller
         $data = [
             'title'       => $request->title,
             'slug'        => $this->generateUniqueSlug($request->title, $productKosan->id),
-            'description' => $request->description,
-            'fasilitas'   => $fasilitas,
-            'wilayah'     => $request->wilayah,
-            'tersedia'    => $request->tersedia,
-            'view'        => $request->view,
+            'description' => $request->description ?? '',
+            'fasilitas'   => $fasilitas ?? '',
+            'wilayah'     => $request->wilayah ?? 'Bali',
+            'tersedia'    => $request->tersedia ?? 0,
+            'view'        => $request->view ?? 0,
             'gmaps'       => $request->gmaps
         ];
 
