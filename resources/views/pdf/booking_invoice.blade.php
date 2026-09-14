@@ -174,8 +174,8 @@
     <table class="header-table">
         <tr>
             <td style="vertical-align: top;">
-                <div class="logo-title">{{ config('app.name', 'NemuKos') }}</div>
-                <div class="subtitle">Platform Sewa Kos & Kamar Terpercaya</div>
+                <div class="logo-title">{{ config('app.name', 'Sinar Citra Lestari') }}</div>
+                <div class="subtitle">Hunian Kos Nyaman & Terpercaya</div>
             </td>
             <td style="vertical-align: top; text-align: right;">
                 <div class="invoice-title">BUKTI BOOKING</div>
@@ -281,7 +281,7 @@
     </div>
 
     <div class="footer">
-        Dokumen ini dibuat otomatis oleh sistem {{ config('app.name', 'NemuKos') }} pada {{ date('d/m/Y H:i:s') }}.<br>
+        Dokumen ini dibuat otomatis oleh sistem {{ config('app.name', 'Sinar Citra Lestari') }} pada {{ date('d/m/Y H:i:s') }}.<br>
         Terima kasih telah mempercayakan hunian Anda kepada kami!
     </div>
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\BookingConfirmationMail;
+use App\Models\ProductKamarKosan;
 use App\Models\Tamu;
 use App\Service\ProcessBookingDate;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -20,39 +21,49 @@ class TamuBookingController extends Controller
         $this->processBookingDates = $processBookingDates;
     }
 
-    public function booking($product_kamar_kosan, Request $request){
+    public function booking($product_kamar_kosan, Request $request)
+    {
+        $kamar = ProductKamarKosan::with(['priceKamar', 'productKosan'])->findOrFail($product_kamar_kosan);
+
         $request->validate([
             'name'              => 'required|string|max:255',
-            'telp'              => 'required|string|max:20',
+            'telp'              => 'required|string|max:25',
             'email'             => 'required|email|max:255',
             'start_date'        => 'required|date',
-            'start_time'        => 'required',
-            'payment_method'    => 'required|string',
+            'start_time'        => 'required|string',
+            'payment_method'    => 'required|string|in:transfer,qris,cash',
             'proof_of_transfer' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'jam'               => 'nullable|integer|min:0',
+            'hari'              => 'nullable|integer|min:0',
+            'minggu'            => 'nullable|integer|min:0',
+            'bulan'             => 'nullable|integer|min:0',
+            'tahun'             => 'nullable|integer|min:0',
         ]);
 
-
-        $bookingDate = $this->processBookingDates->calculateBookingRange($product_kamar_kosan, $request);
-
-        if(isset($bookingDate['status']) && $bookingDate['status'] == false){
-            return back()->with('failed', $bookingDate['message']);
+        // 1. Validasi ketersediaan jadwal kamar
+        $bookingDate = $this->processBookingDates->calculateBookingRange($kamar->id, $request);
+        if (isset($bookingDate['status']) && $bookingDate['status'] === false) {
+            return back()->withInput()->with('failed', $bookingDate['message']);
         }
 
-        $tamu = DB::transaction(function () use($product_kamar_kosan, $bookingDate, $request) {
+        // 2. Kalkulasi total harga resmi dari sisi backend (Anti Price Tampering)
+        $serverCalculatedPrice = $this->processBookingDates->calculateBookingPrice($kamar, $request);
 
+        $tamu = DB::transaction(function () use ($kamar, $bookingDate, $request, $serverCalculatedPrice) {
             $data = [
-                'product_kamar_kosan_id' => $product_kamar_kosan,
-                'name'           => $request->name,
-                'telp'           => $request->telp,
-                'email'          => $request->email,
-                'start_time'     => $request->start_time,
-                'start_date'     => $bookingDate['start'],
-                'end_date'       => $bookingDate['end'],
-                'payment_method' => $request->payment_method,
-                'total_price'    => $request->total_price,
+                'product_kamar_kosan_id' => $kamar->id,
+                'name'                   => strip_tags($request->name),
+                'telp'                   => strip_tags($request->telp),
+                'email'                  => filter_var($request->email, FILTER_SANITIZE_EMAIL),
+                'start_time'             => $request->start_time,
+                'start_date'             => $bookingDate['start'],
+                'end_date'               => $bookingDate['end'],
+                'payment_method'         => strtolower($request->payment_method),
+                'total_price'            => $serverCalculatedPrice,
+                'status'                 => 'pending',
             ];
 
-            if($request->hasFile('proof_of_transfer')){
+            if ($request->hasFile('proof_of_transfer') && $request->file('proof_of_transfer')->isValid()) {
                 $path = $request->file('proof_of_transfer')->store('tamu/proof-of-transfer', 'public');
                 $data['proof_of_transfer'] = $path;
             }
@@ -60,7 +71,7 @@ class TamuBookingController extends Controller
             return Tamu::create($data);
         });
 
-        // Generate PDF dan kirim email konfirmasi
+        // 3. Generate PDF dan kirim email konfirmasi
         try {
             $tamu->load(['productKamarKosan.productKosan']);
             $pdf = Pdf::loadView('pdf.booking_invoice', compact('tamu'));
@@ -71,7 +82,8 @@ class TamuBookingController extends Controller
             Log::error('Gagal mengirim email konfirmasi booking / generate PDF: ' . $e->getMessage());
         }
 
-        return to_route('home')->with('success','Booking Berhasil! Bukti booking telah dikirimkan ke email Anda.');
+        return to_route('home')->with('success', 'Booking Berhasil! Bukti reservasi telah kami kirimkan ke email Anda.');
     }
 }
+
 

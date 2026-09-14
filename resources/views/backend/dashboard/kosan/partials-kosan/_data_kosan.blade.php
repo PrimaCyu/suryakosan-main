@@ -267,56 +267,105 @@
             <!-- MODAL IMAGE GALLERY KOSAN -->
             <div class="modal fade" id="modalImageKosan{{ $item->id }}" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                    <div class="modal-content border-0 shadow-lg">
-                        <div class="modal-header modal-header-modern text-white">
-                            <h5 class="modal-title fs-6 fw-bold">
-                                <i class="bi bi-images me-2 text-warning"></i> Galeri Foto Kosan: {{ $item->title }}
-                            </h5>
+                    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                        <div class="modal-header modal-header-modern text-white p-3 px-4 position-relative">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="p-2 rounded-3 bg-white bg-opacity-10 text-warning d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-images fs-5"></i>
+                                </div>
+                                <div>
+                                    <h5 class="modal-title fs-6 fw-bold mb-0 text-white">
+                                        Galeri Foto Kosan: {{ $item->title }}
+                                    </h5>
+                                    <small class="text-white text-opacity-75 fs-8">Kelola dan unggah koleksi foto promosi untuk unit kosan ini</small>
+                                </div>
+                            </div>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body p-3 p-md-4">
-                            <!-- Existing Images -->
-                            <h6 class="fw-bold fs-7 mb-3 text-dark">Foto Galeri Tersimpan ({{ $item->productImageKosan ? $item->productImageKosan->count() : 0 }})</h6>
-                            <div class="row g-2 mb-4">
-                                @forelse($item->productImageKosan ?? [] as $img)
-                                    <div class="col-4 col-sm-3 col-md-2 position-relative text-center">
-                                        <img src="{{ asset('storage/' . $img->image) }}" class="rounded-2 border shadow-sm w-100" style="height: 80px; object-fit: cover;" alt="Galeri">
-                                        <form action="{{ route('admin.product.kosan.image.delete', $img->id) }}" method="POST" class="mt-1" onsubmit="return confirm('Hapus foto ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-xs btn-outline-danger w-100 py-0" style="font-size: 0.65rem;">
-                                                <i class="bi bi-trash"></i> Hapus
-                                            </button>
-                                        </form>
-                                    </div>
-                                @empty
-                                    <div class="col-12 text-center text-muted py-3">
-                                        <p class="fs-8 mb-0">Belum ada foto galeri untuk kosan ini.</p>
-                                    </div>
-                                @endforelse
+                        <div class="modal-body p-4">
+                            <!-- Header Info / Stats -->
+                            <div class="d-flex align-items-center justify-content-between mb-3 pb-1 border-bottom">
+                                <div class="d-flex align-items-center gap-2">
+                                    <h6 class="fw-bold fs-7 mb-0 text-dark">Foto Galeri Tersimpan</h6>
+                                    <span class="badge badge-subtle-primary rounded-pill px-2.5">
+                                        {{ $item->productImageKosan ? $item->productImageKosan->count() : 0 }} Foto
+                                    </span>
+                                </div>
+                                <span class="fs-8 text-muted">
+                                    <i class="bi bi-shield-check text-success me-1"></i>Tampil di detail publik kos
+                                </span>
                             </div>
 
-                            <hr class="my-3 opacity-25">
+                            <!-- Existing Images Gallery Grid -->
+                            @if($item->productImageKosan && $item->productImageKosan->count() > 0)
+                                <div class="gallery-grid mb-4">
+                                    @foreach($item->productImageKosan as $imgIndex => $img)
+                                        <div class="gallery-item-card">
+                                            <span class="badge-photo-num">#{{ $imgIndex + 1 }}</span>
+                                            <img src="{{ asset('storage/' . $img->image) }}" alt="Foto Kosan {{ $imgIndex + 1 }}" loading="lazy">
+                                            <div class="gallery-item-overlay">
+                                                <a href="{{ asset('storage/' . $img->image) }}" target="_blank" class="btn btn-sm btn-light py-1 px-2 rounded-circle shadow-sm" title="Lihat Foto Ukuran Penuh">
+                                                    <i class="bi bi-arrows-fullscreen fs-8"></i>
+                                                </a>
+                                                <form action="{{ route('admin.product.kosan.image.delete', $img->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus foto galeri ini?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger py-1 px-2 rounded-circle shadow-sm" title="Hapus Foto">
+                                                        <i class="bi bi-trash fs-8"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="text-center py-4 px-3 mb-4 rounded-3 border bg-light bg-opacity-50">
+                                    <div class="d-inline-flex p-3 rounded-circle bg-white text-secondary shadow-sm mb-2">
+                                        <i class="bi bi-images fs-2 text-muted"></i>
+                                    </div>
+                                    <h6 class="fs-7 fw-bold text-dark mb-1">Belum Ada Foto Galeri</h6>
+                                    <p class="fs-8 text-muted mb-0" style="max-width: 400px; margin: auto;">
+                                        Unggah foto-foto terbaik properti kos Anda (tampak fasad depan, lorong, area santai, dapur umum) untuk menarik calon penyewa.
+                                    </p>
+                                </div>
+                            @endif
 
-                            <!-- Form Upload Foto Baru -->
-                            <h6 class="fw-bold fs-7 mb-2 text-dark">Unggah Foto Baru</h6>
-                            <form action="{{ route('admin.product.kosan.image.insert', $item->id) }}" method="POST" enctype="multipart/form-data">
+                            <!-- Form Upload Foto Baru (Modern Drag & Drop Zone) -->
+                            <div class="d-flex align-items-center justify-content-between mb-2 pt-2">
+                                <h6 class="fw-bold fs-7 mb-0 text-dark">
+                                    <i class="bi bi-cloud-arrow-up-fill text-teal me-1"></i> Unggah Foto Baru
+                                </h6>
+                                <span class="badge badge-subtle-success fs-8">Maks. 5 MB / File • Multi-Upload</span>
+                            </div>
+
+                            <form action="{{ route('admin.product.kosan.image.insert', $item->id) }}" method="POST" enctype="multipart/form-data" class="gallery-upload-form" id="galleryUploadForm{{ $item->id }}">
                                 @csrf
-                                <div class="row g-2 align-items-center">
-                                    <div class="col-sm-9">
-                                        <input type="file" name="image[]" class="form-control form-control-sm" multiple accept="image/*" required>
-                                        <small class="text-muted fs-8">Bisa memilih lebih dari 1 file foto sekaligus.</small>
+                                <div class="gallery-dropzone" onclick="document.getElementById('fileInputKosan{{ $item->id }}').click()">
+                                    <div class="dropzone-icon">
+                                        <i class="bi bi-cloud-arrow-up"></i>
                                     </div>
-                                    <div class="col-sm-3 text-sm-end">
-                                        <button type="submit" class="btn btn-sm btn-primary w-100">
-                                            <i class="bi bi-cloud-arrow-up-fill me-1"></i> Upload
-                                        </button>
-                                    </div>
+                                    <h6 class="fw-bold fs-7 text-dark mb-1">
+                                        Klik untuk Pilih Foto atau Seret & Lepas File ke Sini
+                                    </h6>
+                                    <p class="fs-8 text-muted mb-0">
+                                        Bisa memilih lebih dari 1 file foto sekaligus. Format: <strong>JPG, PNG, WEBP</strong>
+                                    </p>
+                                    <input type="file" name="images[]" id="fileInputKosan{{ $item->id }}" class="d-none gallery-file-input" multiple accept="image/jpeg,image/png,image/webp,image/jpg" data-target="previewContainerKosan{{ $item->id }}" data-btn="btnUploadKosan{{ $item->id }}">
+                                </div>
+
+                                <!-- Live Preview Thumbnails -->
+                                <div id="previewContainerKosan{{ $item->id }}" class="preview-grid d-none"></div>
+
+                                <div class="d-flex justify-content-between align-items-center mt-3 pt-2">
+                                    <small class="text-muted fs-8" id="fileCountTextKosan{{ $item->id }}">Belum ada file dipilih.</small>
+                                    <button type="submit" class="btn btn-sm btn-primary px-4 py-2 rounded-pill shadow-sm" id="btnUploadKosan{{ $item->id }}" disabled>
+                                        <i class="bi bi-cloud-arrow-up-fill me-1"></i> Upload Foto Sekarang
+                                    </button>
                                 </div>
                             </form>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <div class="modal-footer bg-light py-2">
+                            <button type="button" class="btn btn-sm btn-secondary rounded-pill px-3" data-bs-dismiss="modal">Tutup</button>
                         </div>
                     </div>
                 </div>

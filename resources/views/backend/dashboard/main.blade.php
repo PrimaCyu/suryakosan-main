@@ -3,7 +3,7 @@
   <!--begin::Head-->
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>NemuKos | Admin Dashboard</title>
+    <title>Sinar Citra Lestari | Admin Dashboard</title>
 
     <!--begin::Theme Init (prevents flash of incorrect theme on load)-->
     <script>
@@ -13,15 +13,16 @@
         let stored = null;
         try {
           stored = localStorage.getItem(STORAGE_KEY);
-        } catch {
-          // localStorage may be unavailable
-        }
+        } catch {}
         const prefersDark = globalThis.matchMedia('(prefers-color-scheme: dark)').matches;
         let resolved = 'light';
-        if (stored === 'dark' || stored === 'light') {
-          resolved = stored;
-        } else if (prefersDark) {
+        if (stored === 'dark') {
           resolved = 'dark';
+        } else if (stored === 'light') {
+          resolved = 'light';
+        } else {
+          // 'auto' or not set: follows OS preferences
+          resolved = prefersDark ? 'dark' : 'light';
         }
         document.documentElement.setAttribute('data-bs-theme', resolved);
         document.documentElement.style.colorScheme = resolved;
@@ -200,8 +201,10 @@
                   {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}
                 </div>
                 <div class="d-none d-md-block text-start" style="line-height: 1.2;">
-                  <span class="d-block fw-bold text-dark fs-7">{{ Auth::user()->name ?? 'Admin' }}</span>
-                  <span class="badge badge-subtle-primary" style="font-size: 0.65rem; padding: 0.15rem 0.4rem !important;">Administrator</span>
+                  <span class="d-block fw-bold text-body-emphasis fs-7">{{ Auth::user()->name ?? 'Admin' }}</span>
+                  <span class="badge {{ Auth::user()->isSuperAdmin() ? 'badge-subtle-danger' : 'badge-subtle-primary' }}" style="font-size: 0.65rem; padding: 0.15rem 0.4rem !important;">
+                    {{ Auth::user()->isSuperAdmin() ? 'Super Admin' : 'Admin Cabang' }}
+                  </span>
                 </div>
               </a>
               <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end shadow-lg border-0" style="border-radius: 14px; min-width: 240px;">
@@ -209,8 +212,16 @@
                   <div class="user-avatar-badge mx-auto mb-2" style="width: 48px; height: 48px; font-size: 1.2rem;">
                     {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}
                   </div>
-                  <h6 class="mb-0 fw-bold text-dark">{{ Auth::user()->name ?? 'Administrator' }}</h6>
-                  <small class="text-muted">{{ Auth::user()->email ?? 'admin@nemukos.id' }}</small>
+                  <h6 class="mb-0 fw-bold text-body-emphasis">{{ Auth::user()->name ?? 'Administrator' }}</h6>
+                  <span class="badge {{ Auth::user()->isSuperAdmin() ? 'bg-danger-subtle text-danger' : 'bg-primary-subtle text-primary' }} mb-1" style="font-size: 0.7rem;">
+                    {{ Auth::user()->isSuperAdmin() ? 'Super Admin' : 'Admin Cabang' }}
+                  </span>
+                  <small class="text-muted d-block">{{ Auth::user()->email ?? 'admin@sinarcitralestari.com' }}</small>
+                </li>
+                <li class="p-2 border-bottom">
+                  <a href="{{ route('admin.profile.edit') }}" class="btn btn-light w-100 d-flex align-items-center justify-content-center gap-2 py-2 text-secondary fw-semibold">
+                    <i class="bi bi-person-gear text-primary"></i> Pengaturan Akun
+                  </a>
                 </li>
                 <li class="p-2">
                   <form action="{{ route('logout') }}" method="POST">
@@ -237,12 +248,13 @@
           <a href="{{ route('admin.dashboard') }}" class="brand-link">
             <img
               src="{{ asset('logo.png') }}"
-              alt="NemuKos"
+              alt="Sinar Citra Lestari"
               class="brand-image"
+              style="max-height: 38px; border-radius: 6px; object-fit: contain; background: white; padding: 2px;"
             />
             <div class="brand-text-wrapper">
-              <span class="brand-title">NemuKos</span>
-              <span class="brand-subtitle">Admin Workspace</span>
+              <span class="brand-title">Sinar Citra</span>
+              <span class="brand-subtitle">Lestari Management</span>
             </div>
           </a>
         </div>
@@ -267,6 +279,18 @@
                   <p>Dashboard</p>
                 </a>
               </li>
+
+              @if(Auth::user()->isSuperAdmin())
+              <!-- SUPER ADMIN SECTION -->
+              <li class="nav-header">SUPER ADMIN</li>
+
+              <li class="nav-item">
+                <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                  <i class="nav-icon bi bi-person-gear"></i>
+                  <p>Kelola Admin & Cabang</p>
+                </a>
+              </li>
+              @endif
 
               <!-- KELOLA KOSAN & WILAYAH -->
               <li class="nav-header">PROPERTI & WILAYAH</li>
@@ -317,6 +341,16 @@
                 </a>
               </li>
 
+              <!-- PENGATURAN SISTEM -->
+              <li class="nav-header">KEAMANAN & AKUN</li>
+
+              <li class="nav-item">
+                <a href="{{ route('admin.profile.edit') }}" class="nav-link {{ request()->routeIs('admin.profile.*') ? 'active' : '' }}">
+                  <i class="nav-icon bi bi-person-gear"></i>
+                  <p>Pengaturan Akun</p>
+                </a>
+              </li>
+
               <!-- TAUTAN WEBSITE -->
               <li class="nav-header">PORTAL PUBLIK</li>
 
@@ -346,7 +380,7 @@
       <footer class="app-footer text-muted fs-7 py-3">
         <div class="container-fluid d-flex justify-content-between align-items-center">
           <div>
-            <strong>Copyright &copy; 2026 <a href="{{ route('home') }}" class="text-decoration-none fw-bold text-primary">NemuKos</a>.</strong> All rights reserved.
+            <strong>Copyright &copy; 2026 <a href="{{ route('home') }}" class="text-decoration-none fw-bold" style="color: var(--nk-primary, #0d9488);">Sinar Citra Lestari</a>.</strong> All rights reserved.
           </div>
           <div class="d-none d-sm-inline">
             Designed for Modern Property Management
@@ -456,6 +490,76 @@
         // Destroy Summernote ketika Modal Edit ditutup
         $('.modal').on('hidden.bs.modal', function () {
           $(this).find('.summernote-edit').summernote('destroy');
+        });
+      });
+    </script>
+
+    <!-- Theme Switcher Synchronizer (Light, Dark, Auto) -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const STORAGE_KEY = 'lte-theme';
+        const themeToggles = document.querySelectorAll('[data-bs-theme-value]');
+        const themeIcons = document.querySelectorAll('[data-lte-theme-icon]');
+
+        const getStoredTheme = () => {
+          try {
+            return localStorage.getItem(STORAGE_KEY) || 'auto';
+          } catch {
+            return 'auto';
+          }
+        };
+
+        const prefersDark = () => globalThis.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        const updateThemeUI = (theme) => {
+          const resolved = (theme === 'auto') ? (prefersDark() ? 'dark' : 'light') : theme;
+          
+          // Apply attribute & style
+          document.documentElement.setAttribute('data-bs-theme', resolved);
+          document.documentElement.style.colorScheme = resolved;
+
+          // Update checkmarks in dropdown
+          themeToggles.forEach(btn => {
+            const val = btn.getAttribute('data-bs-theme-value');
+            const isActive = (val === theme);
+            btn.classList.toggle('active', isActive);
+            btn.setAttribute('aria-pressed', String(isActive));
+            const check = btn.querySelector('.bi-check-lg');
+            if (check) {
+              check.classList.toggle('d-none', !isActive);
+            }
+          });
+
+          // Update active icon on main trigger button
+          themeIcons.forEach(icon => {
+            const iconTheme = icon.dataset.lteThemeIcon;
+            icon.classList.toggle('d-none', iconTheme !== theme);
+          });
+        };
+
+        // Initialize state on page load
+        const initialTheme = getStoredTheme();
+        updateThemeUI(initialTheme);
+
+        // Click listeners for dropdown items
+        themeToggles.forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const selected = btn.getAttribute('data-bs-theme-value');
+            if (selected) {
+              try {
+                localStorage.setItem(STORAGE_KEY, selected);
+              } catch {}
+              updateThemeUI(selected);
+            }
+          });
+        });
+
+        // Dynamic listener for OS preference changes when 'auto' is active
+        globalThis.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+          if (getStoredTheme() === 'auto') {
+            updateThemeUI('auto');
+          }
         });
       });
     </script>

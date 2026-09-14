@@ -15,17 +15,33 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        $user = auth()->user();
+        $isSuper = $user->isSuperAdmin();
+        $assignedIds = $isSuper ? collect() : $user->kosans()->pluck('product_kosans.id');
+
         // Statistics
-        $totalKosan = ProductKosan::count();
-        $totalKamar = ProductKamarKosan::count();
-        $pendingBookingsCount = Tamu::where('status', 'pending')->count();
-        $approvedBookingsCount = Tamu::where('status', 'approved')->count();
+        $totalKosan = $isSuper ? ProductKosan::count() : $assignedIds->count();
+        $totalKamar = $isSuper ? ProductKamarKosan::count() : ProductKamarKosan::whereIn('product_kosan_id', $assignedIds)->count();
+
+        $pendingBookingsCount = Tamu::where('status', 'pending')
+            ->when(!$isSuper, function ($q) use ($assignedIds) {
+                $q->whereHas('productKamarKosan', fn($sub) => $sub->whereIn('product_kosan_id', $assignedIds));
+            })->count();
+
+        $approvedBookingsCount = Tamu::where('status', 'approved')
+            ->when(!$isSuper, function ($q) use ($assignedIds) {
+                $q->whereHas('productKamarKosan', fn($sub) => $sub->whereIn('product_kosan_id', $assignedIds));
+            })->count();
+
         $totalArtikel = Artikel::count();
         $totalTestimoni = Testimoni::count();
         $totalSosmed = SosialMedia::count();
 
         // Recent Bookings (Pending first, then latest)
         $recentBookings = Tamu::with(['productKamarKosan.productKosan'])
+            ->when(!$isSuper, function ($q) use ($assignedIds) {
+                $q->whereHas('productKamarKosan', fn($sub) => $sub->whereIn('product_kosan_id', $assignedIds));
+            })
             ->orderByRaw("CASE WHEN status = 'pending' THEN 1 ELSE 2 END")
             ->orderByDesc('created_at')
             ->take(6)
@@ -33,6 +49,9 @@ class DashboardController extends Controller
 
         // Recent Kosan Properties with room counts
         $recentKosans = ProductKosan::withCount('productKamarKosan')
+            ->when(!$isSuper, function ($q) use ($assignedIds) {
+                $q->whereIn('id', $assignedIds);
+            })
             ->orderByDesc('created_at')
             ->take(5)
             ->get();

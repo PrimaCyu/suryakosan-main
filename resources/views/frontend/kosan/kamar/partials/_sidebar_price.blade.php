@@ -7,11 +7,8 @@
     }
 
     $kategoriOrdered = [
-        'jam' => ['title' => 'Per Jam (Transit)', 'unit' => 'jam', 'icon' => 'fa-clock'],
-        'hari' => ['title' => 'Per Hari', 'unit' => 'hari', 'icon' => 'fa-calendar-day'],
-        'minggu' => ['title' => 'Per Minggu', 'unit' => 'minggu', 'icon' => 'fa-calendar-week'],
-        'bulan' => ['title' => 'Per Bulan', 'unit' => 'bulan', 'icon' => 'fa-calendar'],
-        'tahun' => ['title' => 'Per Tahun', 'unit' => 'tahun', 'icon' => 'fa-calendar-days'],
+        'bulan' => ['title' => 'Per Bulan (Bulanan)', 'unit' => 'bulan', 'icon' => 'fa-calendar'],
+        'tahun' => ['title' => 'Per Tahun (Tahunan)', 'unit' => 'tahun', 'icon' => 'fa-calendar-days'],
     ];
 @endphp
 

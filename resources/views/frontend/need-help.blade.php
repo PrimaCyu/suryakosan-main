@@ -18,16 +18,16 @@
     <div id="help-menu" class="help-menu-enter transition-all duration-300 flex flex-col items-end space-y-2.5">
         <!-- Option 1: Explore & Book Rooms -->
         <a href="{{ route('kosan.index') }}" class="flex items-center space-x-3 group">
-            <span class="bg-white text-slate-800 text-xs font-bold px-3.5 py-2 rounded-2xl shadow-lg border border-slate-100 group-hover:bg-cyan-50 group-hover:text-cyan-700 transition-colors">
+            <span class="bg-white text-slate-800 text-xs font-bold px-3.5 py-2 rounded-2xl shadow-lg border border-slate-100 group-hover:bg-teal-50 group-hover:text-teal-700 transition-colors">
                 🔍 Cari Kamar Kos
             </span>
-            <div class="w-11 h-11 bg-cyan-600 text-white rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-cyan-700 transition-transform">
+            <div class="w-11 h-11 bg-teal-600 text-white rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-teal-700 transition-transform">
                 <i class="fa-solid fa-bed text-sm"></i>
             </div>
         </a>
 
         <!-- Option 2: Email Us -->
-        <a href="mailto:info@nemukos.com" class="flex items-center space-x-3 group">
+        <a href="mailto:info@sinarcitralestari.com" class="flex items-center space-x-3 group">
             <span class="bg-white text-slate-800 text-xs font-bold px-3.5 py-2 rounded-2xl shadow-lg border border-slate-100 group-hover:bg-rose-50 group-hover:text-rose-700 transition-colors">
                 ✉️ Email Dukungan
             </span>
@@ -37,7 +37,7 @@
         </a>
 
         <!-- Option 3: WhatsApp Chat -->
-        <a href="https://wa.me/6282146138847?text=Halo%20Admin%20NemuKOS,%20saya%20ingin%20bertanya%20seputar%20kamar%20kos" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 group">
+        <a href="https://wa.me/6282146138847?text=Halo%20Admin%20Sinar%20Citra%20Lestari,%20saya%20ingin%20bertanya%20seputar%20kamar%20kos" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 group">
             <div class="bg-white text-slate-800 text-xs font-bold px-3.5 py-2 rounded-2xl shadow-lg border border-slate-100 group-hover:bg-emerald-50 transition-colors flex flex-col items-start">
                 <span class="group-hover:text-emerald-700">Chat WhatsApp</span>
                 <span class="text-[9px] text-emerald-600 font-extrabold flex items-center gap-1">
@@ -51,7 +51,7 @@
     </div>
 
     <!-- Main Floating Button Toggle -->
-    <button id="help-toggle-btn" type="button" aria-label="Bantuan" class="flex items-center gap-2.5 px-5 py-3 bg-slate-900 hover:bg-cyan-600 text-white font-bold text-xs sm:text-sm rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300">
+    <button id="help-toggle-btn" type="button" aria-label="Bantuan" class="flex items-center gap-2.5 px-5 py-3 bg-[#2B1810] hover:bg-teal-600 text-white font-bold text-xs sm:text-sm rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300">
         <i id="help-btn-icon" class="fa-solid fa-comment-dots text-base"></i>
         <span id="help-btn-text">Bantuan</span>
     </button>

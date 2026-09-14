@@ -200,6 +200,122 @@
                 }, 250);
             });
         }
+
+        // --- MODERN GALLERY DROPZONE & LIVE PREVIEW ---
+        function initGalleryDropzone(dropzone) {
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.add('dragover');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.remove('dragover');
+                }, false);
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                const input = dropzone.querySelector('.gallery-file-input');
+                if (input && files && files.length > 0) {
+                    input.files = files;
+                    handleFilesPreview(input);
+                }
+            });
+        }
+
+        document.querySelectorAll('.gallery-dropzone').forEach(initGalleryDropzone);
+
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('gallery-file-input')) {
+                handleFilesPreview(e.target);
+            }
+        });
+
+        function handleFilesPreview(input) {
+            const targetId = input.getAttribute('data-target');
+            const btnId = input.getAttribute('data-btn');
+            const container = document.getElementById(targetId);
+            const submitBtn = document.getElementById(btnId);
+            const countTextId = targetId.replace('previewContainer', 'fileCountText');
+            const countText = document.getElementById(countTextId);
+
+            if (!container) return;
+            container.innerHTML = '';
+
+            const files = input.files;
+            if (!files || files.length === 0) {
+                container.classList.add('d-none');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = `<i class="bi bi-cloud-arrow-up-fill me-1"></i> Upload Foto Sekarang`;
+                }
+                if (countText) countText.textContent = 'Belum ada file dipilih.';
+                return;
+            }
+
+            container.classList.remove('d-none');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<i class="bi bi-cloud-arrow-up-fill me-1"></i> Upload ${files.length} Foto Sekarang`;
+            }
+            if (countText) {
+                let totalBytes = Array.from(files).reduce((sum, f) => sum + f.size, 0);
+                let mb = (totalBytes / (1024 * 1024)).toFixed(1);
+                countText.innerHTML = `<span class="text-success fw-bold"><i class="bi bi-check2-circle me-1"></i>${files.length} foto dipilih</span> (${mb} MB)`;
+            }
+
+            Array.from(files).forEach((file, idx) => {
+                if (!file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = 'preview-item';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" alt="${file.name}">
+                        <div class="preview-badge-name" title="${file.name}">${file.name}</div>
+                        <button type="button" class="btn-remove-preview" title="Hapus foto ini" data-idx="${idx}">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    `;
+                    container.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Cancel/remove preview
+        document.addEventListener('click', function(e) {
+            const removeBtn = e.target.closest('.btn-remove-preview');
+            if (removeBtn) {
+                const previewItem = removeBtn.closest('.preview-item');
+                const previewContainer = removeBtn.closest('.preview-grid');
+                if (previewItem && previewContainer) {
+                    previewItem.remove();
+                    if (previewContainer.children.length === 0) {
+                        previewContainer.classList.add('d-none');
+                        const form = previewContainer.closest('form');
+                        if (form) {
+                            const input = form.querySelector('.gallery-file-input');
+                            if (input) input.value = '';
+                            const submitBtn = form.querySelector('button[type="submit"]');
+                            if (submitBtn) {
+                                submitBtn.disabled = true;
+                                submitBtn.innerHTML = `<i class="bi bi-cloud-arrow-up-fill me-1"></i> Upload Foto Sekarang`;
+                            }
+                            const countText = form.querySelector('small[id^="fileCountText"]');
+                            if (countText) countText.textContent = 'Belum ada file dipilih.';
+                        }
+                    }
+                }
+            }
+        });
     });
 </script>
 
