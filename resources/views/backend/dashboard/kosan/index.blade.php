@@ -11,9 +11,15 @@
                 <p class="text-muted fs-7 mb-0">Manajemen daftar properti kos, spesifikasi wilayah, fasilitas, dan unit kamar.</p>
             </div>
             <div class="col-sm-6 text-sm-end mt-3 mt-sm-0">
-                <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambah">
-                    <i class="bi bi-plus-lg me-1"></i> Tambah Kosan Baru
-                </button>
+                @if(Auth::user()->isSuperAdmin())
+                    <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambah">
+                        <i class="bi bi-plus-lg me-1"></i> Tambah Kosan Baru
+                    </button>
+                @else
+                    <span class="badge badge-subtle-primary fs-7 py-2 px-3 border border-primary border-opacity-25 rounded-pill">
+                        <i class="bi bi-shield-check me-1"></i> Mode Admin Cabang Terbatas
+                    </span>
+                @endif
             </div>
         </div>
     </div>
@@ -28,8 +34,10 @@
             @include('backend.dashboard.kosan.partials-kosan._data_kosan')
         </div> <!-- end tab-content -->
 
-        <!-- Partial: Modal Tambah Kosan -->
-        @include('backend.dashboard.kosan.partials-kosan._modals')
+        @if(Auth::user()->isSuperAdmin())
+            <!-- Partial: Modal Tambah Kosan -->
+            @include('backend.dashboard.kosan.partials-kosan._modals')
+        @endif
     </div>
 </div>
 
@@ -113,6 +121,7 @@
 
     // Live Search AJAX untuk Tabel Kosan
     document.addEventListener("DOMContentLoaded", function() {
+        const isSuperAdmin = {{ Auth::user()->isSuperAdmin() ? 'true' : 'false' }};
         const searchInput = document.getElementById('admin-search-kosan');
         const tbody = document.getElementById('kosan-tbody');
         let searchTimeout = null;
@@ -163,6 +172,16 @@
                                     ? `<span class="badge badge-subtle-success"><i class="bi bi-door-closed me-1"></i>${item.tersedia} Unit</span>`
                                     : `<span class="text-muted fs-8">-</span>`;
 
+                                @if(Auth::user()->isSuperAdmin())
+                                const deleteBtnHtml = `
+                                    <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalDelete${item.id}" title="Hapus Kosan">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                `;
+                                @else
+                                const deleteBtnHtml = '';
+                                @endif
+
                                 const tr = document.createElement('tr');
                                 tr.className = 'align-middle';
                                 tr.innerHTML = `
@@ -186,9 +205,7 @@
                                             <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalEdit${item.id}" title="Edit Kosan">
                                                 <i class="bi bi-pencil-square"></i>
                                             </button>
-                                            <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalDelete${item.id}" title="Hapus Kosan">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
+                                            ${deleteBtnHtml}
                                         </div>
                                     </td>
                                 `;

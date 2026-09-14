@@ -61,6 +61,18 @@ class DashboardController extends Controller
             ->take(4)
             ->get();
 
+        // Expiring & Overdue Tenancies (Masa sewa mau habis <= 7 hari ke depan, atau jatuh tempo s/d 14 hari lalu)
+        $expiringTenancies = Tamu::with(['productKamarKosan.productKosan'])
+            ->where('status', 'approved')
+            ->whereDate('end_date', '<=', now()->addDays(7)->toDateString())
+            ->whereDate('end_date', '>=', now()->subDays(14)->toDateString())
+            ->when(!$isSuper, function ($q) use ($assignedIds) {
+                $q->whereHas('productKamarKosan', fn($sub) => $sub->whereIn('product_kosan_id', $assignedIds));
+            })
+            ->orderBy('end_date', 'asc')
+            ->take(6)
+            ->get();
+
         return view('backend.dashboard.home', compact(
             'totalKosan',
             'totalKamar',
@@ -71,7 +83,8 @@ class DashboardController extends Controller
             'totalSosmed',
             'recentBookings',
             'recentKosans',
-            'recentArtikels'
+            'recentArtikels',
+            'expiringTenancies'
         ));
     }
 }

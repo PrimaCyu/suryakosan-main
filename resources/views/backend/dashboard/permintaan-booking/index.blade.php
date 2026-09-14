@@ -79,7 +79,7 @@
                                     </td>
                                     <td>
                                         <div>
-                                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $item->telp) }}" target="_blank" class="text-decoration-none text-success fw-semibold fs-8">
+                                            <a href="https://wa.me/{{ $item->whatsapp_number }}" target="_blank" class="text-decoration-none text-success fw-semibold fs-8" title="Hubungi via WhatsApp">
                                                 <i class="bi bi-whatsapp me-1"></i>{{ $item->telp }}
                                             </a>
                                         </div>

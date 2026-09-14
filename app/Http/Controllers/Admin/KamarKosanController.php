@@ -361,6 +361,7 @@ class KamarKosanController extends Controller
             'telp'              => 'required|string|max:25',
             'email'             => 'required|email|max:255',
             'start_date'        => 'required|date',
+            'payment_method'    => 'nullable|string',
             'proof_of_transfer' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
@@ -380,7 +381,7 @@ class KamarKosanController extends Controller
             'start_time'             => $request->start_time ?: $dataTamu->start_time,
             'start_date'             => $bookingDate['start'],
             'end_date'               => $bookingDate['end'],
-            'payment_method'         => $dataTamu->payment_method,
+            'payment_method'         => $request->payment_method ?: ($dataTamu->payment_method ?: 'cash'),
             'total_price'            => $serverCalculatedPrice,
         ];
 
@@ -394,7 +395,8 @@ class KamarKosanController extends Controller
 
         $dataTamu->update($data);
 
-        return back()->with('success', 'Berhasil memperpanjang sewa ' . $dataTamu->name);
+        $formattedEndDate = \Carbon\Carbon::parse($bookingDate['end'])->isoFormat('D MMMM Y');
+        return back()->with('success', "Masa sewa atas nama {$dataTamu->name} berhasil diperpanjang hingga {$formattedEndDate}.");
     }
 
     public function deleteTamu($product_kosan, $product_kamar_kosan, $tamu)

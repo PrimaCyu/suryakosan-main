@@ -99,17 +99,39 @@
                                         </button>
 
                                         <!-- Delete Button -->
+                                        @if(Auth::user()->isSuperAdmin())
                                         <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalDelete{{ $item->id }}" title="Hapus Kosan">
                                             <i class="bi bi-trash"></i>
                                         </button>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
                                 <td colspan="7" class="text-center text-muted py-5">
-                                    <i class="bi bi-house-x display-6 d-block mb-2 text-secondary opacity-50"></i>
-                                    Belum ada data kos-kosan yang ditambahkan.
+                                    <div class="py-4">
+                                        <i class="bi bi-houses display-6 d-block mb-2 text-secondary opacity-50"></i>
+                                        <h6 class="fw-bold text-dark mb-1">
+                                            @if(Auth::user()->isSuperAdmin())
+                                                Belum Ada Data Kos-Kosan Terdaftar
+                                            @else
+                                                Belum Ada Properti Kos yang Ditugaskan
+                                            @endif
+                                        </h6>
+                                        <p class="text-muted fs-8 mb-3" style="max-width: 480px; margin: auto;">
+                                            @if(Auth::user()->isSuperAdmin())
+                                                Mulai tambahkan kos-kosan baru dengan mengklik tombol <strong>Tambah Kosan Baru</strong> di atas.
+                                            @else
+                                                Akun Anda berstatus <strong>Admin Cabang</strong>. Anda hanya dapat mengelola properti kos yang telah ditugaskan secara resmi oleh Super Admin. Silakan hubungi Super Admin untuk penugasan properti cabang.
+                                            @endif
+                                        </p>
+                                        @if(Auth::user()->isSuperAdmin())
+                                            <button type="button" class="btn btn-sm btn-primary px-3 rounded-pill" data-bs-toggle="modal" data-bs-target="#modalTambah">
+                                                <i class="bi bi-plus-lg me-1"></i> Tambah Kosan Sekarang
+                                            </button>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @endforelse
@@ -238,6 +260,7 @@
             </div>
 
             <!-- MODAL DELETE KOSAN -->
+            @if(Auth::user()->isSuperAdmin())
             <div class="modal fade" id="modalDelete{{ $item->id }}" tabindex="-1" aria-labelledby="modalDeleteLabel{{ $item->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-sm">
                     <div class="modal-content border-0 shadow-lg">
@@ -263,6 +286,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             <!-- MODAL IMAGE GALLERY KOSAN -->
             <div class="modal fade" id="modalImageKosan{{ $item->id }}" tabindex="-1" aria-hidden="true">

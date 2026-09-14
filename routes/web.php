@@ -77,9 +77,9 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function(){
     Route::prefix('/product-kosan')->controller(KosanController::class)->name('product.kosan')->group(function(){
         Route::get('/index', 'index')->name('.index');
         Route::get('/search-ajax', 'searchKosan')->name('.search.ajax');
-        Route::post('/insert', 'insert')->name('.insert');
+        Route::post('/insert', 'insert')->name('.insert')->middleware('super_admin');
         Route::put('/update/{product_kosan}', 'update')->name('.update');
-        Route::delete('/delete/{product_kosan}', 'delete')->name('.delete');
+        Route::delete('/delete/{product_kosan}', 'delete')->name('.delete')->middleware('super_admin');
 
         Route::get('/image/{product_kosan}', 'indexImage')->name('.image.index');
         Route::post('/image/{product_kosan}/insert', 'insertImage')->name('.image.insert');

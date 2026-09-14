@@ -601,6 +601,18 @@
                 }
             }
         });
+
+        // Auto-open tamu modal if triggered directly from dashboard due date alerts
+        @if(request('open_tamu_kamar'))
+            document.addEventListener('DOMContentLoaded', function() {
+                const targetModalId = 'modalTamuKamar{{ request('open_tamu_kamar') }}';
+                const modalEl = document.getElementById(targetModalId);
+                if (modalEl) {
+                    const bsModal = new bootstrap.Modal(modalEl);
+                    bsModal.show();
+                }
+            });
+        @endif
     })();
 </script>
 

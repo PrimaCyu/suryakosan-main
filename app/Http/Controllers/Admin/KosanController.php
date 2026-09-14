@@ -89,6 +89,10 @@ class KosanController extends Controller
 
     public function insert(Request $request)
     {
+        if (!auth()->user()->isSuperAdmin()) {
+            abort(403, 'Akses ditolak. Hanya Super Admin yang berhak menambahkan properti kos-kosan baru.');
+        }
+
         $request->validate([
             'title'       => 'required|string|max:255',
             'wilayah'     => 'nullable|string|max:255',
@@ -115,9 +119,6 @@ class KosanController extends Controller
         ];
 
         $kosan = ProductKosan::create($data);
-        if (auth()->user()->isAdmin()) {
-            $kosan->admins()->attach(auth()->id());
-        }
 
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
             $path = $request->file('image')->store('kosan/image', 'public');
@@ -181,7 +182,10 @@ class KosanController extends Controller
 
     public function delete($product_kosan)
     {
-        $this->checkKosanAccess($product_kosan);
+        if (!auth()->user()->isSuperAdmin()) {
+            abort(403, 'Akses ditolak. Hanya Super Admin yang berhak menghapus properti kos-kosan.');
+        }
+
         $productKosan = ProductKosan::findOrFail($product_kosan);
         $slug = $productKosan->slug;
         $productKosan->delete();
@@ -189,7 +193,7 @@ class KosanController extends Controller
         Cache::forget('home_kamar_list');
         Cache::forget("kosan_detail_{$slug}");
 
-        return back()->with('success', 'delete success');
+        return back()->with('success', 'Properti Kos-kosan berhasil dihapus');
     }
 
     // IMAGE KOSAN

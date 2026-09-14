@@ -40,7 +40,7 @@
                                     </td>
                                     <td>
                                         <div>
-                                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $tamu->telp) }}" target="_blank" class="text-decoration-none text-success fw-semibold fs-7">
+                                            <a href="https://wa.me/{{ $tamu->whatsapp_number }}" target="_blank" class="text-decoration-none text-success fw-semibold fs-7" title="Hubungi via WhatsApp">
                                                 <i class="bi bi-whatsapp me-1"></i>{{ $tamu->telp }}
                                             </a>
                                         </div>
@@ -72,8 +72,24 @@
                                     </td>
                                     <td class="text-center">
                                         <div class="d-inline-flex gap-1">
+                                            @php
+                                                $kosanTitle = $kosan->title ?? 'Sinar Citra Lestari';
+                                                $endDateStr = \Carbon\Carbon::parse($tamu->end_date)->isoFormat('D MMMM Y');
+                                                $priceStr = number_format($tamu->total_price, 0, ',', '.');
+                                                $pesanWA = "Halo Kak *{$tamu->name}*,\n\n"
+                                                         . "Kami dari pengelola *{$kosanTitle}* (Sinar Citra Lestari).\n"
+                                                         . "Mengingatkan bahwa masa sewa kamar *{$item->room}* Anda akan berakhir pada *{$endDateStr}*.\n\n"
+                                                         . "Apakah Kakak berencana untuk memperpanjang sewa untuk periode berikutnya?\n"
+                                                         . "Biaya sewa: *Rp {$priceStr}*.\n\n"
+                                                         . "Mohon konfirmasinya ya Kak. Terima kasih! 🙏";
+                                                $waHref = "https://wa.me/{$tamu->whatsapp_number}?text=" . rawurlencode($pesanWA);
+                                            @endphp
+                                            <!-- Tombol Chat WA -->
+                                            <a href="{{ $waHref }}" target="_blank" class="btn btn-sm btn-outline-success py-1 px-2" title="Kirim Tagihan via WhatsApp">
+                                                <i class="bi bi-whatsapp"></i> Chat
+                                            </a>
                                             <!-- Tombol Perpanjang / Renew Tamu -->
-                                            <button type="button" class="btn btn-sm btn-outline-success py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalRenewTamu{{ $tamu->id }}" title="Perpanjang Sewa">
+                                            <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalRenewTamu{{ $tamu->id }}" title="Perpanjang Sewa">
                                                 <i class="bi bi-arrow-repeat"></i> Perpanjang
                                             </button>
                                             <!-- Tombol Hapus Tamu -->
@@ -114,7 +130,7 @@
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="{{ route('admin.product.kosan.kamar.tamu.renew',['product_kosan' => $product_kosan, 'product_kamar_kosan' => $item->id, 'tamu' => $tamu->id]) }}" method="POST">
+                <form action="{{ route('admin.product.kosan.kamar.tamu.renew',['product_kosan' => $product_kosan, 'product_kamar_kosan' => $item->id, 'tamu' => $tamu->id]) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="modal-body p-4" style="max-height: 75vh; overflow-y: auto;">
@@ -160,48 +176,69 @@
                         </div>
 
                         <!-- SEKSI DURASI PERPANJANGAN -->
-                        <h6 class="fw-bold text-dark mb-3 pb-1 border-bottom">
-                            <i class="bi bi-hourglass-split text-warning me-1"></i> Durasi Perpanjangan Sewa
-                        </h6>
+                        <div class="d-flex align-items-center justify-content-between mb-2 pb-1 border-bottom">
+                            <h6 class="fw-bold text-dark mb-0">
+                                <i class="bi bi-hourglass-split text-warning me-1"></i> Durasi Perpanjangan Sewa
+                            </h6>
+                            <small class="text-muted">Pilih durasi sewa tambahan</small>
+                        </div>
+
+                        <!-- PILIHAN DURASI CEPAT -->
+                        <div class="mb-3 p-2.5 rounded-3 bg-body-tertiary border">
+                            <label class="form-label d-block mb-1.5 fs-8 fw-semibold text-secondary">
+                                <i class="bi bi-lightning-charge-fill text-warning me-1"></i>Pilih Durasi Cepat:
+                            </label>
+                            <div class="d-flex flex-wrap gap-1.5">
+                                <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-3 py-1" onclick="document.getElementById('renew_tahun_{{ $tamu->id }}').value=0; document.getElementById('renew_bulan_{{ $tamu->id }}').value=1;">
+                                    +1 Bulan
+                                </button>
+                                <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-3 py-1" onclick="document.getElementById('renew_tahun_{{ $tamu->id }}').value=0; document.getElementById('renew_bulan_{{ $tamu->id }}').value=3;">
+                                    +3 Bulan
+                                </button>
+                                <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-3 py-1" onclick="document.getElementById('renew_tahun_{{ $tamu->id }}').value=0; document.getElementById('renew_bulan_{{ $tamu->id }}').value=6;">
+                                    +6 Bulan
+                                </button>
+                                <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-3 py-1" onclick="document.getElementById('renew_tahun_{{ $tamu->id }}').value=1; document.getElementById('renew_bulan_{{ $tamu->id }}').value=0;">
+                                    +1 Tahun
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="row g-3">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label class="form-label">Tahun</label>
                                 <div class="input-group input-group-sm">
-                                    <input type="number" name="tahun" class="form-control" placeholder="0" min="0" value="0">
+                                    <input type="number" id="renew_tahun_{{ $tamu->id }}" name="tahun" class="form-control" placeholder="0" min="0" value="0">
                                     <span class="input-group-text bg-body-tertiary">Thn</span>
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label class="form-label">Bulan</label>
                                 <div class="input-group input-group-sm">
-                                    <input type="number" name="bulan" class="form-control" placeholder="0" min="0" value="0">
+                                    <input type="number" id="renew_bulan_{{ $tamu->id }}" name="bulan" class="form-control" placeholder="0" min="0" value="1">
                                     <span class="input-group-text bg-body-tertiary">Bln</span>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="col-md-4">
-                                <label class="form-label">Minggu</label>
-                                <div class="input-group input-group-sm">
-                                    <input type="number" name="minggu" class="form-control" placeholder="0" min="0" value="0">
-                                    <span class="input-group-text bg-body-tertiary">Mgg</span>
-                                </div>
-                            </div>
-
+                        <!-- SEKSI METODE PEMBAYARAN -->
+                        <h6 class="fw-bold text-dark mb-3 pb-1 border-bottom mt-4">
+                            <i class="bi bi-credit-card text-success me-1"></i> Pembayaran Perpanjangan
+                        </h6>
+                        <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label">Hari</label>
-                                <div class="input-group input-group-sm">
-                                    <input type="number" name="hari" class="form-control" placeholder="0" min="0" value="0">
-                                    <span class="input-group-text bg-body-tertiary">Hari</span>
-                                </div>
+                                <label class="form-label">Metode Pembayaran <span class="text-danger">*</span></label>
+                                <select name="payment_method" class="form-select" required>
+                                    <option value="cash" selected>Tunai / Cash (Di Tempat)</option>
+                                    <option value="transfer">Transfer Bank</option>
+                                    <option value="qris">QRIS</option>
+                                </select>
                             </div>
-
                             <div class="col-md-6">
-                                <label class="form-label">Jam</label>
-                                <div class="input-group input-group-sm">
-                                    <input type="number" name="jam" class="form-control" placeholder="0" min="0" value="0">
-                                    <span class="input-group-text bg-body-tertiary">Jam</span>
-                                </div>
+                                <label class="form-label">Unggah Bukti Pembayaran (Opsional)</label>
+                                <input type="file" name="proof_of_transfer" class="form-control" accept="image/jpeg,image/png,image/webp,image/jpg">
+                                <small class="text-muted fs-9">Format JPG, PNG, WEBP (Maks. 2MB)</small>
                             </div>
                         </div>
 

@@ -30,7 +30,7 @@
     </script>
     <!--end::Theme Init-->
 
-    <link rel="icon" href="{{ asset('logo.png') }}">
+    <link rel="icon" href="{{ asset('logo.png') }}?v={{ @filemtime(public_path('logo.png')) ?: '4' }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#4f46e5" media="(prefers-color-scheme: light)" />
@@ -81,7 +81,7 @@
         <!--begin::Container-->
         <div class="container-fluid">
           <!--begin::Start Navbar Links-->
-          <ul class="navbar-nav align-items-center">
+          <ul class="navbar-nav align-items-center gap-2">
             <li class="nav-item">
               <a
                 class="nav-link"
@@ -93,30 +93,118 @@
                 <i class="bi bi-list fs-5"></i>
               </a>
             </li>
-            <li class="nav-item d-none d-sm-inline-block ms-2">
-              <a href="{{ route('home') }}" target="_blank" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1 rounded-pill px-3">
-                <i class="bi bi-globe2"></i>
-                <span>Lihat Website</span>
-                <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.7rem;"></i>
-              </a>
+
+            <!-- Breadcrumb Navigation -->
+            <li class="nav-item d-none d-md-flex align-items-center">
+              <ol class="header-breadcrumb">
+                <li>
+                  <a href="{{ route('admin.dashboard') }}">Workspace</a>
+                  <i class="bi bi-chevron-right text-muted" style="font-size: 0.65rem;"></i>
+                </li>
+                <li class="active">
+                  @if(request()->routeIs('admin.dashboard'))
+                    Dashboard
+                  @elseif(request()->routeIs('admin.users.*'))
+                    Kelola Admin & Cabang
+                  @elseif(request()->routeIs('admin.product.kosan.*'))
+                    Kelola Kos-kosan
+                  @elseif(request()->routeIs('admin..booking.*'))
+                    Permintaan Booking
+                  @elseif(request()->routeIs('admin.artikel.*'))
+                    Artikel Blog
+                  @elseif(request()->routeIs('admin.testimoni.*'))
+                    Testimoni & Review
+                  @elseif(request()->routeIs('admin.sosial.media.*'))
+                    Sosial Media
+                  @elseif(request()->routeIs('admin.profile.*'))
+                    Pengaturan Akun
+                  @else
+                    Admin Panel
+                  @endif
+                </li>
+              </ol>
             </li>
           </ul>
           <!--end::Start Navbar Links-->
 
           <!--begin::End Navbar Links-->
-          <ul class="navbar-nav ms-auto align-items-center gap-1">
+          <ul class="navbar-nav ms-auto align-items-center gap-1.5">
 
-            <!--begin::Pending Bookings Notification-->
-            <li class="nav-item">
-              <a class="nav-link position-relative" href="{{ route('admin..booking.index') }}" title="Permintaan Booking">
+            <!-- Quick Search Palette Trigger -->
+            <li class="nav-item d-none d-sm-inline-block me-1">
+              <a href="#" class="nav-search-trigger" data-bs-toggle="modal" data-bs-target="#globalSearchModal" title="Pencarian Cepat (Ctrl+K)">
+                <i class="bi bi-search text-muted"></i>
+                <span class="d-none d-md-inline">Cari modul...</span>
+                <span class="nav-search-kbd">Ctrl K</span>
+              </a>
+            </li>
+
+            <!-- Public Portal Link -->
+            <li class="nav-item d-none d-lg-inline-block">
+              <a href="{{ route('home') }}" target="_blank" class="nav-link text-muted" title="Buka Website Publik">
+                <i class="bi bi-globe2"></i>
+                <span class="fs-8">Web Publik</span>
+                <i class="bi bi-box-arrow-up-right ms-0.5" style="font-size: 0.65rem;"></i>
+              </a>
+            </li>
+
+            <!-- Notification Center Popover Dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link position-relative" href="#" data-bs-toggle="dropdown" aria-expanded="false" title="Pusat Notifikasi">
                 <i class="bi bi-bell-fill fs-5"></i>
                 @if(isset($pendingBookingCount) && $pendingBookingCount > 0)
                   <span class="position-absolute top-1 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem;">
-                    {{ $pendingBookingCount }}
+                    {{ $pendingBookingCount > 99 ? '99+' : $pendingBookingCount }}
                     <span class="visually-hidden">booking pending</span>
                   </span>
                 @endif
               </a>
+              <div class="dropdown-menu dropdown-menu-end notification-dropdown-menu shadow-lg border-0 mt-2">
+                <div class="notification-dropdown-header">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="fw-bold fs-7 text-body-emphasis">Notifikasi Reservasi</span>
+                    @if(isset($pendingBookingCount) && $pendingBookingCount > 0)
+                      <span class="badge bg-danger rounded-pill px-2 py-0.5" style="font-size: 0.68rem;">{{ $pendingBookingCount }} Baru</span>
+                    @endif
+                  </div>
+                  <a href="{{ route('admin..booking.index') }}" class="fs-8 text-decoration-none text-primary fw-semibold">Buka Semua</a>
+                </div>
+                <div class="notification-dropdown-body">
+                  @if(isset($navbarPendingBookings) && $navbarPendingBookings->count() > 0)
+                    @foreach($navbarPendingBookings as $nb)
+                      <a href="{{ route('admin..booking.index') }}" class="notification-item">
+                        <div class="notification-item-icon">
+                          <i class="bi bi-calendar-check-fill"></i>
+                        </div>
+                        <div class="overflow-hidden flex-grow-1">
+                          <div class="d-flex justify-content-between align-items-center mb-0.5">
+                            <span class="fw-bold fs-8 text-body-emphasis text-truncate" style="max-width: 170px;">{{ $nb->name }}</span>
+                            <small class="text-muted fs-9">{{ \Carbon\Carbon::parse($nb->created_at)->diffForHumans() }}</small>
+                          </div>
+                          <div class="fs-8 text-muted text-truncate" style="max-width: 230px;">
+                            {{ $nb->productKamarKosan->productKosan->title ?? 'Kosan' }} &bull; Kamar {{ $nb->productKamarKosan->room ?? '-' }}
+                          </div>
+                          <div class="fw-semibold text-primary fs-9 mt-0.5">
+                            Rp {{ number_format((float)$nb->total_price, 0, ',', '.') }}
+                          </div>
+                        </div>
+                      </a>
+                    @endforeach
+                  @else
+                    <div class="text-center py-4 px-3 text-muted">
+                      <i class="bi bi-check-circle display-6 d-block mb-2 text-success opacity-75"></i>
+                      <div class="fw-bold fs-8 text-body-emphasis">Semua Reservasi Bersih</div>
+                      <small class="text-muted fs-9">Tidak ada permintaan booking yang menunggu konfirmasi saat ini.</small>
+                    </div>
+                  @endif
+                </div>
+                <div class="notification-dropdown-footer">
+                  <a href="{{ route('admin..booking.index') }}" class="btn btn-xs btn-outline-primary w-100 rounded-pill py-1.5 fw-semibold">
+                    <span>Lihat Seluruh Transaksi Booking</span>
+                    <i class="bi bi-arrow-right ms-1"></i>
+                  </a>
+                </div>
+              </div>
             </li>
             <!--end::Pending Bookings Notification-->
 
@@ -246,15 +334,16 @@
         <!--begin::Sidebar Brand-->
         <div class="sidebar-brand">
           <a href="{{ route('admin.dashboard') }}" class="brand-link">
-            <img
-              src="{{ asset('logo.png') }}"
-              alt="Sinar Citra Lestari"
-              class="brand-image"
-              style="max-height: 38px; border-radius: 6px; object-fit: contain; background: white; padding: 2px;"
-            />
+            <div class="brand-logo-box">
+              <img
+                src="{{ asset('logo.png') }}?v={{ @filemtime(public_path('logo.png')) ?: '4' }}"
+                alt="Sinar Citra Lestari"
+                class="brand-logo-img"
+              />
+            </div>
             <div class="brand-text-wrapper">
               <span class="brand-title">Sinar Citra</span>
-              <span class="brand-subtitle">Lestari Management</span>
+              <span class="brand-subtitle">Lestari</span>
             </div>
           </a>
         </div>
@@ -270,8 +359,8 @@
               data-accordion="false"
               id="navigation">
 
-              <!-- MENU UTAMA -->
-              <li class="nav-header">UTAMA</li>
+              <!-- OVERVIEW -->
+              <li class="nav-header">OVERVIEW</li>
 
               <li class="nav-item">
                 <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
@@ -280,19 +369,7 @@
                 </a>
               </li>
 
-              @if(Auth::user()->isSuperAdmin())
-              <!-- SUPER ADMIN SECTION -->
-              <li class="nav-header">SUPER ADMIN</li>
-
-              <li class="nav-item">
-                <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                  <i class="nav-icon bi bi-person-gear"></i>
-                  <p>Kelola Admin & Cabang</p>
-                </a>
-              </li>
-              @endif
-
-              <!-- KELOLA KOSAN & WILAYAH -->
+              <!-- PROPERTI & WILAYAH -->
               <li class="nav-header">PROPERTI & WILAYAH</li>
 
               <li class="nav-item">
@@ -302,7 +379,7 @@
                 </a>
               </li>
 
-              <!-- TRANSAKSI & BOOKING -->
+              <!-- TRANSAKSI & SEWA -->
               <li class="nav-header">TRANSAKSI & SEWA</li>
 
               <li class="nav-item">
@@ -312,12 +389,12 @@
                     <p class="mb-0">Permintaan Booking</p>
                   </span>
                   @if(isset($pendingBookingCount) && $pendingBookingCount > 0)
-                    <span class="badge bg-danger rounded-pill px-2 py-1 fs-7 fw-bold shadow-sm ms-2">{{ $pendingBookingCount }}</span>
+                    <span class="badge bg-danger rounded-pill px-2 py-0.5 fs-8 fw-bold ms-2">{{ $pendingBookingCount }}</span>
                   @endif
                 </a>
               </li>
 
-              <!-- PENGATURAN UMUM -->
+              <!-- KONTEN & INFORMASI -->
               <li class="nav-header">KONTEN & INFORMASI</li>
 
               <li class="nav-item">
@@ -341,12 +418,24 @@
                 </a>
               </li>
 
-              <!-- PENGATURAN SISTEM -->
+              @if(Auth::user()->isSuperAdmin())
+              <!-- SUPER ADMIN SECTION -->
+              <li class="nav-header">SUPER ADMIN</li>
+
+              <li class="nav-item">
+                <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                  <i class="nav-icon bi bi-person-gear"></i>
+                  <p>Kelola Admin & Cabang</p>
+                </a>
+              </li>
+              @endif
+
+              <!-- KEAMANAN & AKUN -->
               <li class="nav-header">KEAMANAN & AKUN</li>
 
               <li class="nav-item">
                 <a href="{{ route('admin.profile.edit') }}" class="nav-link {{ request()->routeIs('admin.profile.*') ? 'active' : '' }}">
-                  <i class="nav-icon bi bi-person-gear"></i>
+                  <i class="nav-icon bi bi-shield-lock-fill"></i>
                   <p>Pengaturan Akun</p>
                 </a>
               </li>
@@ -382,8 +471,8 @@
           <div>
             <strong>Copyright &copy; 2026 <a href="{{ route('home') }}" class="text-decoration-none fw-bold" style="color: var(--nk-primary, #0d9488);">Sinar Citra Lestari</a>.</strong> All rights reserved.
           </div>
-          <div class="d-none d-sm-inline">
-            Designed for Modern Property Management
+          <div class="d-none d-sm-inline text-secondary">
+            Sinar Citra Lestari &bull; Residence & Living
           </div>
         </div>
       </footer>
@@ -562,7 +651,117 @@
           }
         });
       });
+
+      // Quick Search Palette Modal (Ctrl+K or Cmd+K)
+      document.addEventListener('DOMContentLoaded', () => {
+        const searchModalEl = document.getElementById('globalSearchModal');
+        const searchInput = document.getElementById('globalQuickSearchInput');
+        const resultItems = document.querySelectorAll('#quickSearchResults .search-palette-item');
+
+        document.addEventListener('keydown', (e) => {
+          if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            if (searchModalEl) {
+              const modal = bootstrap.Modal.getOrCreateInstance(searchModalEl);
+              modal.show();
+              setTimeout(() => {
+                if (searchInput) searchInput.focus();
+              }, 250);
+            }
+          }
+        });
+
+        if (searchInput) {
+          searchInput.addEventListener('input', function () {
+            const query = this.value.toLowerCase().trim();
+            resultItems.forEach(item => {
+              const text = item.textContent.toLowerCase();
+              item.style.display = text.includes(query) ? 'flex' : 'none';
+            });
+          });
+        }
+      });
     </script>
+
+    <!-- Global Quick Search Palette Modal -->
+    <div class="modal fade search-palette-modal" id="globalSearchModal" tabindex="-1" aria-labelledby="globalSearchModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+          <div class="modal-header border-bottom p-2 px-3">
+            <div class="d-flex align-items-center gap-2 w-100">
+              <i class="bi bi-search text-primary fs-5"></i>
+              <input type="text" id="globalQuickSearchInput" class="form-control search-palette-input" placeholder="Ketik nama modul, halaman, atau pintasan..." autocomplete="off">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+          </div>
+          <div class="modal-body p-2" id="quickSearchResults">
+            <small class="text-muted px-3 py-1 d-block text-uppercase fs-9 fw-bold">Navigasi Langsung</small>
+            <a href="{{ route('admin.dashboard') }}" class="search-palette-item">
+              <i class="bi bi-grid-1x2-fill"></i>
+              <div>
+                <div class="fw-bold fs-8">Dashboard Utama</div>
+                <small class="text-muted fs-9">Statistik, KPI, dan permintaan booking terbaru</small>
+              </div>
+            </a>
+            <a href="{{ route('admin.product.kosan.index') }}" class="search-palette-item">
+              <i class="bi bi-house-door-fill"></i>
+              <div>
+                <div class="fw-bold fs-8">Kelola Kos-kosan</div>
+                <small class="text-muted fs-9">Daftar properti cabang dan unit kamar</small>
+              </div>
+            </a>
+            <a href="{{ route('admin..booking.index') }}" class="search-palette-item">
+              <i class="bi bi-calendar-check-fill"></i>
+              <div>
+                <div class="fw-bold fs-8">Permintaan Booking</div>
+                <small class="text-muted fs-9">Konfirmasi dan verifikasi pembayaran tamu sewa</small>
+              </div>
+            </a>
+            @if(Auth::user()->isSuperAdmin())
+            <a href="{{ route('admin.users.index') }}" class="search-palette-item">
+              <i class="bi bi-person-gear"></i>
+              <div>
+                <div class="fw-bold fs-8">Kelola Admin & Cabang</div>
+                <small class="text-muted fs-9">Atur penugasan dan akun admin kos</small>
+              </div>
+            </a>
+            @endif
+            <a href="{{ route('admin.artikel.index') }}" class="search-palette-item">
+              <i class="bi bi-file-earmark-text-fill"></i>
+              <div>
+                <div class="fw-bold fs-8">Artikel Blog & Promosi</div>
+                <small class="text-muted fs-9">Kelola berita, informasi, dan penawaran</small>
+              </div>
+            </a>
+            <a href="{{ route('admin.testimoni.index') }}" class="search-palette-item">
+              <i class="bi bi-chat-left-quote-fill"></i>
+              <div>
+                <div class="fw-bold fs-8">Testimoni & Review</div>
+                <small class="text-muted fs-9">Moderasi ulasan dan rating pengunjung</small>
+              </div>
+            </a>
+            <a href="{{ route('admin.sosial.media.index') }}" class="search-palette-item">
+              <i class="bi bi-share-fill"></i>
+              <div>
+                <div class="fw-bold fs-8">Sosial Media</div>
+                <small class="text-muted fs-9">Kelola tautan kanal komunikasi resmi</small>
+              </div>
+            </a>
+            <a href="{{ route('admin.profile.edit') }}" class="search-palette-item">
+              <i class="bi bi-shield-lock-fill"></i>
+              <div>
+                <div class="fw-bold fs-8">Pengaturan Akun</div>
+                <small class="text-muted fs-9">Ubah profil dan kata sandi admin</small>
+              </div>
+            </a>
+          </div>
+          <div class="modal-footer p-2 px-3 border-top bg-body-tertiary d-flex justify-content-between align-items-center">
+            <small class="text-muted fs-9">Tekan <kbd class="px-1.5 py-0.5 bg-body border rounded">ESC</kbd> untuk menutup</small>
+            <small class="text-muted fs-9">Sinar Citra Lestari System</small>
+          </div>
+        </div>
+      </div>
+    </div>
 
   </body>
 </html>

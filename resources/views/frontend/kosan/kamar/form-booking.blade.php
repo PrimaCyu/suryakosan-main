@@ -153,6 +153,7 @@
                 <div>
                   <label class="block font-semibold text-slate-700 mb-1">Nomor WhatsApp / HP <span class="text-rose-500">*</span></label>
                   <input type="tel" name="telp" id="input-wa" required placeholder="08123456XXXX" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl font-medium text-slate-800 focus:outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-100 transition-all">
+                  <p class="text-[11px] text-slate-400 mt-1">Gunakan format biasa (contoh: <code>081234567890</code>). Sistem otomatis mengonversi ke WhatsApp.</p>
                 </div>
               </div>
 
