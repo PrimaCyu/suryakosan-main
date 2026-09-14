@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NemuKOS - {{ $kamar->room ?? 'Detail Kamar' }}</title>
+  <title>Sinar Citra Lestari - {{ $kamar->room ?? 'Detail Kamar' }}</title>
   @vite(['resources/css/app.css', 'resources/js/app.js'])
-  <link rel="icon" href="{{ asset('logo.png') }}">
+  <link rel="icon" href="{{ asset('scl.png') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <style>
@@ -20,7 +20,7 @@
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased overflow-x-hidden">
+<body class="bg-[#fffaf7] text-[#3B2314] font-sans antialiased overflow-x-hidden">
 
     <!-- 1. BAR LOADING -->
     <div id="page-loader" class="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 to-blue-600 z-[100] transition-all duration-500 ease-out"></div>
@@ -29,7 +29,7 @@
     @include('frontend.navbar')
 
     <!-- MAIN CONTENT CONTAINER -->
-    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+    <main class="scl-surface max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
 
         @php
           $namaKosan = $kamar->productKosan->title ?? 'NemuKOS Properti';
@@ -74,9 +74,6 @@
 
     <!-- 8. FOOTER -->
     @include('frontend.footer')
-
-    <!-- 9. NEED HELP WIDGET -->
-    @include('frontend.need-help')
 
     <!-- JAVASCRIPT SYSTEM LOGIC -->
     <script>

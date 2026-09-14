@@ -282,7 +282,7 @@
 
     <div class="footer">
         Dokumen ini dibuat otomatis oleh sistem {{ config('app.name', 'NemuKos') }} pada {{ date('d/m/Y H:i:s') }}.<br>
-        Terima kasih telah mempercayakan hunian Anda kepada kami!
+        Terima kasih telah mempercayakan kosan Anda kepada kami!
     </div>
 
 </body>

@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
     ['email' => 'admin@example.com'],
     [
         'name' => 'Admin NemuKos',
-        'password' => 'password', // <-- ganti tanpa bcrypt()
+        'password' => bcrypt('password'), // Harus di-hash agar Auth Laravel bisa verifikasi
     ]
 );
 

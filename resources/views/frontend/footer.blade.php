@@ -1,78 +1,145 @@
-<footer class="bg-slate-900 text-slate-300 py-10 border-t border-slate-800 relative z-10">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<footer class="bg-[#3B2314] text-[#F8EFE6] border-t border-[#F3A833]/30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7">
 
-        <div class="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-slate-800/80">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-5">
 
-            <!-- 1. Brand Logo & Name -->
-            <a href="{{ url('/') }}" class="flex items-center gap-3 group transition-transform duration-300 hover:scale-105 shrink-0">
-                <div class="w-10 h-10 bg-cyan-500/10 rounded-2xl flex items-center justify-center border border-cyan-500/20 shadow-sm group-hover:shadow-cyan-500/20 group-hover:shadow-md transition-all">
-                    <img src="{{ asset('logo.png') }}" alt="NemuKOS Logo" loading="lazy" class="w-6 h-6 object-contain">
+            <!-- LOGO -->
+            <a
+                href="{{ route('login') }}"
+                aria-label="Login Sinar Citra Lestari"
+                class="group flex items-center gap-3 transition-all duration-300 hover:-translate-y-1"
+            >
+                <div class="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center rounded-2xl bg-white p-1.5 shadow-[0_5px_15px_rgba(0,0,0,0.18)] transition-all duration-300 group-hover:scale-105">
+                    <img
+                        src="{{ asset('scl.png') }}"
+                        alt="Sinar Citra Lestari Logo"
+                        loading="lazy"
+                        class="w-full h-full object-contain pointer-events-none"
+                    >
                 </div>
-                <div class="flex flex-col">
-                    <span class="text-lg font-bold text-white tracking-wide group-hover:text-cyan-400 transition-colors">NemuKOS</span>
-                    <span class="text-[10px] text-slate-400">Temukan Kamar Kos Impianmu</span>
-                </div>
+
+                <span class="text-base sm:text-lg font-black tracking-wide text-white transition-colors duration-300 group-hover:text-[#F3A833]">
+                    SINAR CITRA LESTARI
+                </span>
             </a>
 
-            <!-- 2. Quick Links -->
-            <div class="flex flex-wrap items-center justify-center gap-6 text-xs sm:text-sm font-medium text-slate-300">
-                <a href="{{ url('/') }}" class="hover:text-cyan-400 transition-colors">Beranda</a>
-                <a href="{{ route('kosan.index') }}" class="hover:text-cyan-400 transition-colors">Daftar Kos</a>
-                <a href="{{ route('news.index') }}" class="hover:text-cyan-400 transition-colors">News & Events</a>
-                <a href="https://wa.me/6282146138847" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-400 transition-colors">Bantuan</a>
-            </div>
 
-            <!-- 3. Social Media Buttons -->
-            <div class="flex items-center justify-center gap-2.5">
-                @php
-                    $sosmedIconMap = [
-                        'instagram' => 'fa-instagram',
-                        'facebook'  => 'fa-facebook-f',
-                        'twitter'   => 'fa-twitter',
-                        'x'         => 'fa-x-twitter',
-                        'youtube'   => 'fa-youtube',
-                        'tiktok'    => 'fa-tiktok',
-                        'linkedin'  => 'fa-linkedin-in',
-                        'whatsapp'  => 'fa-whatsapp',
-                        'telegram'  => 'fa-telegram',
-                    ];
-                @endphp
+            <!-- SOCIAL MEDIA -->
+            <div class="flex flex-col items-center sm:items-end gap-2">
 
-                @if(isset($globalSosmed) && $globalSosmed->count() > 0)
-                    @foreach($globalSosmed as $sm)
-                        @php
-                            $titleLower = strtolower(trim($sm->title));
-                            $iconClass = 'fa-globe';
-                            foreach ($sosmedIconMap as $key => $icon) {
-                                if (str_contains($titleLower, $key)) {
-                                    $iconClass = $icon;
-                                    break;
+                <span class="text-[10px] font-bold uppercase tracking-[0.18em] text-[#F8EFE6]/60">
+                    Ikuti Kami
+                </span>
+
+                <div class="flex items-center gap-2.5">
+
+                    @php
+                        $sosmedIconMap = [
+                            'instagram' => 'fa-instagram',
+                            'facebook'  => 'fa-facebook-f',
+                            'twitter'   => 'fa-twitter',
+                            'x'         => 'fa-x-twitter',
+                            'youtube'   => 'fa-youtube',
+                            'tiktok'    => 'fa-tiktok',
+                            'linkedin'  => 'fa-linkedin-in',
+                            'whatsapp'  => 'fa-whatsapp',
+                            'telegram'  => 'fa-telegram',
+                        ];
+                    @endphp
+
+                    @if(isset($globalSosmed) && $globalSosmed->count() > 0)
+
+                        @foreach($globalSosmed as $sm)
+
+                            @php
+                                $titleLower = strtolower(trim($sm->title));
+                                $iconClass = 'fa-globe';
+
+                                foreach ($sosmedIconMap as $key => $icon) {
+                                    if (str_contains($titleLower, $key)) {
+                                        $iconClass = $icon;
+                                        break;
+                                    }
                                 }
-                            }
-                        @endphp
-                        <a href="{{ $sm->url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $sm->title }}" title="{{ $sm->title }}" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-cyan-600 hover:text-white flex items-center justify-center text-slate-300 transition-all duration-200 hover:-translate-y-0.5">
-                            <i class="fa-brands {{ $iconClass }} text-sm"></i>
+                            @endphp
+
+                            <a
+                                href="{{ $sm->url }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="{{ $sm->title }}"
+                                title="{{ $sm->title }}"
+                                class="group w-10 h-10 rounded-xl
+                                       bg-[#F8EFE6]/10
+                                       border border-[#F8EFE6]/10
+                                       flex items-center justify-center
+                                       text-[#F8EFE6]
+                                       cursor-pointer
+                                       transition-all duration-300 ease-out
+                                       hover:-translate-y-1
+                                       hover:scale-105
+                                       hover:bg-[#F3A833]
+                                       hover:text-[#3B2314]
+                                       hover:border-[#F3A833]
+                                       hover:shadow-[0_8px_18px_rgba(243,168,51,0.30)]
+                                       active:scale-90"
+                            >
+                                <i
+                                    class="fa-brands {{ $iconClass }}
+                                           text-sm
+                                           pointer-events-none
+                                           select-none
+                                           transition-transform duration-300
+                                           group-hover:scale-110"
+                                ></i>
+                            </a>
+
+                        @endforeach
+
+                    @else
+
+                        <a
+                            href="https://instagram.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Instagram"
+                            class="group w-10 h-10 rounded-xl bg-[#F8EFE6]/10 border border-[#F8EFE6]/10 flex items-center justify-center text-[#F8EFE6] cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:bg-[#F3A833] hover:text-[#3B2314] hover:border-[#F3A833] hover:shadow-[0_8px_18px_rgba(243,168,51,0.30)] active:scale-90"
+                        >
+                            <i class="fa-brands fa-instagram text-sm pointer-events-none select-none"></i>
                         </a>
-                    @endforeach
-                @else
-                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-cyan-600 hover:text-white flex items-center justify-center text-slate-300 transition-all duration-200 hover:-translate-y-0.5">
-                        <i class="fa-brands fa-instagram text-sm"></i>
-                    </a>
-                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-cyan-600 hover:text-white flex items-center justify-center text-slate-300 transition-all duration-200 hover:-translate-y-0.5">
-                        <i class="fa-brands fa-facebook-f text-sm"></i>
-                    </a>
-                    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-cyan-600 hover:text-white flex items-center justify-center text-slate-300 transition-all duration-200 hover:-translate-y-0.5">
-                        <i class="fa-brands fa-twitter text-sm"></i>
-                    </a>
-                @endif
+
+                        <a
+                            href="https://facebook.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Facebook"
+                            class="group w-10 h-10 rounded-xl bg-[#F8EFE6]/10 border border-[#F8EFE6]/10 flex items-center justify-center text-[#F8EFE6] cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:bg-[#F3A833] hover:text-[#3B2314] hover:border-[#F3A833] hover:shadow-[0_8px_18px_rgba(243,168,51,0.30)] active:scale-90"
+                        >
+                            <i class="fa-brands fa-facebook-f text-sm pointer-events-none select-none"></i>
+                        </a>
+
+                        <a
+                            href="https://twitter.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Twitter"
+                            class="group w-10 h-10 rounded-xl bg-[#F8EFE6]/10 border border-[#F8EFE6]/10 flex items-center justify-center text-[#F8EFE6] cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:bg-[#F3A833] hover:text-[#3B2314] hover:border-[#F3A833] hover:shadow-[0_8px_18px_rgba(243,168,51,0.30)] active:scale-90"
+                        >
+                            <i class="fa-brands fa-twitter text-sm pointer-events-none select-none"></i>
+                        </a>
+
+                    @endif
+
+                </div>
             </div>
 
         </div>
 
-        <!-- 4. Copyright Bottom Bar -->
-        <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 text-center sm:text-left">
-            <p>&copy; {{ date('Y') }} NemuKOS. Seluruh hak cipta dilindungi undang-undang.</p>
-            <p class="text-[11px] text-slate-500">Dibuat dengan ❤️ untuk kenyamanan hunian Anda.</p>
+        <!-- COPYRIGHT -->
+        <div class="mt-6 pt-4 border-t border-[#F3A833]/15 text-center">
+            <p class="text-[10px] sm:text-xs text-[#F8EFE6]/50">
+                &copy; {{ date('Y') }} Sinar Citra Lestari. Seluruh hak cipta dilindungi.
+            </p>
         </div>
 
     </div>

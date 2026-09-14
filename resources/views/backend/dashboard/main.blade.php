@@ -29,7 +29,7 @@
     </script>
     <!--end::Theme Init-->
 
-    <link rel="icon" href="{{ asset('logo.png') }}">
+    <link rel="icon" href="{{ asset('scl.png') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#4f46e5" media="(prefers-color-scheme: light)" />
@@ -236,7 +236,7 @@
         <div class="sidebar-brand">
           <a href="{{ route('admin.dashboard') }}" class="brand-link">
             <img
-              src="{{ asset('logo.png') }}"
+              src="{{ asset('scl.png') }}"
               alt="NemuKos"
               class="brand-image"
             />

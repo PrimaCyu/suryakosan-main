@@ -9,6 +9,56 @@
 @theme {
     --font-sans: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-brand-red: #E60049;
+    --color-brand-dark: #3B2314;
+    --color-brand-yellow: #F3A833;
+    --color-brand-teal: #00A896;
+    --color-brand-cream: #fffaf7;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    background: #fffaf7;
+    color: #3B2314;
+}
+
+.scl-surface {
+    background: linear-gradient(135deg, #fffaf7 0%, #fff3e7 100%);
+    color: #3B2314;
+}
+
+.scl-card {
+    background: #fffdfb;
+    border: 1px solid rgba(59, 35, 20, 0.08);
+    box-shadow: 0 24px 80px rgba(59, 35, 20, 0.08);
+    border-radius: 2rem;
+}
+
+.scl-heading {
+    color: #3B2314;
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+}
+
+.scl-kicker {
+    background: #F3A833;
+    color: #3B2314;
+    border-radius: 999px;
+    padding: 0.45rem 1rem;
+    font-weight: 800;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+}
+
+.scl-button {
+    background: #00A896;
+    color: white;
+    border-radius: 999px;
+    font-weight: 800;
+}
+
+.scl-button:hover {
+    background: #E60049;
 }
 
 @layer utilities {
