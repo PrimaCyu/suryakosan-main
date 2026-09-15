@@ -8,9 +8,6 @@
                 <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-br from-[#E60049]/20 to-[#F3A833]/30 flex items-center justify-center p-1.5 shadow-sm border border-[#F3A833]/40 group-hover:border-[#E60049]/70 transition-all duration-300">
                     <img src="{{ asset('scl.png') }}" alt="Sinar Citra Lestari Logo" loading="lazy" class="w-full h-full object-contain">
                 </div>
-                <div class="flex flex-col">
-                    <span class="text-base sm:text-xl font-extrabold tracking-tight text-[#3B2314] group-hover:text-[#E60049] transition-colors">Sinar Citra Lestari</span>
-                </div>
             </a>
 
             <!-- Navigation Menu -->
@@ -52,10 +49,10 @@
     ></span>
 </a>
                 <a href="{{ route('kosan.index') }}" class="px-2.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-extrabold rounded-full transition-all duration-200 {{ Request::is('kosan*') || Request::is('kamar*') ? 'bg-[#00A896] text-white shadow-sm' : 'text-[#3B2314] hover:text-[#00A896] hover:bg-[#00A896]/10' }}">
-                    Kos-kosan
+                    Kos
                 </a>
                 <a href="{{ route('news.index') }}" class="px-2.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-extrabold rounded-full transition-all duration-200 {{ Request::is('news*') ? 'bg-[#F3A833]/20 text-[#3B2314] border border-[#F3A833]/40' : 'text-[#3B2314] hover:text-[#E60049] hover:bg-[#F3A833]/12' }}">
-                    News & Event
+                    Berita
                 </a>
                 <a href="https://wa.me/6282146138847" target="_blank" rel="noopener noreferrer" class="ml-1 px-3 py-1.5 sm:px-5 sm:py-2.5 bg-[#3B2314] hover:bg-[#E60049] text-white font-extrabold text-xs sm:text-sm rounded-full shadow-md shadow-[#3B2314]/20 hover:shadow-[#E60049]/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center gap-1.5 sm:gap-2">
                     <i class="fa-brands fa-whatsapp text-[#F3A833] text-sm"></i>

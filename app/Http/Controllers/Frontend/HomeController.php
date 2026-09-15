@@ -16,7 +16,6 @@ class HomeController extends Controller
     {
         $kamarList = Cache::remember('home_kamar_list', 3600, function () {
             return ProductKamarKosan::with(['productKosan.productImageKosan', 'productKamarImageKosan', 'priceKamar'])
-                        ->orderByDesc('views')
                         ->orderByDesc('created_at')
                         ->get();
         });

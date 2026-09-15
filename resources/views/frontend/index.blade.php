@@ -143,22 +143,22 @@
         <div class="absolute -top-10 -right-20 w-72 h-72 bg-[#F3A833]/15 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute bottom-0 -left-20 w-80 h-80 bg-[#00A896]/10 rounded-full blur-3xl pointer-events-none"></div>
 
-        <div class="relative rounded-[2.5rem] bg-[#3B2314] overflow-hidden shadow-2xl p-7 sm:p-10 lg:p-14 reveal">
-            <div class="absolute right-0 top-0 w-72 h-72 rounded-full bg-[#F3A833]/15 blur-2xl"></div>
-            <div class="absolute left-1/2 bottom-0 w-56 h-56 rounded-full bg-[#00A896]/10 blur-2xl"></div>
+        <div class="relative rounded-[2.5rem] overflow-hidden shadow-2xl reveal min-h-[420px] sm:min-h-[500px]">
+            <img src="https://images.unsplash.com/photo-1600566752355-35792bedcfea?auto=format&fit=crop&w=1800&q=80" alt="Eco Friendly Home" class="absolute inset-0 w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-r from-[#3B2314]/80 via-[#3B2314]/30 to-[#00A896]/20"></div>
 
-            <div class="relative grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
-                <div class="lg:col-span-7 text-white">
+            <div class="relative z-10 flex flex-col justify-center items-start min-h-[420px] sm:min-h-[500px] px-7 sm:px-10 lg:px-14 py-12 text-white">
+                <div class="mb-5 flex items-center gap-2">
+                    <span class="w-9 h-9 rounded-full bg-[#F3A833] text-[#3B2314] flex items-center justify-center shadow-lg">
+                        <i class="fa-solid fa-home text-sm"></i>
+                    </span>
+                </div>
 
-                    <h1 class="mt-5 text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.08] tracking-tight">
-                        Kos-Kosan <span class="text-[#F3A833]">Nyaman</span> & <span class="text-[#00A896]">Strategis</span>
+                <div class="max-w-3xl">
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.08] tracking-tight">
+                        Sinar Citra Lestari - Platform Pencarian & Sewa Kosan Terpercaya
                     </h1>
 
-                    <p class="mt-5 text-white/75 text-sm sm:text-base lg:text-lg max-w-xl leading-relaxed">
-                        Kami hadirkan kosan nyaman, sehat, dan strategis untuk kehidupan yang lebih tenang setiap harinya.
-                    </p>
-
-                    <!-- Search Bar Komponen -->
                     <form action="{{ route('kosan.index') }}" method="GET" class="mt-7 bg-white rounded-2xl p-2 flex flex-col sm:flex-row gap-2 max-w-2xl shadow-xl">
                         <div class="flex items-center flex-1 min-w-0">
                             <div class="w-10 h-10 rounded-xl bg-[#00A896]/10 text-[#00A896] flex items-center justify-center shrink-0">
@@ -170,32 +170,6 @@
                             Cari Kos
                         </button>
                     </form>
-                </div>
-
-                <!-- Hero Gallery: susunan berbeda, kartu bertumpuk -->
-                <div class="lg:col-span-5 relative min-h-[360px] sm:min-h-[430px]">
-                    <div class="absolute inset-x-6 top-5 bottom-5 bg-[#F3A833]/15 rounded-[2rem] rotate-3"></div>
-
-                    <div class="absolute left-0 top-8 w-[62%] h-72 sm:h-80 rounded-[2rem] overflow-hidden border-4 border-white/10 shadow-2xl scl-float">
-                        <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80" alt="Kamar Utama" loading="lazy" class="w-full h-full object-cover">
-                        <div class="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-[#3B2314]/80 to-transparent">
-                            <span class="text-white font-bold text-sm">Kamar Nyaman & Bersih</span>
-                        </div>
-                    </div>
-
-                    <div class="absolute right-0 top-0 w-[48%] h-44 sm:h-52 rounded-[2rem] overflow-hidden border-4 border-white/10 shadow-xl rotate-2">
-                        <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=600&q=80" alt="Ruang Tamu" loading="lazy" class="w-full h-full object-cover">
-                        <div class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-[#3B2314]/75 to-transparent">
-                            <span class="text-white font-bold text-xs">Area Bersama Asri</span>
-                        </div>
-                    </div>
-
-                    <div class="absolute right-2 bottom-2 w-[54%] h-48 sm:h-56 rounded-[2rem] overflow-hidden border-4 border-white/10 shadow-2xl -rotate-2">
-                        <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=600&q=80" alt="Interior Kos" loading="lazy" class="w-full h-full object-cover">
-                        <div class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-[#3B2314]/75 to-transparent">
-                            <span class="text-white font-bold text-xs">Fasilitas Lengkap</span>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -252,13 +226,20 @@
             @endphp
 
             @if($kamarList->count() > 0)
-                <!-- Container Card Slider Manual -->
-                <div class="relative">
-                    <div class="absolute left-0 top-0 bottom-6 w-8 bg-gradient-to-r from-[#3B2314] to-transparent z-10 pointer-events-none"></div>
-                    <div class="absolute right-0 top-0 bottom-6 w-8 bg-gradient-to-l from-[#3B2314] to-transparent z-10 pointer-events-none"></div>
+                @php
+                    $groupedKamar = $kamarList
+                        ->groupBy(function ($kamar) {
+                            return $kamar->productKosan->wilayah ?? 'Lainnya';
+                        })
+                        ->map(function ($group) {
+                            return $group->take(3);
+                        })
+                        ->flatten(1);
+                @endphp
 
-                    <div class="flex overflow-x-auto gap-5 pb-6 pt-2 no-scrollbar scroll-smooth" id="kos-card-container">
-                        @foreach ($kamarList as $kamar)
+                <div class="relative">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5" id="kos-card-container">
+                        @foreach ($groupedKamar as $kamar)
                             @php
                                 $firstImg = $kamar->productKamarImageKosan->first();
 
@@ -283,8 +264,7 @@
                                 $kosanJudul = $kamar->productKosan->title ?? 'Kost Properti';
                             @endphp
 
-                            <!-- CARD KAMAR -->
-                            <div class="kos-card w-72 sm:w-80 bg-[#FFFCF8] rounded-[2rem] shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 shrink-0 border border-[#F3A833]/20 flex flex-col overflow-hidden group" data-wilayah="{{ Str::slug($wilayahNama) }}">
+                            <div class="kos-card bg-[#FFFCF8] rounded-[2rem] shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 shrink-0 border border-[#F3A833]/20 flex flex-col overflow-hidden group" data-wilayah="{{ Str::slug($wilayahNama) }}">
                                 <div class="relative overflow-hidden h-52 bg-[#6B4630]/10">
                                     <img src="{{ $imgUrl }}" alt="{{ $kamar->room }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
 
@@ -317,7 +297,6 @@
                                             <i class="fa-solid fa-location-dot text-[#E60049]"></i> {{ $wilayahNama }}
                                         </p>
 
-                                        <!-- Fasilitas -->
                                         <div class="flex flex-wrap items-center gap-1.5 my-4 text-[11px] font-medium min-h-[28px]">
                                             @forelse(array_slice($fasilitasArr, 0, 3) as $fas)
                                                 @php $iconClass = $iconMap[$fas] ?? 'fa-check'; @endphp
@@ -336,7 +315,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Harga & Aksi -->
                                     <div class="flex items-end justify-between pt-4 border-t border-[#3B2314]/10 mt-2">
                                         <div>
                                             <span class="block text-[10px] uppercase tracking-wider font-bold text-[#6B4630]/60">Mulai dari</span>
@@ -460,58 +438,68 @@
                 </div>
             </div>
 
-            <!-- Slider Cards dibuat full-width, bukan kolom kanan -->
-            <div class="overflow-hidden relative w-full rounded-[2rem]">
-                <div class="animate-infinite-scroll gap-5 py-3">
-                    @forelse($testimonis as $t)
-                        @php
-                            $profileImg = $t->image_profile
-                                ? asset('storage/' . $t->image_profile)
-                                : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80';
-                            $ratingVal = max(1, min(5, (int) $t->rating));
-                        @endphp
+            <div class="relative w-full rounded-[2rem]">
+                <div class="flex items-center justify-end gap-2 mb-3">
+                    <button type="button" class="manual-testimoni-scroll prev w-10 h-10 rounded-full bg-[#3B2314] text-white hover:bg-[#E60049] transition-all shadow-md flex items-center justify-center">
+                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                    </button>
+                    <button type="button" class="manual-testimoni-scroll next w-10 h-10 rounded-full bg-[#3B2314] text-white hover:bg-[#E60049] transition-all shadow-md flex items-center justify-center">
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
 
-                        <div class="w-80 bg-[#FFFCF8] p-6 rounded-[2rem] shadow-lg shrink-0 space-y-4 border border-[#F3A833]/20">
-                            <div class="flex items-center justify-between">
-                                <div class="flex text-[#F3A833] text-xs gap-1">
-                                    @for($i = 1; $i <= $ratingVal; $i++)
-                                        <i class="fa-solid fa-star"></i>
-                                    @endfor
-                                    @for($j = $ratingVal + 1; $j <= 5; $j++)
-                                        <i class="fa-regular fa-star text-[#6B4630]/20"></i>
-                                    @endfor
+                <div class="overflow-x-auto no-scrollbar scroll-smooth rounded-[2rem] pb-2" id="testimonial-scroller">
+                    <div class="flex gap-4 py-3">
+                        @forelse($testimonis as $t)
+                            @php
+                                $profileImg = $t->image_profile
+                                    ? asset('storage/' . $t->image_profile)
+                                    : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80';
+                                $ratingVal = max(1, min(5, (int) $t->rating));
+                            @endphp
+
+                            <div class="w-64 bg-[#FFFCF8] p-4 rounded-[1.75rem] shadow-lg shrink-0 space-y-3 border border-[#F3A833]/20">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex text-[#F3A833] text-[11px] gap-1">
+                                        @for($i = 1; $i <= $ratingVal; $i++)
+                                            <i class="fa-solid fa-star"></i>
+                                        @endfor
+                                        @for($j = $ratingVal + 1; $j <= 5; $j++)
+                                            <i class="fa-regular fa-star text-[#6B4630]/20"></i>
+                                        @endfor
+                                    </div>
+                                    <i class="fa-solid fa-quote-right text-[#E60049]/20 text-lg"></i>
                                 </div>
-                                <i class="fa-solid fa-quote-right text-[#E60049]/20 text-xl"></i>
-                            </div>
 
-                            <p class="text-[#6B4630] text-xs leading-relaxed font-medium">
-                                "{{ $t->review }}"
-                            </p>
+                                <p class="text-[#6B4630] text-[11px] leading-relaxed font-medium">
+                                    "{{ $t->review }}"
+                                </p>
 
-                            <div class="flex items-center gap-3 pt-3 border-t border-[#3B2314]/10">
-                                <img src="{{ $profileImg }}" alt="{{ $t->name }}" loading="lazy" class="w-10 h-10 rounded-full object-cover shadow-sm border-2 border-[#F3A833]/30">
-                                <div>
-                                    <h4 class="font-bold text-[#3B2314] text-xs">{{ $t->name }}</h4>
-                                    <span class="text-[10px] text-[#00A896] font-semibold">Penyewa Terverifikasi</span>
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="w-80 bg-[#FFFCF8] p-6 rounded-[2rem] shadow-lg shrink-0 space-y-4 border border-[#F3A833]/20">
-                            <div class="flex text-[#F3A833] text-xs gap-1">
-                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                            </div>
-                            <p class="text-[#6B4630] text-xs leading-relaxed font-medium">
-                                "Sangat mudah menemukan kos yang nyaman dan fasilitas lengkap di NemuKOS. Pelayanannya cepat dan terpercaya!"
-                            </p>
-                            <div class="flex items-center gap-3 pt-3 border-t border-[#3B2314]/10">
-                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="Siska Amelia" loading="lazy" class="w-10 h-10 rounded-full object-cover shadow-sm border-2 border-[#F3A833]/30">
-                                <div>
-                                    <h4 class="font-bold text-[#3B2314] text-xs">Siska Amelia</h4>
+                                <div class="flex items-center gap-3 pt-3 border-t border-[#3B2314]/10">
+                                    <img src="{{ $profileImg }}" alt="{{ $t->name }}" loading="lazy" class="w-9 h-9 rounded-full object-cover shadow-sm border-2 border-[#F3A833]/30">
+                                    <div>
+                                        <h4 class="font-bold text-[#3B2314] text-[11px]">{{ $t->name }}</h4>
+                                        <span class="text-[10px] text-[#00A896] font-semibold">Penyewa Terverifikasi</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    @endforelse
+                        @empty
+                            <div class="w-64 bg-[#FFFCF8] p-4 rounded-[1.75rem] shadow-lg shrink-0 space-y-3 border border-[#F3A833]/20">
+                                <div class="flex text-[#F3A833] text-[11px] gap-1">
+                                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                </div>
+                                <p class="text-[#6B4630] text-[11px] leading-relaxed font-medium">
+                                    "Sangat mudah menemukan kos yang nyaman dan fasilitas lengkap di NemuKOS. Pelayanannya cepat dan terpercaya!"
+                                </p>
+                                <div class="flex items-center gap-3 pt-3 border-t border-[#3B2314]/10">
+                                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="Siska Amelia" loading="lazy" class="w-9 h-9 rounded-full object-cover shadow-sm border-2 border-[#F3A833]/30">
+                                    <div>
+                                        <h4 class="font-bold text-[#3B2314] text-[11px]">Siska Amelia</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforelse
+                    </div>
                 </div>
             </div>
         </div>
@@ -583,6 +571,21 @@
                 });
             });
         });
+
+        // Manual testimonial scroll arrows
+        const testimonialScroller = document.getElementById('testimonial-scroller');
+        const testimonialPrev = document.querySelector('.manual-testimoni-scroll.prev');
+        const testimonialNext = document.querySelector('.manual-testimoni-scroll.next');
+
+        if (testimonialScroller && testimonialPrev && testimonialNext) {
+            testimonialPrev.addEventListener('click', () => {
+                testimonialScroller.scrollBy({ left: -260, behavior: 'smooth' });
+            });
+
+            testimonialNext.addEventListener('click', () => {
+                testimonialScroller.scrollBy({ left: 260, behavior: 'smooth' });
+            });
+        }
 
         // Flash Modal Close
         function closeSuccessModal() {
