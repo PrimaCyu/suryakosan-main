@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminManagementController;
 use App\Http\Controllers\Admin\BookingAdminController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KamarKosanController;
 use App\Http\Controllers\Admin\KosanController;
+use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Frontend\HomeController;
@@ -19,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:5,1')->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 /*
@@ -39,7 +41,7 @@ Route::get('/kamar/booking/{product_kamar_kosan}', function($product_kamar_kosan
     return view('frontend.kosan.kamar.form-booking', compact('kamar'));
 })->name('form.booking.kamar');
 
-Route::post('/booking/kamar/{product_kamar_kosan}', [TamuBookingController::class, 'booking'])->name('tamu.booking');
+Route::post('/booking/kamar/{product_kamar_kosan}', [TamuBookingController::class, 'booking'])->middleware('throttle:10,1')->name('tamu.booking');
 
 Route::get('/check-date/kamar/{id}', function($id) {
     $kamar = ProductKamarKosan::find($id);
@@ -47,7 +49,7 @@ Route::get('/check-date/kamar/{id}', function($id) {
         return response()->json([], 404);
     }
     $tamu = $kamar->tamu()
-                    ->where('status', 'approved')
+                    ->whereIn('status', ['approved', 'pending'])
                     ->select('start_date', 'end_date')
                     ->get();
 
@@ -63,13 +65,21 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function(){
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Admin & Cabang Management (Super Admin only)
+    Route::prefix('/users')->middleware(['super_admin'])->controller(AdminManagementController::class)->name('users.')->group(function(){
+        Route::get('/', 'index')->name('index');
+        Route::post('/store', 'store')->name('store');
+        Route::put('/update/{user}', 'update')->name('update');
+        Route::delete('/destroy/{user}', 'destroy')->name('destroy');
+    });
+
     // Kosan Management
     Route::prefix('/product-kosan')->controller(KosanController::class)->name('product.kosan')->group(function(){
         Route::get('/index', 'index')->name('.index');
         Route::get('/search-ajax', 'searchKosan')->name('.search.ajax');
-        Route::post('/insert', 'insert')->name('.insert');
+        Route::post('/insert', 'insert')->name('.insert')->middleware('super_admin');
         Route::put('/update/{product_kosan}', 'update')->name('.update');
-        Route::delete('/delete/{product_kosan}', 'delete')->name('.delete');
+        Route::delete('/delete/{product_kosan}', 'delete')->name('.delete')->middleware('super_admin');
 
         Route::get('/image/{product_kosan}', 'indexImage')->name('.image.index');
         Route::post('/image/{product_kosan}/insert', 'insertImage')->name('.image.insert');
@@ -139,6 +149,13 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function(){
         Route::post('/insert', 'insert')->name('.insert');
         Route::put('/update/{testimoni}', 'update')->name('.update');
         Route::delete('/delete/{testimoni}', 'delete')->name('.delete');
+    });
+
+    // Profile & Password Management
+    Route::prefix('/profile')->controller(ProfileController::class)->name('profile.')->group(function(){
+        Route::get('/', 'edit')->name('edit');
+        Route::put('/update', 'updateProfile')->name('update');
+        Route::put('/password', 'updatePassword')->name('password');
     });
 
 });

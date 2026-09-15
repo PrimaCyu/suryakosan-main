@@ -153,6 +153,7 @@
                 <div>
                   <label class="block font-semibold text-slate-700 mb-1">Nomor WhatsApp / HP <span class="text-rose-500">*</span></label>
                   <input type="tel" name="telp" id="input-wa" required placeholder="08123456XXXX" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl font-medium text-slate-800 focus:outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-100 transition-all">
+                  <p class="text-[11px] text-slate-400 mt-1">Gunakan format biasa (contoh: <code>081234567890</code>). Sistem otomatis mengonversi ke WhatsApp.</p>
                 </div>
               </div>
 
@@ -173,29 +174,43 @@
 
             <div class="space-y-4 text-xs sm:text-sm">
               <div>
-                <span class="block font-semibold text-slate-700 mb-2">Durasi Sewa</span>
-                <div class="grid grid-cols-5 gap-2">
-                  <div>
-                    <label class="block text-[10px] text-slate-400 font-semibold mb-1 text-center">Jam</label>
-                    <input type="number" id="durasi-jam" name="jam" value="0" min="0" class="w-full px-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-center font-bold text-slate-800 focus:outline-none focus:border-cyan-600">
+                <span class="block font-semibold text-slate-700 mb-2">Pilih Durasi Sewa <span class="text-rose-500">*</span></span>
+                <!-- Hidden inputs for legacy categories -->
+                <input type="hidden" id="durasi-jam" name="jam" value="0">
+                <input type="hidden" id="durasi-hari" name="hari" value="0">
+                <input type="hidden" id="durasi-minggu" name="minggu" value="0">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div class="p-3.5 sm:p-4 rounded-2xl border-2 border-cyan-100 bg-cyan-50/30 hover:border-cyan-400 transition-all">
+                    <div class="flex items-center justify-between mb-2">
+                      <label for="durasi-bulan" class="text-xs font-bold text-slate-800 flex items-center gap-1.5 cursor-pointer">
+                        <i class="fa-solid fa-calendar text-cyan-600 text-sm"></i> Durasi Bulanan
+                      </label>
+                      <span class="text-[10px] font-semibold text-cyan-700 bg-cyan-100/70 px-2 py-0.5 rounded-full">Per Bulan</span>
+                    </div>
+                    <div class="relative">
+                      <input type="number" id="durasi-bulan" name="bulan" value="1" min="0" class="w-full pl-4 pr-16 py-2.5 bg-white border border-slate-200 rounded-xl font-extrabold text-slate-800 text-base focus:outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-100 transition-all">
+                      <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400 pointer-events-none">Bulan</span>
+                    </div>
                   </div>
-                  <div>
-                    <label class="block text-[10px] text-slate-400 font-semibold mb-1 text-center">Hari</label>
-                    <input type="number" id="durasi-hari" name="hari" value="0" min="0" class="w-full px-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-center font-bold text-slate-800 focus:outline-none focus:border-cyan-600">
-                  </div>
-                  <div>
-                    <label class="block text-[10px] text-slate-400 font-semibold mb-1 text-center">Minggu</label>
-                    <input type="number" id="durasi-minggu" name="minggu" value="0" min="0" class="w-full px-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-center font-bold text-slate-800 focus:outline-none focus:border-cyan-600">
-                  </div>
-                  <div>
-                    <label class="block text-[10px] text-slate-400 font-semibold mb-1 text-center">Bulan</label>
-                    <input type="number" id="durasi-bulan" name="bulan" value="1" min="0" class="w-full px-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-center font-bold text-slate-800 focus:outline-none focus:border-cyan-600">
-                  </div>
-                  <div>
-                    <label class="block text-[10px] text-slate-400 font-semibold mb-1 text-center">Tahun</label>
-                    <input type="number" id="durasi-tahun" name="tahun" value="0" min="0" class="w-full px-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-center font-bold text-slate-800 focus:outline-none focus:border-cyan-600">
+
+                  <div class="p-3.5 sm:p-4 rounded-2xl border-2 border-slate-200 bg-slate-50/50 hover:border-cyan-400 transition-all">
+                    <div class="flex items-center justify-between mb-2">
+                      <label for="durasi-tahun" class="text-xs font-bold text-slate-800 flex items-center gap-1.5 cursor-pointer">
+                        <i class="fa-solid fa-calendar-days text-cyan-600 text-sm"></i> Durasi Tahunan
+                      </label>
+                      <span class="text-[10px] font-semibold text-slate-600 bg-slate-200/70 px-2 py-0.5 rounded-full">Per Tahun</span>
+                    </div>
+                    <div class="relative">
+                      <input type="number" id="durasi-tahun" name="tahun" value="0" min="0" class="w-full pl-4 pr-16 py-2.5 bg-white border border-slate-200 rounded-xl font-extrabold text-slate-800 text-base focus:outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-100 transition-all">
+                      <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400 pointer-events-none">Tahun</span>
+                    </div>
                   </div>
                 </div>
+                <p class="mt-2 text-[11px] text-slate-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-circle-info text-cyan-600"></i>
+                  <span>Sewa kos ini khusus bulanan atau tahunan. Masukkan durasi yang diinginkan (minimal 1 bulan atau 1 tahun).</span>
+                </p>
               </div>
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -448,16 +463,10 @@
     });
 
     function calculateRealtimePrice() {
-      const jam = parseInt(document.getElementById('durasi-jam')?.value) || 0;
-      const hari = parseInt(document.getElementById('durasi-hari')?.value) || 0;
-      const minggu = parseInt(document.getElementById('durasi-minggu')?.value) || 0;
       const bulan = parseInt(document.getElementById('durasi-bulan')?.value) || 0;
       const tahun = parseInt(document.getElementById('durasi-tahun')?.value) || 0;
 
       const durationMap = {
-        'jam': jam,
-        'hari': hari,
-        'minggu': minggu,
         'bulan': bulan,
         'tahun': tahun
       };

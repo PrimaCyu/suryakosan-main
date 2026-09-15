@@ -64,7 +64,7 @@ class ArtikelController extends Controller
         $request->validate([
             'title'     => 'required|string|max:255',
             'slug'      => 'nullable|string|max:255',
-            'image'     => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'image'     => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'deskripsi' => 'nullable|string',
         ]);
 
@@ -91,7 +91,7 @@ class ArtikelController extends Controller
         $request->validate([
             'title'     => 'required|string|max:255',
             'slug'      => 'nullable|string|max:255',
-            'image'     => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'image'     => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'deskripsi' => 'nullable|string',
         ]);
 

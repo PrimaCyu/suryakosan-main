@@ -1,4 +1,11 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
+
+    # Block direct access to sensitive files and directories
+    RewriteRule ^\.env.*$ - [F,L,NC]
+    RewriteRule ^composer\.(json|lock)$ - [F,L,NC]
+    RewriteRule ^package(-lock)?\.json$ - [F,L,NC]
+    RewriteRule ^\.git.*$ - [F,L,NC]
+
     RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>

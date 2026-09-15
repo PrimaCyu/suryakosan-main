@@ -164,7 +164,7 @@
         </div>
 
         <div class="footer">
-            &copy; {{ date('Y') }} {{ config('app.name', 'NemuKos') }}. All rights reserved.<br>
+            &copy; {{ date('Y') }} {{ config('app.name', 'Sinar Citra Lestari') }}. All rights reserved.<br>
             Email ini dikirim secara otomatis oleh sistem reservasi kos.
         </div>
     </div>

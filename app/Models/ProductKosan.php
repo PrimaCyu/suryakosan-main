@@ -39,4 +39,8 @@ class ProductKosan extends Model
     public function productKamarKosan(){
         return $this->hasMany(ProductKamarKosan::class);
     }
+
+    public function admins(){
+        return $this->belongsToMany(User::class, 'admin_kosan', 'product_kosan_id', 'user_id')->withTimestamps();
+    }
 }

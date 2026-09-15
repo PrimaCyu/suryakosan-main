@@ -42,7 +42,7 @@ class TestimoniController extends Controller
     {
         $request->validate([
             'name'          => 'required|string|max:255',
-            'image_profile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'image_profile' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'rating'        => 'required|integer|min:1|max:5',
             'review'        => 'nullable|string',
         ]);
@@ -68,7 +68,7 @@ class TestimoniController extends Controller
     {
         $request->validate([
             'name'          => 'required|string|max:255',
-            'image_profile' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'image_profile' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'rating'        => 'required|integer|min:1|max:5',
             'review'        => 'nullable|string',
         ]);

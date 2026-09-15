@@ -20,7 +20,12 @@
 
                         <div class="col-md-4">
                             <label class="form-label">Diskon Akumulatif (%)</label>
-                            <input type="number" step="0.01" name="cumulative_discount" class="form-control" value="{{ $item->cumulative_discount }}">
+                            @if(Auth::user()->isSuperAdmin())
+                                <input type="number" step="0.01" name="cumulative_discount" class="form-control" value="{{ $item->cumulative_discount }}">
+                            @else
+                                <input type="number" step="0.01" class="form-control bg-light" value="{{ $item->cumulative_discount }}" readonly disabled>
+                                <small class="text-muted d-block mt-1"><i class="bi bi-lock-fill text-warning me-1"></i>Hanya diatur langsung oleh Super Admin</small>
+                            @endif
                         </div>
 
                         <div class="col-md-4">

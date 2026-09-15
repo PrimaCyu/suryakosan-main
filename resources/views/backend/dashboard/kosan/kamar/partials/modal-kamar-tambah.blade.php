@@ -23,7 +23,12 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label mb-1">Diskon Akumulatif (%)</label>
-                                <input type="number" step="0.01" name="dataKamar[0][cumulative_discount]" class="form-control" placeholder="0">
+                                @if(Auth::user()->isSuperAdmin())
+                                    <input type="number" step="0.01" name="dataKamar[0][cumulative_discount]" class="form-control" placeholder="0">
+                                @else
+                                    <input type="number" step="0.01" name="dataKamar[0][cumulative_discount]" class="form-control bg-light" value="0" readonly disabled title="Hanya diatur langsung oleh Super Admin">
+                                    <small class="text-muted d-block mt-1" style="font-size: 0.72rem;"><i class="bi bi-lock-fill text-warning me-1"></i>Khusus Super Admin</small>
+                                @endif
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label mb-1"><i class="bi bi-eye me-1"></i> Views Count</label>

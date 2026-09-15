@@ -12,7 +12,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
                         <h6 class="fw-bold mb-0 text-dark">Daftar Kategori Harga</h6>
-                        <small class="text-muted">Kelola tarif sewa harian, bulanan, atau tahunan</small>
+                        <small class="text-muted">Kelola tarif sewa khusus bulanan atau tahunan</small>
                     </div>
                     <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalAddPriceKamar{{ $item->id }}">
                         <i class="bi bi-plus-lg me-1"></i> Tambah Kategori Harga
@@ -34,7 +34,11 @@
                             @forelse ($item->priceKamar as $prcIndex => $prc)
                                 <tr>
                                     <td class="text-center fw-semibold text-muted">{{ $prcIndex + 1 }}</td>
-                                    <td><span class="badge badge-subtle-primary">{{ $prc->kategori }}</span></td>
+                                    <td>
+                                        <span class="badge badge-subtle-primary text-capitalize">
+                                            <i class="bi bi-calendar-check me-1"></i>{{ $prc->kategori === 'bulan' ? 'Bulanan' : ($prc->kategori === 'tahun' ? 'Tahunan' : $prc->kategori) }}
+                                        </span>
+                                    </td>
                                     <td class="fw-bold text-dark">Rp {{ number_format($prc->price, 0, ',', '.') }}</td>
                                     <td>
                                         @if($prc->discount > 0)
@@ -87,14 +91,17 @@
                 @csrf
                 <div class="modal-body p-4" style="max-height: 70vh; overflow-y: auto;">
                     <p class="text-muted fs-7 mb-3">
-                        <i class="bi bi-info-circle me-1"></i> Tambahkan satu atau beberapa kategori harga sekaligus (misal: Bulanan, Tahunan).
+                        <i class="bi bi-info-circle me-1"></i> Tentukan kategori tarif sewa (khusus <strong>Bulanan</strong> atau <strong>Tahunan</strong>).
                     </p>
                     <div class="price-kamar-container" id="priceKamarContainer{{ $item->id }}">
                         <div class="price-kamar-row card border rounded p-3 mb-3">
                             <div class="row g-3 align-items-center">
                                 <div class="col-md-5">
                                     <label class="form-label mb-1">Kategori Sewa <span class="text-danger">*</span></label>
-                                    <input type="text" name="priceKamar[0][kategori]" class="form-control" placeholder="Contoh: Bulanan / Harian" required>
+                                    <select name="priceKamar[0][kategori]" class="form-select" required>
+                                        <option value="bulan">Bulanan (Per Bulan)</option>
+                                        <option value="tahun">Tahunan (Per Tahun)</option>
+                                    </select>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label mb-1">Nominal Harga (Rp) <span class="text-danger">*</span></label>
@@ -102,7 +109,12 @@
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label mb-1">Diskon (%)</label>
-                                    <input type="number" step="0.01" name="priceKamar[0][discount]" class="form-control" placeholder="0">
+                                    @if(Auth::user()->isSuperAdmin())
+                                        <input type="number" step="0.01" name="priceKamar[0][discount]" class="form-control" placeholder="0">
+                                    @else
+                                        <input type="number" step="0.01" name="priceKamar[0][discount]" class="form-control bg-light" value="0" readonly disabled title="Hanya diatur langsung oleh Super Admin">
+                                        <small class="text-muted d-block mt-1" style="font-size: 0.72rem;"><i class="bi bi-lock-fill text-warning me-1"></i>Khusus Super Admin</small>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -139,7 +151,10 @@
                     <div class="modal-body p-4">
                         <div class="mb-3">
                             <label class="form-label">Kategori Sewa <span class="text-danger">*</span></label>
-                            <input type="text" name="kategori" class="form-control" value="{{ $prc->kategori }}" required>
+                            <select name="kategori" class="form-select" required>
+                                <option value="bulan" {{ in_array(strtolower($prc->kategori), ['bulan', 'bulanan']) ? 'selected' : '' }}>Bulanan (Per Bulan)</option>
+                                <option value="tahun" {{ in_array(strtolower($prc->kategori), ['tahun', 'tahunan']) ? 'selected' : '' }}>Tahunan (Per Tahun)</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Nominal Harga (Rp) <span class="text-danger">*</span></label>
@@ -147,7 +162,12 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Diskon (%)</label>
-                            <input type="number" step="0.01" name="discount" class="form-control" value="{{ $prc->discount }}">
+                            @if(Auth::user()->isSuperAdmin())
+                                <input type="number" step="0.01" name="discount" class="form-control" value="{{ $prc->discount }}">
+                            @else
+                                <input type="number" step="0.01" class="form-control bg-light" value="{{ $prc->discount }}" readonly disabled>
+                                <small class="text-muted d-block mt-1"><i class="bi bi-lock-fill text-warning me-1"></i>Hanya dapat diatur langsung oleh Super Admin</small>
+                            @endif
                         </div>
                     </div>
                     <div class="modal-footer">

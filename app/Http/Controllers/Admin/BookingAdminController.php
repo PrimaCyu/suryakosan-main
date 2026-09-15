@@ -10,8 +10,15 @@ class BookingAdminController extends Controller
 {
     public function indexBooking(Request $request)
     {
+        $user = auth()->user();
+        $isSuper = $user->isSuperAdmin();
+        $assignedIds = $isSuper ? collect() : $user->kosans()->pluck('product_kosans.id');
+
         $query = Tamu::with(['productKamarKosan.productKosan'])
-            ->where('status', 'pending');
+            ->where('status', 'pending')
+            ->when(!$isSuper, function ($q) use ($assignedIds) {
+                $q->whereHas('productKamarKosan', fn($sub) => $sub->whereIn('product_kosan_id', $assignedIds));
+            });
 
         if ($request->has('search') && !empty($request->search)) {
             $search = strtolower($request->search);
@@ -33,7 +40,15 @@ class BookingAdminController extends Controller
 
     public function approveBooking($tamu)
     {
-        $dataTamu = Tamu::findOrFail($tamu);
+        $dataTamu = Tamu::with('productKamarKosan')->findOrFail($tamu);
+        $user = auth()->user();
+
+        if (!$user->isSuperAdmin()) {
+            $assignedIds = $user->kosans()->pluck('product_kosans.id')->toArray();
+            if (!in_array($dataTamu->productKamarKosan->product_kosan_id, $assignedIds)) {
+                abort(403, 'Akses ditolak. Anda tidak berwenang mengelola booking kosan ini.');
+            }
+        }
 
         $dataTamu->update([
             'status' => 'approved'
@@ -44,7 +59,16 @@ class BookingAdminController extends Controller
 
     public function rejectBooking($tamu)
     {
-        $dataTamu = Tamu::findOrFail($tamu);
+        $dataTamu = Tamu::with('productKamarKosan')->findOrFail($tamu);
+        $user = auth()->user();
+
+        if (!$user->isSuperAdmin()) {
+            $assignedIds = $user->kosans()->pluck('product_kosans.id')->toArray();
+            if (!in_array($dataTamu->productKamarKosan->product_kosan_id, $assignedIds)) {
+                abort(403, 'Akses ditolak. Anda tidak berwenang mengelola booking kosan ini.');
+            }
+        }
+
         $dataTamu->delete();
 
         return back()->with('success', 'Permintaan booking atas nama ' . $dataTamu->name . ' telah ditolak (Rejected).');

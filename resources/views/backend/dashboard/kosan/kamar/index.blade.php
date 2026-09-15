@@ -180,6 +180,7 @@
 <script>
     (function () {
         let kamarRowIndex = 1;
+        const isSuperAdminUser = {{ Auth::user()->isSuperAdmin() ? 'true' : 'false' }};
         const container = document.getElementById('kamarInputContainer');
 
         function initSummernote(element) {
@@ -219,6 +220,10 @@
                     const div = document.createElement('div');
                     div.className = 'kamar-row card border rounded p-3 mb-3';
                     div.id = `kamar-row-${index}`;
+                    const discKamarField = isSuperAdminUser
+                        ? `<input type="number" step="0.01" name="dataKamar[${index}][cumulative_discount]" class="form-control" placeholder="0">`
+                        : `<input type="number" step="0.01" name="dataKamar[${index}][cumulative_discount]" class="form-control bg-light" value="0" readonly disabled title="Hanya diatur langsung oleh Super Admin"><small class="text-muted d-block mt-1" style="font-size: 0.72rem;"><i class="bi bi-lock-fill text-warning me-1"></i>Khusus Super Admin</small>`;
+
                     div.innerHTML = `
                         <div class="row g-3 align-items-center">
                             <div class="col-md-4">
@@ -227,7 +232,7 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label mb-1">Diskon Akumulatif (%)</label>
-                                <input type="number" step="0.01" name="dataKamar[${index}][cumulative_discount]" class="form-control" placeholder="0">
+                                ${discKamarField}
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label mb-1"><i class="bi bi-eye me-1"></i> Views</label>
@@ -303,11 +308,18 @@
                 const index = rows.length;
                 const div = document.createElement('div');
                 div.className = 'price-kamar-row card border rounded p-3 mb-3';
+                const discPriceField = isSuperAdminUser
+                    ? `<input type="number" step="0.01" name="priceKamar[${index}][discount]" class="form-control" placeholder="0">`
+                    : `<input type="number" step="0.01" name="priceKamar[${index}][discount]" class="form-control bg-light" value="0" readonly disabled title="Hanya diatur langsung oleh Super Admin"><small class="text-muted d-block mt-1" style="font-size: 0.72rem;"><i class="bi bi-lock-fill text-warning me-1"></i>Khusus Super Admin</small>`;
+
                 div.innerHTML = `
                     <div class="row g-3 align-items-center">
                         <div class="col-md-5">
                             <label class="form-label mb-1">Kategori Sewa <span class="text-danger">*</span></label>
-                            <input type="text" name="priceKamar[${index}][kategori]" class="form-control" placeholder="Contoh: Bulanan" required>
+                            <select name="priceKamar[${index}][kategori]" class="form-select" required>
+                                <option value="bulan">Bulanan (Per Bulan)</option>
+                                <option value="tahun">Tahunan (Per Tahun)</option>
+                            </select>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label mb-1">Nominal Harga (Rp) <span class="text-danger">*</span></label>
@@ -315,7 +327,7 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label mb-1">Diskon (%)</label>
-                            <input type="number" step="0.01" name="priceKamar[${index}][discount]" class="form-control" placeholder="0">
+                            ${discPriceField}
                         </div>
                         <div class="col-md-1 text-end align-self-end">
                             <button type="button" class="btn btn-sm btn-outline-danger btn-remove-price-row w-100" title="Hapus">
@@ -333,7 +345,7 @@
             if (btnRemovePrcRow) {
                 const container = btnRemovePrcRow.closest('.price-kamar-container');
                 btnRemovePrcRow.closest('.price-kamar-row').remove();
-                rebuildBulkPriceIndexes(container);
+                if (container) rebuildBulkPriceIndexes(container);
                 return;
             }
         });
@@ -369,7 +381,7 @@
         function rebuildBulkPriceIndexes(container) {
             const rows = container.querySelectorAll('.price-kamar-row');
             rows.forEach((row, i) => {
-                const kategori = row.querySelector('input[name*="[kategori]"]');
+                const kategori = row.querySelector('[name*="[kategori]"]');
                 const price = row.querySelector('input[name*="[price]"]');
                 const discount = row.querySelector('input[name*="[discount]"]');
                 if (kategori) kategori.name = `priceKamar[${i}][kategori]`;
@@ -473,6 +485,134 @@
                 }, 250);
             });
         }
+
+        // --- MODERN GALLERY DROPZONE & LIVE PREVIEW ---
+        function initGalleryDropzone(dropzone) {
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.add('dragover');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.remove('dragover');
+                }, false);
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                const input = dropzone.querySelector('.gallery-file-input');
+                if (input && files && files.length > 0) {
+                    input.files = files;
+                    handleFilesPreview(input);
+                }
+            });
+        }
+
+        document.querySelectorAll('.gallery-dropzone').forEach(initGalleryDropzone);
+
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('gallery-file-input')) {
+                handleFilesPreview(e.target);
+            }
+        });
+
+        function handleFilesPreview(input) {
+            const targetId = input.getAttribute('data-target');
+            const btnId = input.getAttribute('data-btn');
+            const container = document.getElementById(targetId);
+            const submitBtn = document.getElementById(btnId);
+            const countTextId = targetId.replace('previewContainer', 'fileCountText');
+            const countText = document.getElementById(countTextId);
+
+            if (!container) return;
+            container.innerHTML = '';
+
+            const files = input.files;
+            if (!files || files.length === 0) {
+                container.classList.add('d-none');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = `<i class="bi bi-cloud-arrow-up-fill me-1"></i> Upload Foto Kamar`;
+                }
+                if (countText) countText.textContent = 'Belum ada file dipilih.';
+                return;
+            }
+
+            container.classList.remove('d-none');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<i class="bi bi-cloud-arrow-up-fill me-1"></i> Upload ${files.length} Foto Kamar`;
+            }
+            if (countText) {
+                let totalBytes = Array.from(files).reduce((sum, f) => sum + f.size, 0);
+                let mb = (totalBytes / (1024 * 1024)).toFixed(1);
+                countText.innerHTML = `<span class="text-success fw-bold"><i class="bi bi-check2-circle me-1"></i>${files.length} foto dipilih</span> (${mb} MB)`;
+            }
+
+            Array.from(files).forEach((file, idx) => {
+                if (!file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = 'preview-item';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" alt="${file.name}">
+                        <div class="preview-badge-name" title="${file.name}">${file.name}</div>
+                        <button type="button" class="btn-remove-preview" title="Hapus foto ini" data-idx="${idx}">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    `;
+                    container.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Cancel/remove preview
+        document.addEventListener('click', function(e) {
+            const removeBtn = e.target.closest('.btn-remove-preview');
+            if (removeBtn) {
+                const previewItem = removeBtn.closest('.preview-item');
+                const previewContainer = removeBtn.closest('.preview-grid');
+                if (previewItem && previewContainer) {
+                    previewItem.remove();
+                    if (previewContainer.children.length === 0) {
+                        previewContainer.classList.add('d-none');
+                        const form = previewContainer.closest('form');
+                        if (form) {
+                            const input = form.querySelector('.gallery-file-input');
+                            if (input) input.value = '';
+                            const submitBtn = form.querySelector('button[type="submit"]');
+                            if (submitBtn) {
+                                submitBtn.disabled = true;
+                                submitBtn.innerHTML = `<i class="bi bi-cloud-arrow-up-fill me-1"></i> Upload Foto Kamar`;
+                            }
+                            const countText = form.querySelector('small[id^="fileCountText"]');
+                            if (countText) countText.textContent = 'Belum ada file dipilih.';
+                        }
+                    }
+                }
+            }
+        });
+
+        // Auto-open tamu modal if triggered directly from dashboard due date alerts
+        @if(request('open_tamu_kamar'))
+            document.addEventListener('DOMContentLoaded', function() {
+                const targetModalId = 'modalTamuKamar{{ request('open_tamu_kamar') }}';
+                const modalEl = document.getElementById(targetModalId);
+                if (modalEl) {
+                    const bsModal = new bootstrap.Modal(modalEl);
+                    bsModal.show();
+                }
+            });
+        @endif
     })();
 </script>
 

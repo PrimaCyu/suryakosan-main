@@ -8,7 +8,7 @@
                 <h1 class="page-title">
                     <i class="bi bi-share-fill text-primary"></i> Kelola Sosial Media
                 </h1>
-                <p class="page-subtitle">Atur tautan profil sosial media resmi dan saluran komunikasi NemuKos.</p>
+                <p class="page-subtitle">Atur tautan profil sosial media resmi dan saluran komunikasi Sinar Citra Lestari.</p>
             </div>
             <div>
                 <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambahSosialMedia">
