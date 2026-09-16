@@ -19,6 +19,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register Model Observers for Automated Real-Time Cache Invalidation
+        \App\Models\ProductKosan::observe(\App\Observers\KosanObserver::class);
+        \App\Models\ProductKamarKosan::observe(\App\Observers\KamarObserver::class);
+        \App\Models\PriceKamar::observe(\App\Observers\KamarSubItemObserver::class);
+        \App\Models\ProductKamarImageKosan::observe(\App\Observers\KamarSubItemObserver::class);
+        \App\Models\FasilitasKamar::observe(\App\Observers\KamarSubItemObserver::class);
+        \App\Models\ProductImageKosan::observe(\App\Observers\KamarSubItemObserver::class);
+        \App\Models\Tamu::observe(\App\Observers\KamarSubItemObserver::class);
+        \App\Models\Artikel::observe(\App\Observers\ArtikelObserver::class);
+        \App\Models\Testimoni::observe(\App\Observers\TestimoniObserver::class);
+
         try {
             if (\Illuminate\Support\Facades\Schema::hasTable('sosial_media')) {
                 $sosmedList = \App\Models\SosialMedia::all();

@@ -69,7 +69,9 @@ class BookingAdminController extends Controller
             }
         }
 
-        $dataTamu->delete();
+        $dataTamu->update([
+            'status' => 'reject'
+        ]);
 
         return back()->with('success', 'Permintaan booking atas nama ' . $dataTamu->name . ' telah ditolak (Rejected).');
     }

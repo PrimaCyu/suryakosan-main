@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 class ProductImageKosan extends Model
 {
     protected $fillable = ['product_kosan_id','image'];
+    protected $touches = ['productKosan'];
 
     protected static function boot()
     {

@@ -98,6 +98,11 @@
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
 
+                                        <!-- Lihat di Web Button -->
+                                        <a href="{{ route('kosan.detail', $item->slug) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-info py-1 px-2" title="Lihat di Web Frontend">
+                                            <i class="bi bi-box-arrow-up-right"></i>
+                                        </a>
+
                                         <!-- Delete Button -->
                                         @if(Auth::user()->isSuperAdmin())
                                         <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalDelete{{ $item->id }}" title="Hapus Kosan">

@@ -20,6 +20,15 @@
                 <a href="{{ route('kosan.index') }}" class="hover:text-teal-400 transition-colors">Daftar Kos</a>
                 <a href="{{ route('news.index') }}" class="hover:text-teal-400 transition-colors">News & Events</a>
                 <a href="https://wa.me/6282146138847" target="_blank" rel="noopener noreferrer" class="hover:text-teal-400 transition-colors">Bantuan</a>
+                @auth
+                    <a href="{{ route('admin.dashboard') }}" class="text-teal-400 hover:underline flex items-center gap-1 font-bold">
+                        <i class="fa-solid fa-gauge-high text-xs"></i> Panel Admin
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="hover:text-teal-400 transition-colors flex items-center gap-1">
+                        <i class="fa-solid fa-lock text-xs"></i> Akses Pengelola
+                    </a>
+                @endauth
             </div>
 
             <!-- 3. Social Media Buttons -->

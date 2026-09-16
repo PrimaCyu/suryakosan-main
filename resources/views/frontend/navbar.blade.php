@@ -30,6 +30,18 @@
                     <span class="hidden xs:inline">Hubungi Kami</span>
                     <span class="xs:hidden">Kontak</span>
                 </a>
+
+                @auth
+                    <a href="{{ route('admin.dashboard') }}" class="ml-1 px-3 py-1.5 sm:px-4 sm:py-2 bg-teal-500/15 text-teal-800 hover:bg-teal-600 hover:text-white font-bold text-xs sm:text-sm rounded-full border border-teal-300/60 transition-all duration-200 flex items-center gap-1.5" title="Buka Panel Dashboard Admin">
+                        <i class="fa-solid fa-gauge-high text-xs"></i>
+                        <span>Dashboard</span>
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="ml-0.5 px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-semibold text-slate-600 hover:text-teal-700 hover:bg-slate-100 rounded-full transition-all duration-200 flex items-center gap-1" title="Login Admin / Pengelola">
+                        <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
+                        <span class="hidden md:inline">Masuk</span>
+                    </a>
+                @endauth
             </nav>
 
         </div>

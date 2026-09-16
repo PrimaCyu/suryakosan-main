@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class ProductKamarKosan extends Model
 {
     protected $fillable = ['product_kosan_id','room','description','fasilitas','cumulative_discount','gmaps','views'];
+    protected $touches = ['productKosan'];
 
     protected static function boot()
     {

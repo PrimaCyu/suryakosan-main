@@ -83,6 +83,9 @@
                                             <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalEditArtikel{{ $item->id }}" title="Edit Artikel">
                                                 <i class="bi bi-pencil-square"></i> Edit
                                             </button>
+                                            <a href="{{ route('news.detail', $item->slug) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-info py-1 px-2" title="Lihat di Web Frontend">
+                                                <i class="bi bi-box-arrow-up-right"></i>
+                                            </a>
                                             <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalDeleteArtikel{{ $item->id }}" title="Hapus Artikel">
                                                 <i class="bi bi-trash"></i>
                                             </button>
