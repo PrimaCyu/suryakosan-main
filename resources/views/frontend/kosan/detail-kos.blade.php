@@ -158,7 +158,11 @@
     <section id="deskripsi" class="space-y-3 pt-2 reveal">
       <h3 class="text-base font-extrabold text-slate-900">Deskripsi Properti</h3>
       <div class="text-xs sm:text-sm text-slate-600 leading-relaxed bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-        {!! nl2br(e($kosan->description ?? 'Deskripsi kosan belum ditambahkan oleh pemilik.')) !!}
+        @if(!empty(trim(strip_tags($kosan->description ?? ''))))
+          {!! $kosan->description !!}
+        @else
+          <p class="text-slate-400 italic">Deskripsi kosan belum ditambahkan oleh pemilik.</p>
+        @endif
       </div>
     </section>
 

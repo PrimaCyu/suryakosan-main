@@ -210,8 +210,8 @@
                                     </div>
 
                                     <div class="col-12">
-                                        <label for="edit_deskripsi_{{ $item->id }}" class="form-label">Deskripsi Lengkap Kosan</label>
-                                        <textarea name="deskripsi" id="edit_deskripsi_{{ $item->id }}" class="form-control summernote-edit" rows="3">{{ old('deskripsi', $item->deskripsi) }}</textarea>
+                                        <label for="edit_description_{{ $item->id }}" class="form-label">Deskripsi Lengkap Kosan</label>
+                                        <textarea name="description" id="edit_description_{{ $item->id }}" class="form-control summernote-edit" rows="3">{{ old('description', $item->description) }}</textarea>
                                     </div>
 
                                     <div class="col-12">

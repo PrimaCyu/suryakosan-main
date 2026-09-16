@@ -602,6 +602,15 @@
         $('.modal').on('hidden.bs.modal', function () {
           $(this).find('.summernote-edit').summernote('destroy');
         });
+
+        // Pastikan konten Summernote disinkronkan ke textarea sebelum form disubmit
+        $(document).on('submit', 'form', function () {
+          $(this).find('.summernote-init, .summernote-edit, .summernote-artikel, .summernote-edit-artikel, #summernote_description, textarea').each(function () {
+            if (typeof $.fn.summernote !== 'undefined' && $(this).data('summernote')) {
+              $(this).val($(this).summernote('code'));
+            }
+          });
+        });
       });
     </script>
 

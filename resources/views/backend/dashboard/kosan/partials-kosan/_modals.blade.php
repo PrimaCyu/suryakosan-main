@@ -154,7 +154,7 @@
                             </label>
                             <textarea name="description"
                                       id="summernote_description"
-                                      class="form-control @error('description') is-invalid @enderror">{{ old('description') }}</textarea>
+                                      class="form-control summernote-init @error('description') is-invalid @enderror">{{ old('description') }}</textarea>
                             @error('description')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror

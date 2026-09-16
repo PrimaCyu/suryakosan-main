@@ -107,10 +107,12 @@ class KosanController extends Controller
             $fasilitas = implode(', ', $fasilitas);
         }
 
+        $description = $request->description ?: ($request->deskripsi ?: '');
+
         $data = [
             'title'       => $request->title,
             'slug'        => $this->generateUniqueSlug($request->title),
-            'description' => $request->description ?? '',
+            'description' => $description,
             'fasilitas'   => $fasilitas ?? '',
             'wilayah'     => $request->wilayah ?? 'Bali',
             'tersedia'    => $request->tersedia ?? 0,
@@ -142,6 +144,7 @@ class KosanController extends Controller
             'title'       => 'required|string|max:255',
             'wilayah'     => 'nullable|string|max:255',
             'description' => 'nullable|string',
+            'deskripsi'   => 'nullable|string',
             'tersedia'    => 'nullable|numeric',
             'view'        => 'nullable|numeric',
             'gmaps'       => 'nullable|string',
@@ -153,10 +156,12 @@ class KosanController extends Controller
             $fasilitas = implode(', ', $fasilitas);
         }
 
+        $description = $request->description ?: ($request->deskripsi ?: ($productKosan->description ?: ''));
+
         $data = [
             'title'       => $request->title,
             'slug'        => $this->generateUniqueSlug($request->title, $productKosan->id),
-            'description' => $request->description ?? '',
+            'description' => $description,
             'fasilitas'   => $fasilitas ?? '',
             'wilayah'     => $request->wilayah ?? 'Bali',
             'tersedia'    => $request->tersedia ?? 0,

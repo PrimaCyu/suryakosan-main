@@ -53,7 +53,7 @@
             @if($kamar && $kamar->description)
                 {!! $kamar->description !!}
             @elseif($kamar && $kamar->productKosan && $kamar->productKosan->description)
-                {!! nl2br(e($kamar->productKosan->description)) !!}
+                {!! $kamar->productKosan->description !!}
             @else
                 <p>Kamar kos nyaman dan bersih berada di lokasi strategis wilayah {{ $wilayahNama }}. Dilengkapi dengan fasilitas pendukung penuh untuk kenyamanan Anda.</p>
             @endif
