@@ -6,12 +6,12 @@
         <div class="page-header-box">
             <div>
                 <h1 class="page-title">
-                    <i class="bi bi-file-earmark-text-fill text-primary"></i> Kelola Artikel Blog
+                    <i class="bi bi-file-earmark-text text-secondary"></i> Kelola Artikel Blog
                 </h1>
                 <p class="page-subtitle">Publikasikan konten edukasi sewa kos, tips properti, dan panduan untuk calon penyewa.</p>
             </div>
             <div>
-                <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambahArtikel">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahArtikel">
                     <i class="bi bi-plus-lg me-1"></i> Tulis Artikel Baru
                 </button>
             </div>
@@ -27,7 +27,7 @@
             <div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
                 <div>
                     <h5 class="card-title mb-0 fs-6 fw-bold">
-                        <i class="bi bi-journal-richtext text-primary me-2"></i>Daftar Artikel Blog
+                        <i class="bi bi-journal-richtext text-secondary me-2"></i>Daftar Artikel Blog
                     </h5>
                     <p class="text-muted fs-8 mb-0">Total {{ $artikels->total() }} artikel terpublikasi.</p>
                 </div>
@@ -119,11 +119,11 @@
         <div class="modal fade" id="modalTambahArtikel" tabindex="-1" aria-labelledby="modalTambahArtikelLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content border-0 shadow-lg">
-                    <div class="modal-header modal-header-primary text-white">
-                        <h5 class="modal-title fs-6 fw-bold" id="modalTambahArtikelLabel">
-                            <i class="bi bi-pencil-square me-2"></i> Tulis Artikel Baru
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalTambahArtikelLabel">
+                            <i class="bi bi-pencil-square text-secondary me-2"></i> Tulis Artikel Baru
                         </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                     </div>
                     <form action="{{ route('admin.artikel.insert') }}" method="POST" enctype="multipart/form-data">
                         @csrf
@@ -140,7 +140,7 @@
                                     <label for="image_tambah" class="form-label">Gambar Sampul / Utama</label>
                                     <input type="file" name="image" id="image_tambah" class="form-control" accept="image/*" onchange="previewImageTambah(event)">
                                     <div id="previewContainerTambah" class="mt-2 d-none">
-                                        <img id="imagePreviewTambah" src="#" alt="Preview Gambar" class="rounded-2 border shadow-sm" style="max-height: 140px;">
+                                        <img id="imagePreviewTambah" src="#" alt="Preview Gambar" class="rounded-2 border" style="max-height: 140px;">
                                     </div>
                                 </div>
 
@@ -167,11 +167,11 @@
             <div class="modal fade" id="modalEditArtikel{{ $item->id }}" tabindex="-1" aria-labelledby="modalEditArtikelLabel{{ $item->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                     <div class="modal-content border-0 shadow-lg">
-                        <div class="modal-header modal-header-primary text-white">
-                            <h5 class="modal-title fs-6 fw-bold" id="modalEditArtikelLabel{{ $item->id }}">
-                                <i class="bi bi-pencil-square me-2"></i> Edit Artikel: {{ $item->title }}
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalEditArtikelLabel{{ $item->id }}">
+                                <i class="bi bi-pencil-square text-secondary me-2"></i> Edit Artikel: {{ $item->title }}
                             </h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                         </div>
                         <form action="{{ route('admin.artikel.update', $item->id) }}" method="POST" enctype="multipart/form-data">
                             @csrf
@@ -222,14 +222,11 @@
             <div class="modal fade" id="modalDeleteArtikel{{ $item->id }}" tabindex="-1" aria-labelledby="modalDeleteArtikelLabel{{ $item->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-sm">
                     <div class="modal-content border-0 shadow-lg">
-                        <div class="modal-body p-4 text-center">
-                            <div class="p-3 rounded-circle bg-danger-subtle text-danger d-inline-flex mb-3">
-                                <i class="bi bi-trash3-fill fs-2"></i>
-                            </div>
-                            <h6 class="fw-bold text-dark mb-1">Hapus Artikel?</h6>
+                        <div class="modal-body p-4">
+                            <h6 class="fw-bold text-dark mb-2">Hapus Artikel?</h6>
                             <p class="text-muted fs-8 mb-0">Apakah Anda yakin ingin menghapus artikel <strong>"{{ $item->title }}"</strong>?</p>
                         </div>
-                        <div class="modal-footer d-flex justify-content-center border-top-0 pt-0 pb-3">
+                        <div class="modal-footer d-flex justify-content-end border-top-0 pt-0 pb-3">
                             <button type="button" class="btn btn-sm btn-secondary px-3" data-bs-dismiss="modal">Batal</button>
                             <form action="{{ route('admin.artikel.delete', $item->id) }}" method="POST" class="d-inline">
                                 @csrf

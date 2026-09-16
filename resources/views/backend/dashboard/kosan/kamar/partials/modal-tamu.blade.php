@@ -2,11 +2,11 @@
 <div class="modal fade" id="modalTamuKamar{{ $item->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header modal-header-modern text-white">
-                <h5 class="modal-title fs-6 fw-bold">
-                    <i class="bi bi-people-fill me-2 text-info"></i> Data Tamu / Penghuni: {{ $item->room }}
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-people text-secondary me-2"></i> Riwayat Penghuni: {{ $item->room }}
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
             <div class="modal-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -186,19 +186,19 @@
                         <!-- PILIHAN DURASI CEPAT -->
                         <div class="mb-3 p-2.5 rounded-3 bg-body-tertiary border">
                             <label class="form-label d-block mb-1.5 fs-8 fw-semibold text-secondary">
-                                <i class="bi bi-lightning-charge-fill text-warning me-1"></i>Pilih Durasi Cepat:
+                                Pilih Durasi Tambahan:
                             </label>
                             <div class="d-flex flex-wrap gap-1.5">
-                                <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-3 py-1" onclick="document.getElementById('renew_tahun_{{ $tamu->id }}').value=0; document.getElementById('renew_bulan_{{ $tamu->id }}').value=1;">
+                                <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-1" onclick="document.getElementById('renew_tahun_{{ $tamu->id }}').value=0; document.getElementById('renew_bulan_{{ $tamu->id }}').value=1;">
                                     +1 Bulan
                                 </button>
-                                <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-3 py-1" onclick="document.getElementById('renew_tahun_{{ $tamu->id }}').value=0; document.getElementById('renew_bulan_{{ $tamu->id }}').value=3;">
+                                <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-1" onclick="document.getElementById('renew_tahun_{{ $tamu->id }}').value=0; document.getElementById('renew_bulan_{{ $tamu->id }}').value=3;">
                                     +3 Bulan
                                 </button>
-                                <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-3 py-1" onclick="document.getElementById('renew_tahun_{{ $tamu->id }}').value=0; document.getElementById('renew_bulan_{{ $tamu->id }}').value=6;">
+                                <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-1" onclick="document.getElementById('renew_tahun_{{ $tamu->id }}').value=0; document.getElementById('renew_bulan_{{ $tamu->id }}').value=6;">
                                     +6 Bulan
                                 </button>
-                                <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-3 py-1" onclick="document.getElementById('renew_tahun_{{ $tamu->id }}').value=1; document.getElementById('renew_bulan_{{ $tamu->id }}').value=0;">
+                                <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-1" onclick="document.getElementById('renew_tahun_{{ $tamu->id }}').value=1; document.getElementById('renew_bulan_{{ $tamu->id }}').value=0;">
                                     +1 Tahun
                                 </button>
                             </div>
@@ -224,7 +224,7 @@
 
                         <!-- SEKSI METODE PEMBAYARAN -->
                         <h6 class="fw-bold text-dark mb-3 pb-1 border-bottom mt-4">
-                            <i class="bi bi-credit-card text-success me-1"></i> Pembayaran Perpanjangan
+                            <i class="bi bi-credit-card text-secondary me-1"></i> Pembayaran Perpanjangan
                         </h6>
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -245,7 +245,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#modalTamuKamar{{ $item->id }}">Kembali</button>
-                        <button type="submit" class="btn btn-sm btn-success">
+                        <button type="submit" class="btn btn-sm btn-primary">
                             <i class="bi bi-save me-1"></i> Simpan Perpanjangan
                         </button>
                     </div>
@@ -258,14 +258,11 @@
     <div class="modal fade" id="modalDeleteTamu{{ $tamu->id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content border-0 shadow-lg">
-                <div class="modal-body text-center p-4">
-                    <div class="p-3 rounded-circle bg-danger-subtle text-danger d-inline-flex mb-3">
-                        <i class="bi bi-trash3-fill fs-2"></i>
-                    </div>
-                    <h6 class="fw-bold text-dark mb-1">Hapus Data Tamu?</h6>
-                    <p class="text-muted fs-7 mb-0">Hapus riwayat tamu <strong>"{{ $tamu->name }}"</strong>?</p>
+                <div class="modal-body p-4">
+                    <h6 class="fw-bold text-dark mb-2">Hapus Data Tamu?</h6>
+                    <p class="text-muted fs-8 mb-0">Hapus riwayat tamu <strong>"{{ $tamu->name }}"</strong>?</p>
                 </div>
-                <div class="modal-footer d-flex justify-content-center border-top-0 pt-0 pb-3">
+                <div class="modal-footer d-flex justify-content-end border-top-0 pt-0 pb-3">
                     <button type="button" class="btn btn-sm btn-secondary px-3" data-bs-toggle="modal" data-bs-target="#modalTamuKamar{{ $item->id }}">Batal</button>
                     <form action="{{ route('admin.product.kosan.kamar.tamu.delete', [$product_kosan, $item->id, $tamu->id]) }}" method="POST" class="d-inline">
                         @csrf

@@ -6,12 +6,12 @@
         <div class="page-header-box">
             <div>
                 <h1 class="page-title">
-                    <i class="bi bi-share-fill text-primary"></i> Kelola Sosial Media
+                    <i class="bi bi-share text-secondary"></i> Kelola Sosial Media
                 </h1>
                 <p class="page-subtitle">Atur tautan profil sosial media resmi dan saluran komunikasi Sinar Citra Lestari.</p>
             </div>
             <div>
-                <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambahSosialMedia">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahSosialMedia">
                     <i class="bi bi-plus-lg me-1"></i> Tambah Sosial Media
                 </button>
             </div>
@@ -27,7 +27,7 @@
             <div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
                 <div>
                     <h5 class="card-title mb-0 fs-6 fw-bold">
-                        <i class="bi bi-link-45deg text-primary me-2"></i>Daftar Akun & Platform
+                        <i class="bi bi-link-45deg text-secondary me-2"></i>Daftar Akun & Platform
                     </h5>
                     <p class="text-muted fs-8 mb-0">Total {{ $sosialMedias->total() }} platform terhubung.</p>
                 </div>
@@ -59,7 +59,7 @@
                                     <td class="text-center fw-semibold text-muted">{{ $sosialMedias->firstItem() + $index }}</td>
                                     <td>
                                         <div class="d-flex align-items-center gap-2">
-                                            <div class="p-2 rounded-2 bg-primary-subtle text-primary">
+                                            <div class="property-icon-box p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
                                                 @php
                                                     $titleLower = strtolower($item->title);
                                                     $icon = 'bi-share-fill';
@@ -119,11 +119,11 @@
         <div class="modal fade" id="modalTambahSosialMedia" tabindex="-1" aria-labelledby="modalTambahSosialMediaLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content border-0 shadow-lg">
-                    <div class="modal-header modal-header-primary text-white">
-                        <h5 class="modal-title fs-6 fw-bold" id="modalTambahSosialMediaLabel">
-                            <i class="bi bi-plus-circle me-2"></i> Tambah Akun Sosial Media
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalTambahSosialMediaLabel">
+                            <i class="bi bi-plus-circle text-secondary me-2"></i> Tambah Akun Sosial Media
                         </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                     </div>
                     <form action="{{ route('admin.sosial.media.insert') }}" method="POST">
                         @csrf
@@ -161,11 +161,11 @@
             <div class="modal fade" id="modalEditSosialMedia{{ $item->id }}" tabindex="-1" aria-labelledby="modalEditSosialMediaLabel{{ $item->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                     <div class="modal-content border-0 shadow-lg">
-                        <div class="modal-header modal-header-primary text-white">
-                            <h5 class="modal-title fs-6 fw-bold" id="modalEditSosialMediaLabel{{ $item->id }}">
-                                <i class="bi bi-pencil-square me-2"></i> Edit: {{ $item->title }}
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalEditSosialMediaLabel{{ $item->id }}">
+                                <i class="bi bi-pencil-square text-secondary me-2"></i> Edit: {{ $item->title }}
                             </h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                         </div>
                         <form action="{{ route('admin.sosial.media.update', $item->id) }}" method="POST">
                             @csrf
@@ -202,14 +202,11 @@
             <div class="modal fade" id="modalDeleteSosialMedia{{ $item->id }}" tabindex="-1" aria-labelledby="modalDeleteSosialMediaLabel{{ $item->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-sm">
                     <div class="modal-content border-0 shadow-lg">
-                        <div class="modal-body p-4 text-center">
-                            <div class="p-3 rounded-circle bg-danger-subtle text-danger d-inline-flex mb-3">
-                                <i class="bi bi-trash3-fill fs-2"></i>
-                            </div>
-                            <h6 class="fw-bold text-dark mb-1">Hapus Sosial Media?</h6>
+                        <div class="modal-body p-4">
+                            <h6 class="fw-bold text-dark mb-2">Hapus Sosial Media?</h6>
                             <p class="text-muted fs-8 mb-0">Apakah Anda yakin ingin menghapus <strong>"{{ $item->title }}"</strong>?</p>
                         </div>
-                        <div class="modal-footer d-flex justify-content-center border-top-0 pt-0 pb-3">
+                        <div class="modal-footer d-flex justify-content-end border-top-0 pt-0 pb-3">
                             <button type="button" class="btn btn-sm btn-secondary px-3" data-bs-dismiss="modal">Batal</button>
                             <form action="{{ route('admin.sosial.media.delete', $item->id) }}" method="POST" class="d-inline">
                                 @csrf

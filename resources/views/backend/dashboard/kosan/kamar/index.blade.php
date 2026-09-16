@@ -6,17 +6,17 @@
         <div class="page-header-box">
             <div>
                 <div class="d-flex align-items-center gap-2 mb-1">
-                    <a href="{{ route('admin.product.kosan.index') }}" class="btn btn-xs btn-outline-secondary rounded-pill px-2">
+                    <a href="{{ route('admin.product.kosan.index') }}" class="btn btn-sm btn-outline-secondary">
                         <i class="bi bi-arrow-left me-1"></i> Kembali ke Kosan
                     </a>
                 </div>
                 <h1 class="page-title">
-                    <i class="bi bi-door-closed-fill text-primary"></i> Kelola Kamar: {{ $kosan->title }}
+                    <i class="bi bi-door-closed text-secondary"></i> Kelola Kamar: {{ $kosan->title }}
                 </h1>
                 <p class="page-subtitle">Atur unit tipe kamar, galeri foto, kategori tarif sewa, fasilitas kamar, dan riwayat penghuni.</p>
             </div>
             <div>
-                <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambahKamar">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahKamar">
                     <i class="bi bi-plus-lg me-1"></i> Tambah Kamar Baru
                 </button>
             </div>
@@ -33,7 +33,7 @@
             <div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
                 <div>
                     <h5 class="card-title mb-0 fs-6 fw-bold">
-                        <i class="bi bi-grid text-primary me-2"></i>Daftar Unit & Tipe Kamar
+                        <i class="bi bi-grid text-secondary me-2"></i>Daftar Unit & Tipe Kamar
                     </h5>
                     <p class="text-muted fs-8 mb-0">Total {{ $kamar_kosan->total() }} unit kamar terdaftar.</p>
                 </div>

@@ -3,21 +3,21 @@
 
 <div class="app-content-header">
     <div class="container-fluid">
-        <div class="row align-items-center">
-            <div class="col-sm-6">
-                <h1 class="mb-1 fs-3 fw-bold text-dark">
-                    <i class="bi bi-house-door-fill text-primary me-2"></i> Kelola Properti Kos-kosan
+        <div class="page-header-box">
+            <div>
+                <h1 class="page-title">
+                    <i class="bi bi-house-door text-secondary"></i> Kelola Properti Kos-kosan
                 </h1>
-                <p class="text-muted fs-7 mb-0">Manajemen daftar properti kos, spesifikasi wilayah, fasilitas, dan unit kamar.</p>
+                <p class="page-subtitle">Manajemen daftar properti kos, spesifikasi wilayah, fasilitas, dan unit kamar.</p>
             </div>
-            <div class="col-sm-6 text-sm-end mt-3 mt-sm-0">
+            <div>
                 @if(Auth::user()->isSuperAdmin())
-                    <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambah">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambah">
                         <i class="bi bi-plus-lg me-1"></i> Tambah Kosan Baru
                     </button>
                 @else
-                    <span class="badge badge-subtle-primary fs-7 py-2 px-3 border border-primary border-opacity-25 rounded-pill">
-                        <i class="bi bi-shield-check me-1"></i> Mode Admin Cabang Terbatas
+                    <span class="badge badge-subtle-secondary">
+                        <i class="bi bi-shield-check me-1"></i> Mode Admin Cabang
                     </span>
                 @endif
             </div>

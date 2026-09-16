@@ -30,12 +30,12 @@
         <div class="page-header-box">
             <div>
                 <h1 class="page-title">
-                    <i class="bi bi-chat-left-quote-fill text-primary"></i> Kelola Testimoni & Review
+                    <i class="bi bi-chat-left-quote text-secondary"></i> Kelola Testimoni & Review
                 </h1>
                 <p class="page-subtitle">Kelola ulasan kepuasan, pengalaman penghuni kos, dan rating bintang.</p>
             </div>
             <div>
-                <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambahTestimoni">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahTestimoni">
                     <i class="bi bi-plus-lg me-1"></i> Tambah Testimoni
                 </button>
             </div>
@@ -51,7 +51,7 @@
             <div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
                 <div>
                     <h5 class="card-title mb-0 fs-6 fw-bold">
-                        <i class="bi bi-star-half text-warning me-2"></i>Daftar Testimoni Pelanggan
+                        <i class="bi bi-chat-quote text-secondary me-2"></i>Daftar Testimoni Pelanggan
                     </h5>
                     <p class="text-muted fs-8 mb-0">Total {{ $testimonis->total() }} ulasan tercatat.</p>
                 </div>
@@ -152,11 +152,11 @@
         <div class="modal fade" id="modalTambahTestimoni" tabindex="-1" aria-labelledby="modalTambahTestimoniLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content border-0 shadow-lg">
-                    <div class="modal-header modal-header-primary text-white">
-                        <h5 class="modal-title fs-6 fw-bold" id="modalTambahTestimoniLabel">
-                            <i class="bi bi-chat-quote-fill me-2"></i> Tambah Testimoni Baru
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalTambahTestimoniLabel">
+                            <i class="bi bi-chat-quote text-secondary me-2"></i> Tambah Testimoni Baru
                         </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                     </div>
                     <form action="{{ route('admin.testimoni.insert') }}" method="POST" enctype="multipart/form-data">
                         @csrf
@@ -195,7 +195,7 @@
                                     <label for="image_profile_tambah" class="form-label">Foto Profil Pelanggan</label>
                                     <input type="file" name="image_profile" id="image_profile_tambah" class="form-control" accept="image/*" onchange="previewImageProfileTambah(event)">
                                     <div id="previewProfileContainerTambah" class="mt-2 d-none">
-                                        <img id="imageProfilePreviewTambah" src="#" alt="Preview" class="rounded-circle border shadow-sm" style="width: 65px; height: 65px; object-fit: cover;">
+                                        <img id="imageProfilePreviewTambah" src="#" alt="Preview" class="rounded-circle border" style="width: 65px; height: 65px; object-fit: cover;">
                                     </div>
                                 </div>
 
@@ -222,11 +222,11 @@
             <div class="modal fade" id="modalEditTestimoni{{ $item->id }}" tabindex="-1" aria-labelledby="modalEditTestimoniLabel{{ $item->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                     <div class="modal-content border-0 shadow-lg">
-                        <div class="modal-header modal-header-primary text-white">
-                            <h5 class="modal-title fs-6 fw-bold" id="modalEditTestimoniLabel{{ $item->id }}">
-                                <i class="bi bi-pencil-square me-2"></i> Edit Testimoni: {{ $item->name }}
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalEditTestimoniLabel{{ $item->id }}">
+                                <i class="bi bi-pencil-square text-secondary me-2"></i> Edit Testimoni: {{ $item->name }}
                             </h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                         </div>
                         <form action="{{ route('admin.testimoni.update', $item->id) }}" method="POST" enctype="multipart/form-data">
                             @csrf
@@ -299,14 +299,11 @@
             <div class="modal fade" id="modalDeleteTestimoni{{ $item->id }}" tabindex="-1" aria-labelledby="modalDeleteTestimoniLabel{{ $item->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-sm">
                     <div class="modal-content border-0 shadow-lg">
-                        <div class="modal-body p-4 text-center">
-                            <div class="p-3 rounded-circle bg-danger-subtle text-danger d-inline-flex mb-3">
-                                <i class="bi bi-trash3-fill fs-2"></i>
-                            </div>
-                            <h6 class="fw-bold text-dark mb-1">Hapus Testimoni?</h6>
+                        <div class="modal-body p-4">
+                            <h6 class="fw-bold text-dark mb-2">Hapus Testimoni?</h6>
                             <p class="text-muted fs-8 mb-0">Apakah Anda yakin ingin menghapus ulasan dari <strong>"{{ $item->name }}"</strong>?</p>
                         </div>
-                        <div class="modal-footer d-flex justify-content-center border-top-0 pt-0 pb-3">
+                        <div class="modal-footer d-flex justify-content-end border-top-0 pt-0 pb-3">
                             <button type="button" class="btn btn-sm btn-secondary px-3" data-bs-dismiss="modal">Batal</button>
                             <form action="{{ route('admin.testimoni.delete', $item->id) }}" method="POST" class="d-inline">
                                 @csrf

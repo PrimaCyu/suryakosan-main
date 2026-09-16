@@ -6,14 +6,14 @@
         <div class="page-header-box">
             <div>
                 <div class="page-title">
-                    <i class="bi bi-calendar-check-fill text-primary"></i> Permintaan Booking
+                    <i class="bi bi-calendar-check text-secondary"></i> Permintaan Booking
                     @if(isset($pendingBookingCount) && $pendingBookingCount > 0)
-                        <span class="badge badge-subtle-danger rounded-pill px-3 py-1 fs-8">
-                            <i class="bi bi-bell-fill me-1"></i> {{ $pendingBookingCount }} Menunggu Review
+                        <span class="badge badge-subtle-danger ms-2">
+                            {{ $pendingBookingCount }} Menunggu Review
                         </span>
                     @else
-                        <span class="badge badge-subtle-success rounded-pill px-3 py-1 fs-8">
-                            <i class="bi bi-check-circle-fill me-1"></i> Semua Terproses
+                        <span class="badge badge-subtle-secondary ms-2">
+                            Semua Terproses
                         </span>
                     @endif
                 </div>
@@ -31,7 +31,7 @@
             <div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
                 <div>
                     <h5 class="card-title mb-0 fs-6 fw-bold">
-                        <i class="bi bi-clock-history text-warning me-2"></i>Antrean Booking Masuk
+                        <i class="bi bi-clock-history text-secondary me-2"></i>Antrean Booking Masuk
                     </h5>
                     <p class="text-muted fs-8 mb-0">Total {{ $bookings->total() }} transaksi booking tercatat.</p>
                 </div>
@@ -110,13 +110,13 @@
                                     <td class="text-center">
                                         <div class="action-btn-group">
                                             <!-- Approve Button -->
-                                            <button type="button" class="btn btn-sm btn-success py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalApprove{{ $item->id }}" title="Setujui Booking">
-                                                <i class="bi bi-check-circle"></i> Approve
+                                            <button type="button" class="btn btn-sm btn-primary py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalApprove{{ $item->id }}" title="Setujui Booking">
+                                                <i class="bi bi-check2"></i> Approve
                                             </button>
 
                                             <!-- Reject Button -->
                                             <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalReject{{ $item->id }}" title="Tolak Booking">
-                                                <i class="bi bi-x-circle"></i> Reject
+                                                <i class="bi bi-x"></i> Reject
                                             </button>
                                         </div>
                                     </td>
@@ -154,17 +154,20 @@
         <div class="modal fade" id="modalProof{{ $item->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content border-0 shadow-lg">
-                    <div class="modal-header modal-header-modern text-white">
-                        <h5 class="modal-title fs-6 fw-bold">
-                            <i class="bi bi-image me-2 text-info"></i> Bukti Transfer: {{ $item->name }}
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="bi bi-image text-secondary me-2"></i> Bukti Transfer: {{ $item->name }}
                         </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                     </div>
                     <div class="modal-body text-center p-3 p-md-4">
-                        <img src="{{ asset('storage/' . $item->proof_of_transfer) }}" alt="Bukti Transfer" class="img-fluid rounded-3 border shadow-sm" style="max-height: 400px; object-fit: contain;">
+                        <img src="{{ asset('storage/' . $item->proof_of_transfer) }}" alt="Bukti Transfer" class="img-fluid rounded-2 border" style="max-height: 400px; object-fit: contain;">
                         <p class="text-muted fs-8 mt-2 mb-0">File: {{ $item->proof_of_transfer }}</p>
                     </div>
                     <div class="modal-footer">
+                        <a href="{{ asset('storage/' . $item->proof_of_transfer) }}" target="_blank" class="btn btn-sm btn-outline-secondary me-auto">
+                            <i class="bi bi-box-arrow-up-right me-1"></i> Buka Gambar Asli
+                        </a>
                         <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Tutup</button>
                     </div>
                 </div>
@@ -176,22 +179,19 @@
     <div class="modal fade" id="modalApprove{{ $item->id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content border-0 shadow-lg">
-                <div class="modal-body p-4 text-center">
-                    <div class="p-3 rounded-circle bg-success-subtle text-success d-inline-flex mb-3">
-                        <i class="bi bi-check-circle-fill fs-2"></i>
-                    </div>
-                    <h6 class="fw-bold text-dark mb-1">Setujui Booking?</h6>
+                <div class="modal-body p-4">
+                    <h6 class="fw-bold text-dark mb-2">Setujui Booking?</h6>
                     <p class="text-muted fs-8 mb-0">
-                        Booking atas nama <strong>"{{ $item->name }}"</strong> akan diubah menjadi <strong>Approved</strong> dan tamu resmi terdaftar.
+                        Booking atas nama <strong>"{{ $item->name }}"</strong> akan diverifikasi dan tamu otomatis terdaftar sebagai penghuni aktif.
                     </p>
                 </div>
-                <div class="modal-footer d-flex justify-content-center border-top-0 pt-0 pb-3">
+                <div class="modal-footer d-flex justify-content-end border-top-0 pt-0 pb-3">
                     <button type="button" class="btn btn-sm btn-secondary px-3" data-bs-dismiss="modal">Batal</button>
                     <form action="{{ route('admin.booking.approve', $item->id) }}" method="POST" class="d-inline">
                         @csrf
                         @method('PUT')
-                        <button type="submit" class="btn btn-sm btn-success px-3">
-                            <i class="bi bi-check-lg me-1"></i> Ya, Setujui
+                        <button type="submit" class="btn btn-sm btn-primary px-3">
+                            <i class="bi bi-check2 me-1"></i> Ya, Setujui
                         </button>
                     </form>
                 </div>
@@ -203,16 +203,13 @@
     <div class="modal fade" id="modalReject{{ $item->id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content border-0 shadow-lg">
-                <div class="modal-body p-4 text-center">
-                    <div class="p-3 rounded-circle bg-danger-subtle text-danger d-inline-flex mb-3">
-                        <i class="bi bi-exclamation-triangle-fill fs-2"></i>
-                    </div>
-                    <h6 class="fw-bold text-dark mb-1">Tolak Booking?</h6>
+                <div class="modal-body p-4">
+                    <h6 class="fw-bold text-dark mb-2">Tolak Booking?</h6>
                     <p class="text-muted fs-8 mb-0">
                         Booking atas nama <strong>"{{ $item->name }}"</strong> akan ditolak dan dihapus dari antrean pending.
                     </p>
                 </div>
-                <div class="modal-footer d-flex justify-content-center border-top-0 pt-0 pb-3">
+                <div class="modal-footer d-flex justify-content-end border-top-0 pt-0 pb-3">
                     <button type="button" class="btn btn-sm btn-secondary px-3" data-bs-dismiss="modal">Batal</button>
                     <form action="{{ route('admin.booking.reject', $item->id) }}" method="POST" class="d-inline">
                         @csrf

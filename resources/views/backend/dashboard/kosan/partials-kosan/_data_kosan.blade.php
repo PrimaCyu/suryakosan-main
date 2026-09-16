@@ -4,7 +4,7 @@
         <div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
             <div>
                 <h5 class="card-title mb-0 fs-6 fw-bold">
-                    <i class="bi bi-list-stars text-primary me-2"></i>Daftar Properti Kosan
+                    <i class="bi bi-house-door text-secondary me-2"></i>Daftar Properti Kosan
                 </h5>
                 <p class="text-muted fs-8 mb-0">Total {{ $product_kosan->total() }} properti kos terdaftar.</p>
             </div>
@@ -162,11 +162,11 @@
             <div class="modal fade modalEditKosan" id="modalEdit{{ $item->id }}" tabindex="-1" aria-labelledby="modalEditLabel{{ $item->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                     <div class="modal-content border-0 shadow-lg">
-                        <div class="modal-header modal-header-primary text-white">
-                            <h5 class="modal-title fs-6 fw-bold" id="modalEditLabel{{ $item->id }}">
-                                <i class="bi bi-pencil-square me-2"></i> Edit Kosan: {{ $item->title }}
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalEditLabel{{ $item->id }}">
+                                <i class="bi bi-pencil-square text-secondary me-2"></i> Edit Kosan: {{ $item->title }}
                             </h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                         </div>
                         <form action="{{ route('admin.product.kosan.update', $item->id) }}" method="POST" enctype="multipart/form-data">
                             @csrf
@@ -269,16 +269,13 @@
             <div class="modal fade" id="modalDelete{{ $item->id }}" tabindex="-1" aria-labelledby="modalDeleteLabel{{ $item->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-sm">
                     <div class="modal-content border-0 shadow-lg">
-                        <div class="modal-body p-4 text-center">
-                            <div class="p-3 rounded-circle bg-danger-subtle text-danger d-inline-flex mb-3">
-                                <i class="bi bi-trash3-fill fs-2"></i>
-                            </div>
-                            <h6 class="fw-bold text-dark mb-1">Hapus Properti Kosan?</h6>
+                        <div class="modal-body p-4">
+                            <h6 class="fw-bold text-dark mb-2">Hapus Properti Kosan?</h6>
                             <p class="text-muted fs-8 mb-0">
-                                Kosan <strong>"{{ $item->title }}"</strong> beserta seluruh kamar di dalamnya akan dihapus secara permanen.
+                                Kosan <strong>"{{ $item->title }}"</strong> beserta seluruh unit kamar di dalamnya akan dihapus secara permanen.
                             </p>
                         </div>
-                        <div class="modal-footer d-flex justify-content-center border-top-0 pt-0 pb-3">
+                        <div class="modal-footer d-flex justify-content-end border-top-0 pt-0 pb-3">
                             <button type="button" class="btn btn-sm btn-secondary px-3" data-bs-dismiss="modal">Batal</button>
                             <form action="{{ route('admin.product.kosan.delete', $item->id) }}" method="POST" class="d-inline">
                                 @csrf
@@ -296,20 +293,15 @@
             <!-- MODAL IMAGE GALLERY KOSAN -->
             <div class="modal fade" id="modalImageKosan{{ $item->id }}" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                        <div class="modal-header modal-header-modern text-white p-3 px-4 position-relative">
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="p-2 rounded-3 bg-white bg-opacity-10 text-warning d-flex align-items-center justify-content-center">
-                                    <i class="bi bi-images fs-5"></i>
-                                </div>
-                                <div>
-                                    <h5 class="modal-title fs-6 fw-bold mb-0 text-white">
-                                        Galeri Foto Kosan: {{ $item->title }}
-                                    </h5>
-                                    <small class="text-white text-opacity-75 fs-8">Kelola dan unggah koleksi foto promosi untuk unit kosan ini</small>
-                                </div>
+                    <div class="modal-content border-0 shadow-lg">
+                        <div class="modal-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="modal-title mb-0">
+                                    <i class="bi bi-images text-secondary me-2"></i> Galeri Foto: {{ $item->title }}
+                                </h5>
+                                <p class="text-muted fs-8 mb-0">Kelola dan unggah koleksi foto promosi untuk unit kosan ini</p>
                             </div>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                         </div>
                         <div class="modal-body p-4">
                             <!-- Header Info / Stats -->

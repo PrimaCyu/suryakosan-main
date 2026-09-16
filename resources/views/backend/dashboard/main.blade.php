@@ -381,68 +381,68 @@
               data-accordion="false"
               id="navigation">
 
-              <!-- OVERVIEW -->
-              <li class="nav-header">OVERVIEW</li>
+              <!-- Overview -->
+              <li class="nav-header">Overview</li>
 
               <li class="nav-item">
                 <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                  <i class="nav-icon bi bi-grid-1x2-fill"></i>
+                  <i class="nav-icon bi bi-grid-1x2"></i>
                   <p>Dashboard</p>
                 </a>
               </li>
 
-              <!-- PROPERTI & WILAYAH -->
-              <li class="nav-header">PROPERTI & WILAYAH</li>
+              <!-- Properti & Wilayah -->
+              <li class="nav-header">Properti & Wilayah</li>
 
               <li class="nav-item">
                 <a href="{{ route('admin.product.kosan.index') }}" class="nav-link {{ request()->routeIs('admin.product.kosan.*') ? 'active' : '' }}">
-                  <i class="nav-icon bi bi-house-door-fill"></i>
+                  <i class="nav-icon bi bi-house-door"></i>
                   <p>Kelola Kos-kosan</p>
                 </a>
               </li>
 
-              <!-- TRANSAKSI & SEWA -->
-              <li class="nav-header">TRANSAKSI & SEWA</li>
+              <!-- Transaksi & Sewa -->
+              <li class="nav-header">Transaksi & Sewa</li>
 
               <li class="nav-item">
                 <a href="{{ route('admin.booking.index') }}" class="nav-link {{ request()->routeIs('admin.booking.*') ? 'active' : '' }} d-flex align-items-center justify-content-between">
                   <span class="d-flex align-items-center">
-                    <i class="nav-icon bi bi-calendar-check-fill"></i>
+                    <i class="nav-icon bi bi-calendar-check"></i>
                     <p class="mb-0">Permintaan Booking</p>
                   </span>
                   @if(isset($pendingBookingCount) && $pendingBookingCount > 0)
-                    <span class="badge bg-danger rounded-pill px-2 py-0.5 fs-8 fw-bold ms-2">{{ $pendingBookingCount }}</span>
+                    <span class="badge rounded-pill px-2 py-0.5 fs-8 fw-bold ms-2" style="background-color: var(--dash-accent-urgent); color: #ffffff;">{{ $pendingBookingCount }}</span>
                   @endif
                 </a>
               </li>
 
-              <!-- KONTEN & INFORMASI -->
-              <li class="nav-header">KONTEN & INFORMASI</li>
+              <!-- Konten & Informasi -->
+              <li class="nav-header">Konten & Informasi</li>
 
               <li class="nav-item">
                 <a href="{{ route('admin.artikel.index') }}" class="nav-link {{ request()->routeIs('admin.artikel.*') ? 'active' : '' }}">
-                  <i class="nav-icon bi bi-file-earmark-text-fill"></i>
+                  <i class="nav-icon bi bi-file-earmark-text"></i>
                   <p>Artikel Blog</p>
                 </a>
               </li>
 
               <li class="nav-item">
                 <a href="{{ route('admin.testimoni.index') }}" class="nav-link {{ request()->routeIs('admin.testimoni.*') ? 'active' : '' }}">
-                  <i class="nav-icon bi bi-chat-left-quote-fill"></i>
+                  <i class="nav-icon bi bi-chat-left-quote"></i>
                   <p>Testimoni & Review</p>
                 </a>
               </li>
 
               <li class="nav-item">
                 <a href="{{ route('admin.sosial.media.index') }}" class="nav-link {{ request()->routeIs('admin.sosial.media.*') ? 'active' : '' }}">
-                  <i class="nav-icon bi bi-share-fill"></i>
+                  <i class="nav-icon bi bi-share"></i>
                   <p>Sosial Media</p>
                 </a>
               </li>
 
               @if(Auth::user()->isSuperAdmin())
-              <!-- SUPER ADMIN SECTION -->
-              <li class="nav-header">SUPER ADMIN</li>
+              <!-- Super Admin -->
+              <li class="nav-header">Super Admin</li>
 
               <li class="nav-item">
                 <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
@@ -452,18 +452,18 @@
               </li>
               @endif
 
-              <!-- KEAMANAN & AKUN -->
-              <li class="nav-header">KEAMANAN & AKUN</li>
+              <!-- Keamanan & Akun -->
+              <li class="nav-header">Keamanan & Akun</li>
 
               <li class="nav-item">
                 <a href="{{ route('admin.profile.edit') }}" class="nav-link {{ request()->routeIs('admin.profile.*') ? 'active' : '' }}">
-                  <i class="nav-icon bi bi-shield-lock-fill"></i>
-                  <p>Pengaturan Akun</p>
+                  <i class="nav-icon bi bi-shield-lock"></i>
+                  <p>Profil Akun</p>
                 </a>
               </li>
 
-              <!-- TAUTAN WEBSITE -->
-              <li class="nav-header">PORTAL PUBLIK</li>
+              <!-- Tautan Website -->
+              <li class="nav-header">Portal Publik</li>
 
               <li class="nav-item">
                 <a href="{{ route('home') }}" target="_blank" class="nav-link">

@@ -1,24 +1,20 @@
 @extends('backend.dashboard.main')
 
 @section('content')
-<!-- Header Content -->
-<div class="app-content-header pb-2">
-  <div class="container-fluid">
-    <div class="row align-items-center">
-      <div class="col-sm-6">
-        <h3 class="mb-0 fw-bold text-dark">
-          <i class="bi bi-people-fill text-primary me-2"></i>Manajemen Admin & Penugasan Kos
-        </h3>
-        <p class="text-muted fs-7 mb-0">Kelola akun administrator dan tentukan cabang kos yang menjadi tanggung jawab masing-masing admin.</p>
+  <!-- Page Header -->
+  <div class="page-header-box mb-4">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+      <div>
+        <h2 class="page-title mb-1">Manajemen Admin & Penugasan Kos</h2>
+        <p class="page-subtitle mb-0">Kelola akun administrator dan tentukan cabang kos yang menjadi tanggung jawab masing-masing admin.</p>
       </div>
-      <div class="col-sm-6 text-sm-end mt-3 mt-sm-0">
-        <button type="button" class="btn btn-primary fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambahAdmin">
+      <div>
+        <button type="button" class="btn btn-primary fw-semibold" data-bs-toggle="modal" data-bs-target="#modalTambahAdmin">
           <i class="bi bi-person-plus-fill me-1"></i> Tambah Admin Baru
         </button>
       </div>
     </div>
   </div>
-</div>
 
 <!-- Main Content -->
 <div class="app-content">
@@ -51,14 +47,14 @@
     @endif
 
     <!-- Card Table -->
-    <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+    <div class="card border-0 shadow-sm">
       <div class="card-header bg-white border-bottom py-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
-        <h5 class="card-title fw-bold mb-0 text-dark">Daftar Akun Pengelola</h5>
+        <h3 class="section-title mb-0">Daftar Akun Pengelola</h3>
 
         <!-- Form Pencarian -->
         <form action="{{ route('admin.users.index') }}" method="GET" class="d-flex gap-2" style="max-width: 320px;">
           <input type="text" name="search" value="{{ request('search') }}" class="form-control form-control-sm" placeholder="Cari nama / email...">
-          <button type="submit" class="btn btn-sm btn-outline-primary">
+          <button type="submit" class="btn btn-sm btn-outline-secondary">
             <i class="bi bi-search"></i>
           </button>
           @if(request('search'))
@@ -85,22 +81,22 @@
                 <td class="ps-4 text-muted">{{ $users->firstItem() + $index }}</td>
                 <td>
                   <div class="d-flex align-items-center gap-3">
-                    <div class="user-avatar-badge" style="width: 40px; height: 40px; font-size: 1rem;">
+                    <div class="user-avatar-badge" style="width: 38px; height: 38px; font-size: 0.95rem;">
                       {{ strtoupper(substr($u->name, 0, 1)) }}
                     </div>
                     <div>
-                      <div class="fw-bold text-dark">{{ $u->name }}</div>
-                      <div class="text-muted fs-7">{{ $u->email }}</div>
+                      <div class="table-cell-title">{{ $u->name }}</div>
+                      <div class="table-cell-sub">{{ $u->email }}</div>
                     </div>
                   </div>
                 </td>
                 <td>
                   @if($u->isSuperAdmin())
-                    <span class="badge bg-primary px-2.5 py-1.5 fw-semibold shadow-xs">
+                    <span class="badge bg-dark-subtle text-dark border px-2.5 py-1 fw-semibold">
                       <i class="bi bi-shield-check me-1"></i> Super Admin
                     </span>
                   @else
-                    <span class="badge bg-info text-dark px-2.5 py-1.5 fw-semibold shadow-xs">
+                    <span class="badge bg-light text-secondary border px-2.5 py-1 fw-semibold">
                       <i class="bi bi-person-badge me-1"></i> Admin Cabang
                     </span>
                   @endif
@@ -114,13 +110,13 @@
                     @if($u->kosans->count() > 0)
                       <div class="d-flex flex-wrap gap-1">
                         @foreach($u->kosans as $kos)
-                          <span class="badge bg-secondary-subtle text-dark border px-2 py-1 fs-8">
+                          <span class="badge bg-light text-dark border px-2 py-1 fs-8">
                             <i class="bi bi-house-door me-1"></i>{{ $kos->title }} ({{ $kos->wilayah ?? '-' }})
                           </span>
                         @endforeach
                       </div>
                     @else
-                      <span class="badge bg-warning-subtle text-warning-emphasis border px-2 py-1 fs-8">
+                      <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 fs-8">
                         <i class="bi bi-exclamation-circle me-1"></i> Belum Ada Tugas Kos
                       </span>
                     @endif
@@ -131,7 +127,7 @@
                 </td>
                 <td class="text-end pe-4">
                   <div class="btn-group btn-group-sm">
-                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalEditAdmin{{ $u->id }}" title="Edit Admin">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalEditAdmin{{ $u->id }}" title="Edit Admin">
                       <i class="bi bi-pencil-square"></i>
                     </button>
                     @if($u->id !== auth()->id())
@@ -150,10 +146,10 @@
               <!-- MODAL EDIT ADMIN -->
               <div class="modal fade" id="modalEditAdmin{{ $u->id }}" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-lg">
-                  <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                  <div class="modal-content border-0 shadow-lg">
                     <div class="modal-header border-bottom py-3">
-                      <h5 class="modal-title fw-bold text-dark">
-                        <i class="bi bi-person-gear text-primary me-2"></i>Edit Data Admin: {{ $u->name }}
+                      <h5 class="modal-title fs-5" style="font-family: var(--dash-font-serif); font-weight: 600; color: var(--dash-navy);">
+                        Edit Data Admin: {{ $u->name }}
                       </h5>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -208,7 +204,7 @@
                         </div>
                       </div>
                       <div class="modal-footer border-top py-2.5">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
                         <button type="submit" class="btn btn-primary fw-semibold">Simpan Perubahan</button>
                       </div>
                     </form>
@@ -241,10 +237,10 @@
 <!-- MODAL TAMBAH ADMIN BARU -->
 <div class="modal fade" id="modalTambahAdmin" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+    <div class="modal-content border-0 shadow-lg">
       <div class="modal-header border-bottom py-3">
-        <h5 class="modal-title fw-bold text-dark">
-          <i class="bi bi-person-plus text-primary me-2"></i>Tambah Administrator Baru
+        <h5 class="modal-title fs-5" style="font-family: var(--dash-font-serif); font-weight: 600; color: var(--dash-navy);">
+          Tambah Administrator Baru
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -295,7 +291,7 @@
           </div>
         </div>
         <div class="modal-footer border-top py-2.5">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
           <button type="submit" class="btn btn-primary fw-semibold">
             <i class="bi bi-save me-1"></i> Simpan Admin
           </button>

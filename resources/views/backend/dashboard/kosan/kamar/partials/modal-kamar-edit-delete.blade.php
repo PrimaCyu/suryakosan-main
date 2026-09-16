@@ -2,11 +2,11 @@
 <div class="modal fade" id="modalEditKamar{{ $item->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header modal-header-primary text-white">
-                <h5 class="modal-title fs-6 fw-bold">
-                    <i class="bi bi-pencil-square me-2"></i> Edit Data Kamar: {{ $item->room }}
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil-square text-secondary me-2"></i> Edit Data Kamar: {{ $item->room }}
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
             <form action="{{ route('admin.product.kosan.kamar.update', [$product_kosan, $item->id]) }}" method="POST" enctype="multipart/form-data">
                 @csrf
@@ -89,14 +89,11 @@
 <div class="modal fade" id="modalDeleteKamar{{ $item->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content border-0 shadow-lg">
-            <div class="modal-body text-center p-4">
-                <div class="p-3 rounded-circle bg-danger-subtle text-danger d-inline-flex mb-3">
-                    <i class="bi bi-trash3-fill fs-2"></i>
-                </div>
-                <h6 class="fw-bold text-dark mb-1">Hapus Kamar?</h6>
-                <p class="text-muted fs-7 mb-0">Apakah Anda yakin ingin menghapus <strong>"{{ $item->room }}"</strong> beserta seluruh galeri & harganya?</p>
+            <div class="modal-body p-4">
+                <h6 class="fw-bold text-dark mb-2">Hapus Kamar?</h6>
+                <p class="text-muted fs-8 mb-0">Apakah Anda yakin ingin menghapus <strong>"{{ $item->room }}"</strong> beserta seluruh galeri & tarif harganya?</p>
             </div>
-            <div class="modal-footer d-flex justify-content-center border-top-0 pt-0 pb-3">
+            <div class="modal-footer d-flex justify-content-end border-top-0 pt-0 pb-3">
                 <button type="button" class="btn btn-sm btn-secondary px-3" data-bs-dismiss="modal">Batal</button>
                 <form action="{{ route('admin.product.kosan.kamar.delete', [$product_kosan, $item->id]) }}" method="POST" class="d-inline">
                     @csrf

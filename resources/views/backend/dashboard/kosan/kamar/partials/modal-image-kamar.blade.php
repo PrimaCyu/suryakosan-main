@@ -1,20 +1,15 @@
 <!-- MODAL IMAGE KAMAR -->
 <div class="modal fade" id="modalImageKamar{{ $item->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-            <div class="modal-header modal-header-modern text-white p-3 px-4 position-relative">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="p-2 rounded-3 bg-white bg-opacity-10 text-warning d-flex align-items-center justify-content-center">
-                        <i class="bi bi-door-open fs-5"></i>
-                    </div>
-                    <div>
-                        <h5 class="modal-title fs-6 fw-bold mb-0 text-white">
-                            Galeri Foto Kamar: {{ $item->room }}
-                        </h5>
-                        <small class="text-white text-opacity-75 fs-8">Kelola dan unggah foto unit tipe kamar ini</small>
-                    </div>
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="modal-title mb-0">
+                        <i class="bi bi-images text-secondary me-2"></i> Galeri Foto Kamar: {{ $item->room }}
+                    </h5>
+                    <p class="text-muted fs-8 mb-0">Kelola dan unggah foto unit tipe kamar ini</p>
                 </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
             <div class="modal-body p-4">
                 <!-- Header Info / Stats -->

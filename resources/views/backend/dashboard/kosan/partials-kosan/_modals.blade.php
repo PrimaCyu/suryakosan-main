@@ -5,11 +5,11 @@
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg">
             <!-- Modal Header -->
-            <div class="modal-header modal-header-primary text-white">
-                <h5 class="modal-title fs-6 fw-bold" id="modalTambahLabel">
-                    <i class="bi bi-building-fill-add me-2"></i> Tambah Properti Kos-Kosan
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTambahLabel">
+                    <i class="bi bi-house-door text-secondary me-2"></i> Tambah Properti Kos-Kosan
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
 
             <!-- Modal Form -->

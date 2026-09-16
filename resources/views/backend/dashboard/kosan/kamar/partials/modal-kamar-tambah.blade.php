@@ -3,11 +3,11 @@
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <form action="{{ route('admin.product.kosan.kamar.insert', $product_kosan) }}" method="POST" enctype="multipart/form-data" class="modal-content border-0 shadow-lg">
             @csrf
-            <div class="modal-header modal-header-primary text-white">
-                <h5 class="modal-title fs-6 fw-bold">
-                    <i class="bi bi-door-open-fill me-2"></i> Tambah Unit / Tipe Kamar
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-door-closed text-secondary me-2"></i> Tambah Unit / Tipe Kamar
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
             <div class="modal-body p-4" style="max-height: 70vh; overflow-y: auto;">
                 <p class="text-muted fs-7 mb-3">
