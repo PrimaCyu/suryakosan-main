@@ -5,25 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ $artikel->title }} - Sinar Citra Lestari</title>
   @vite(['resources/css/app.css', 'resources/js/app.js'])
-  <link rel="icon" href="{{ asset('logo.png') }}">
+  <link rel="icon" href="{{ asset('scl.png') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <style>
+    :root {
+      --scl-brown: #3B2314;
+      --scl-red: #E60049;
+      --scl-yellow: #F3A833;
+      --scl-green: #00A896;
+      --scl-cream: #FFF8F1;
+    }
+
     .reveal {
       opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateY(24px);
+      transition: opacity .65s ease, transform .65s cubic-bezier(.16,1,.3,1);
     }
     .reveal.active {
       opacity: 1;
       transform: translateY(0);
     }
+    .article-copy p { margin-bottom: 1rem; }
+    .article-copy img { border-radius: 1.25rem; margin: 1.5rem 0; max-width: 100%; }
+    .share-pop { animation: sharePop .25s ease-out; }
+    @keyframes sharePop {
+      from { opacity: 0; transform: translateY(5px) scale(.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased overflow-x-hidden">
+
+<body class="bg-[#FFF8F1] text-[#3B2314] font-sans antialiased overflow-x-hidden">
 
   <!-- 1. BAR LOADING -->
-  <div id="page-loader" class="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 to-blue-600 z-[100] transition-all duration-500 ease-out"></div>
+  <div id="page-loader" class="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-[#F3A833] via-[#E60049] to-[#00A896] transition-all duration-500 ease-out"></div>
 
   <!-- 2. NAVBAR -->
   @include('frontend.navbar')
@@ -32,50 +48,34 @@
     $imgUrl = $artikel->image ? asset('storage/' . $artikel->image) : 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80';
   @endphp
 
-  <!-- BREADCRUMB -->
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-    <nav class="flex items-center gap-2 text-xs font-semibold text-slate-400 reveal">
-      <a href="{{ url('/') }}" class="hover:text-cyan-600 transition-colors">Beranda</a>
-      <i class="fa-solid fa-chevron-right text-[9px]"></i>
-      <a href="{{ route('news.index') }}" class="hover:text-cyan-600 transition-colors">News & Events</a>
-      <i class="fa-solid fa-chevron-right text-[9px]"></i>
-      <span class="text-slate-800 font-bold truncate max-w-xs sm:max-w-md">{{ $artikel->title }}</span>
-    </nav>
-  </div>
-
   <!-- MAIN CONTENT WRAPPER -->
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-7">
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
 
       <!-- KOLOM UTAMA (ARTIKEL DETAIL) -->
-      <article class="lg:col-span-8 space-y-6 reveal">
-
-        <!-- Badge Kategori -->
-        <div>
-          <span class="inline-block px-3.5 py-1 bg-cyan-100 text-cyan-800 rounded-full text-[11px] font-bold uppercase tracking-wider">
-            News & Event
-          </span>
-        </div>
+      <article class="lg:col-span-8 reveal">
 
         <!-- Judul Berita -->
-        <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
+        <h1 class="text-3xl sm:text-5xl font-black text-[#3B2314] leading-[1.08] tracking-tight max-w-4xl">
           {{ $artikel->title }}
         </h1>
 
         <!-- Author, Views, Date, & Social Share Bar -->
-        <div class="flex flex-wrap items-center justify-between gap-4 py-2 border-y border-slate-200/80">
+        <div class="mt-6 flex flex-col sm:flex-row sm:items-end justify-between gap-5">
           <!-- Author Info & Viewer Stats -->
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-cyan-600 text-white font-bold flex items-center justify-center text-sm shadow-sm">
+            <div class="w-11 h-11 rounded-2xl bg-[#E60049] text-white flex items-center justify-center text-sm shadow-md rotate-[-3deg]">
               <i class="fa-solid fa-user-pen"></i>
             </div>
             <div>
-              <h4 class="text-xs font-bold text-slate-900">Redaksi Sinar Citra Lestari</h4>
-              <div class="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5 font-medium">
+              <h4 class="text-xs font-extrabold text-[#3B2314]">Redaksi Sinar Citra Lestari</h4>
+              <div class="flex flex-wrap items-center gap-2 text-[11px] text-[#8A6B58] mt-1 font-medium">
                 <span>{{ $artikel->created_at ? $artikel->created_at->translatedFormat('d F Y') : 'Terbaru' }}</span>
-                <span>•</span>
+                <span class="text-[#F3A833]">•</span>
                 <span class="flex items-center gap-1">
-                  <i class="fa-solid fa-eye text-cyan-600"></i> {{ number_format($artikel->view ?? 0) }} views
+                  <i class="fa-solid fa-eye text-[#00A896]"></i>
+                  {{ number_format($artikel->view ?? 0) }} views
                 </span>
               </div>
             </div>
@@ -83,60 +83,90 @@
 
           <!-- Social Share Buttons -->
           <div class="flex items-center gap-2">
-            <button onclick="shareToWhatsApp()" class="w-8 h-8 rounded-full bg-emerald-50 hover:bg-emerald-500 hover:text-white text-emerald-600 transition-all flex items-center justify-center text-xs shadow-sm hover:scale-110" title="Bagikan ke WhatsApp">
+            <span class="hidden sm:inline text-[10px] font-bold uppercase tracking-wider text-[#A78A77] mr-1">Bagikan</span>
+            <button onclick="shareToWhatsApp()" class="w-9 h-9 rounded-xl bg-[#E8F7F4] hover:bg-[#00A896] hover:text-white text-[#008F80] transition-all flex items-center justify-center text-xs shadow-sm hover:-translate-y-1" title="Bagikan ke WhatsApp">
               <i class="fa-brands fa-whatsapp text-sm"></i>
             </button>
-            <button onclick="shareToFacebook()" class="w-8 h-8 rounded-full bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-600 transition-all flex items-center justify-center text-xs shadow-sm hover:scale-110" title="Bagikan ke Facebook">
+            <button onclick="shareToFacebook()" class="w-9 h-9 rounded-xl bg-[#FFF0D9] hover:bg-[#F3A833] hover:text-[#3B2314] text-[#B76E00] transition-all flex items-center justify-center text-xs shadow-sm hover:-translate-y-1" title="Bagikan ke Facebook">
               <i class="fa-brands fa-facebook-f text-xs"></i>
             </button>
-            <button onclick="copyPageUrl()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-600 transition-all flex items-center justify-center text-xs shadow-sm hover:scale-110 relative" title="Salin Tautan">
+            <button onclick="copyPageUrl()" class="w-9 h-9 rounded-xl bg-[#F7E6EC] hover:bg-[#E60049] hover:text-white text-[#C0003D] transition-all flex items-center justify-center text-xs shadow-sm hover:-translate-y-1 relative" title="Salin Tautan">
               <i class="fa-solid fa-link text-xs"></i>
-              <span id="copy-toast" class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-0.5 rounded opacity-0 transition-opacity pointer-events-none whitespace-nowrap font-bold">Tersalin!</span>
+              <span id="copy-toast" class="absolute -top-9 left-1/2 -translate-x-1/2 bg-[#3B2314] text-[#FFF8F1] text-[10px] px-2.5 py-1 rounded-lg opacity-0 transition-opacity pointer-events-none whitespace-nowrap font-bold">Tersalin!</span>
             </button>
           </div>
         </div>
 
         <!-- Featured Image Detail -->
-        <div class="rounded-3xl overflow-hidden shadow-lg border border-slate-100 h-[280px] sm:h-[420px] bg-slate-100">
-          <img src="{{ $imgUrl }}" alt="{{ $artikel->title }}" loading="lazy" class="w-full h-full object-cover">
+        <div class="mt-7 relative rounded-[2rem] overflow-hidden shadow-xl h-[300px] sm:h-[470px] bg-[#EADFD6] group">
+          <img src="{{ $imgUrl }}" alt="{{ $artikel->title }}" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.025]">
+          <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#3B2314]/40 to-transparent pointer-events-none"></div>
         </div>
 
         <!-- Isi Konten Artikel -->
-        <div class="space-y-4 text-sm sm:text-base text-slate-700 leading-relaxed pt-2 bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm">
-          {!! nl2br(e($artikel->deskripsi ?? 'Konten artikel belum ditambahkan.')) !!}
+        <div class="mt-7 grid grid-cols-1 sm:grid-cols-[8px_1fr] gap-5 items-stretch">
+          <div class="hidden sm:block rounded-full bg-gradient-to-b from-[#E60049] via-[#F3A833] to-[#00A896]"></div>
+          <div class="article-copy text-sm sm:text-base text-[#5B4537] leading-[1.9] bg-white p-6 sm:p-9 rounded-[2rem] border border-[#EADFD6] shadow-sm">
+            {!! nl2br(e($artikel->deskripsi ?? 'Konten artikel belum ditambahkan.')) !!}
+          </div>
         </div>
 
       </article>
 
       <!-- SIDEBAR DESKTOP SEARCH & BERITA LAIN -->
-      <aside class="hidden lg:block lg:col-span-4 sticky top-28 space-y-6 reveal">
-        <div class="bg-white p-6 rounded-3xl space-y-5 border border-slate-100 shadow-sm">
-          <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
-            <i class="fa-solid fa-magnifying-glass text-cyan-600"></i> Cari Artikel Lain
-          </h3>
+      <aside class="hidden lg:block lg:col-span-4 sticky top-28 reveal">
+        <div class="space-y-5">
 
-          <form action="{{ route('news.index') }}" method="GET" class="relative">
-            <input type="text" name="search" placeholder="Ketik kata kunci..." class="w-full px-4 py-2.5 bg-slate-50 text-xs rounded-2xl border border-slate-200 focus:outline-none focus:border-cyan-600 font-medium">
-          </form>
+          <div class="rounded-[2rem] bg-[#3B2314] p-6 text-[#FFF8F1] shadow-lg overflow-hidden relative">
+            <div class="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-[#E60049]/30"></div>
+            <div class="absolute -right-2 bottom-[-35px] w-24 h-24 rounded-full bg-[#F3A833]/20"></div>
 
-          <div class="space-y-4 pt-2">
-            <span class="text-xs font-extrabold text-slate-900 block">Artikel Terkait Lainnya</span>
-            @forelse($beritaLainnya as $itemLain)
-              @php
-                $imgLain = $itemLain->image ? asset('storage/' . $itemLain->image) : 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80';
-              @endphp
-              <a href="{{ route('news.detail', $itemLain->slug) }}" class="flex items-center gap-3 group hover:bg-slate-50 p-2 rounded-2xl transition-all">
-                <img src="{{ $imgLain }}" alt="{{ $itemLain->title }}" loading="lazy" class="w-14 h-14 rounded-xl object-cover shrink-0">
-                <div>
-                  <span class="text-[9px] font-bold text-cyan-600 uppercase">Artikel</span>
-                  <h5 class="text-xs font-bold text-slate-800 leading-snug group-hover:text-cyan-600 transition-colors line-clamp-2">{{ $itemLain->title }}</h5>
-                  <span class="text-[10px] text-slate-400 mt-0.5 block">{{ $itemLain->created_at ? $itemLain->created_at->format('d M Y') : '' }}</span>
+            <div class="relative">
+              <span class="text-[10px] uppercase tracking-[.2em] font-bold text-[#F3A833]">Eksplorasi</span>
+              <h3 class="text-xl font-black mt-2 leading-tight">Temukan bacaan lainnya.</h3>
+              <p class="text-xs text-[#E8D9CD] mt-2 leading-relaxed">Cari informasi, tips, dan kabar terbaru seputar kosan.</p>
+
+              <form action="{{ route('news.index') }}" method="GET" class="mt-5">
+                <div class="relative">
+                  <input type="text" name="search" placeholder="Ketik kata kunci..." class="w-full px-4 py-3 pr-11 bg-[#FFF8F1] text-[#3B2314] text-xs rounded-2xl border-0 focus:outline-none focus:ring-2 focus:ring-[#F3A833] font-medium placeholder-[#9A8170]">
+                  <button type="submit" class="absolute right-1.5 top-1.5 w-9 h-9 rounded-xl bg-[#E60049] hover:bg-[#C90040] text-white transition-all flex items-center justify-center">
+                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                  </button>
                 </div>
-              </a>
-            @empty
-              <p class="text-xs text-slate-400 py-2">Berita lainnya belum tersedia.</p>
-            @endforelse
+              </form>
+            </div>
           </div>
+
+          <div class="bg-white p-6 rounded-[2rem] border border-[#EADFD6] shadow-sm">
+            <div class="flex items-center justify-between mb-5">
+              <div>
+                <span class="text-[10px] uppercase tracking-wider font-bold text-[#00A896]">Pilihan bacaan</span>
+                <h3 class="font-black text-[#3B2314] text-base mt-1">Artikel Lainnya</h3>
+              </div>
+              <span class="w-8 h-8 rounded-xl bg-[#FFF0D9] text-[#F3A833] flex items-center justify-center">
+                <i class="fa-solid fa-book-open text-xs"></i>
+              </span>
+            </div>
+
+            <div class="space-y-2">
+              @forelse($beritaLainnya as $itemLain)
+                @php
+                  $imgLain = $itemLain->image ? asset('storage/' . $itemLain->image) : 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80';
+                @endphp
+                <a href="{{ route('news.detail', $itemLain->slug) }}" class="flex items-center gap-3 group p-2.5 rounded-2xl hover:bg-[#FFF8F1] transition-all">
+                  <img src="{{ $imgLain }}" alt="{{ $itemLain->title }}" loading="lazy" class="w-16 h-16 rounded-xl object-cover shrink-0 group-hover:scale-[1.03] transition-transform">
+                  <div class="min-w-0">
+                    <span class="text-[9px] font-bold text-[#E60049] uppercase">Artikel</span>
+                    <h5 class="text-xs font-extrabold text-[#3B2314] leading-snug group-hover:text-[#E60049] transition-colors line-clamp-2">{{ $itemLain->title }}</h5>
+                    <span class="text-[10px] text-[#9A8170] mt-1 block">{{ $itemLain->created_at ? $itemLain->created_at->format('d M Y') : '' }}</span>
+                  </div>
+                </a>
+              @empty
+                <p class="text-xs text-[#9A8170] py-2">Berita lainnya belum tersedia.</p>
+              @endforelse
+            </div>
+          </div>
+
         </div>
       </aside>
 
@@ -145,38 +175,44 @@
 
   <!-- SECTION REKOMENDASI BERITA BOTTOM -->
   @if($beritaLainnya->count() > 0)
-    <section class="bg-gradient-to-b from-cyan-50/50 to-slate-100/60 py-12 mt-12 border-t border-slate-100">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 reveal">
+    <section class="bg-[#3B2314] py-14 mt-10 overflow-hidden">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-7 reveal">
 
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <h2 class="text-2xl font-extrabold text-slate-900">Rekomendasi News & Events Menarik</h2>
-            <p class="text-xs text-slate-500 mt-0.5">Artikel dan tips lainnya yang informatif untuk dibaca.</p>
+            <span class="inline-flex items-center gap-2 text-[10px] uppercase tracking-[.18em] font-bold text-[#F3A833]">
+              <span class="w-7 h-px bg-[#F3A833]"></span> Lanjut membaca
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-black text-[#FFF8F1] mt-2">Rekomendasi Menarik</h2>
           </div>
-          <a href="{{ route('news.index') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-600 hover:text-cyan-700 transition-colors">
-            <span>Lihat Semua</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          <a href="{{ route('news.index') }}" class="self-start sm:self-auto inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#FFF8F1] text-[#3B2314] text-xs font-extrabold hover:bg-[#F3A833] transition-all hover:-translate-y-0.5">
+            <span>Lihat Semua</span>
+            <i class="fa-solid fa-arrow-right text-[10px]"></i>
           </a>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
           @foreach($beritaLainnya->take(3) as $rekom)
             @php
               $rekomImg = $rekom->image ? asset('storage/' . $rekom->image) : 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80';
             @endphp
-            <div class="bg-white rounded-3xl p-3 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between border border-slate-100 group">
-              <div class="rounded-2xl overflow-hidden h-44 relative bg-slate-100">
+            <div class="bg-[#FFF8F1] rounded-[2rem] p-3 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col justify-between group">
+              <a href="{{ route('news.detail', $rekom->slug) }}" class="block rounded-[1.5rem] overflow-hidden h-48 relative bg-[#EADFD6]">
                 <img src="{{ $rekomImg }}" alt="{{ $rekom->title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-              </div>
+                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-[#3B2314]/90 text-[#FFF8F1] text-[9px] font-bold uppercase">Artikel</span>
+              </a>
+
               <div class="p-4 space-y-3 flex-1 flex flex-col justify-between">
                 <div>
-                  <span class="text-[10px] font-bold text-cyan-600 uppercase tracking-wider">Artikel</span>
-                  <h4 class="font-extrabold text-slate-900 text-sm mt-1 leading-snug line-clamp-2 hover:text-cyan-600 transition-colors" title="{{ $rekom->title }}">
-                    <a href="{{ route('news.detail', $rekom->slug) }}">{{ $rekom->title }}</a>
+                  <span class="text-[10px] font-bold text-[#00A896] uppercase tracking-wider">{{ $rekom->created_at ? $rekom->created_at->format('d M Y') : 'Terbaru' }}</span>
+                  <h4 class="font-black text-[#3B2314] text-sm mt-1.5 leading-snug line-clamp-2" title="{{ $rekom->title }}">
+                    <a href="{{ route('news.detail', $rekom->slug) }}" class="hover:text-[#E60049] transition-colors">{{ $rekom->title }}</a>
                   </h4>
-                  <p class="text-slate-500 text-xs mt-1 line-clamp-2">{{ Str::limit(strip_tags($rekom->deskripsi), 80) }}</p>
+                  <p class="text-[#795F4D] text-xs mt-2 line-clamp-2 leading-relaxed">{{ Str::limit(strip_tags($rekom->deskripsi), 80) }}</p>
                 </div>
-                <a href="{{ route('news.detail', $rekom->slug) }}" class="inline-flex items-center gap-1 text-xs font-bold text-cyan-600 hover:text-cyan-700 pt-2 border-t border-slate-100">
-                  <span>Baca Selengkapnya</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                <a href="{{ route('news.detail', $rekom->slug) }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#E60049] hover:text-[#B9003A] pt-3 border-t border-[#EADFD6]">
+                  <span>Baca Selengkapnya</span>
+                  <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
                 </a>
               </div>
             </div>
@@ -189,9 +225,6 @@
 
   <!-- FOOTER -->
   @include('frontend.footer')
-
-  <!-- NEED HELP WIDGET -->
-  @include('frontend.need-help')
 
   <!-- JAVASCRIPT SYSTEM LOGIC -->
   <script>
@@ -221,7 +254,21 @@
         const toast = document.getElementById('copy-toast');
         if (toast) {
           toast.classList.remove('opacity-0');
-          setTimeout(() => { toast.classList.add('opacity-0'); }, 2000);
+          toast.classList.add('share-pop');
+          setTimeout(() => {
+            toast.classList.add('opacity-0');
+            toast.classList.remove('share-pop');
+          }, 2000);
+        }
+      }).catch(() => {
+        const toast = document.getElementById('copy-toast');
+        if (toast) {
+          toast.textContent = 'Gagal menyalin';
+          toast.classList.remove('opacity-0');
+          setTimeout(() => {
+            toast.classList.add('opacity-0');
+            toast.textContent = 'Tersalin!';
+          }, 2000);
         }
       });
     }
@@ -231,11 +278,12 @@
     const revealOnScroll = () => {
       const windowHeight = window.innerHeight;
       revealElements.forEach(el => {
-        if (el.getBoundingClientRect().top < windowHeight - 80) {
+        if (el.getBoundingClientRect().top < windowHeight - 70) {
           el.classList.add('active');
         }
       });
     };
+
     window.addEventListener('scroll', revealOnScroll);
     window.addEventListener('load', revealOnScroll);
   </script>

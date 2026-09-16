@@ -49,6 +49,38 @@ class HomeController extends Controller
             $query->where('wilayah', $request->wilayah);
         }
 
+        if ($request->filled('price_min') || $request->filled('price_max')) {
+            $min = $request->price_min;
+            $max = $request->price_max;
+            $query->whereHas('productKamarKosan.priceKamar', function ($q) use ($min, $max) {
+                if (!empty($min)) {
+                    $q->where('price', '>=', (float)$min);
+                }
+                if (!empty($max)) {
+                    $q->where('price', '<=', (float)$max);
+                }
+            });
+        } elseif ($request->filled('price_range')) {
+            $rangeMap = [
+                'under-500'  => [null, 500000],
+                '500-1000'   => [500000, 1000000],
+                '1000-1500'  => [1000000, 1500000],
+                '1500-2500'  => [1500000, 2500000],
+                'over-2500'  => [2500000, null],
+            ];
+            if (isset($rangeMap[$request->price_range])) {
+                [$min, $max] = $rangeMap[$request->price_range];
+                $query->whereHas('productKamarKosan.priceKamar', function ($q) use ($min, $max) {
+                    if (!is_null($min)) {
+                        $q->where('price', '>=', $min);
+                    }
+                    if (!is_null($max)) {
+                        $q->where('price', '<=', $max);
+                    }
+                });
+            }
+        }
+
         $kosanList = $query->orderByDesc('created_at')->paginate(9)->withQueryString();
         return view('frontend.kosan.kos', compact('kosanList'));
     }
