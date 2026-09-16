@@ -3,12 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Artikel;
 use App\Models\ProductKamarKosan;
 use App\Models\ProductKosan;
-use App\Models\SosialMedia;
 use App\Models\Tamu;
-use App\Models\Testimoni;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -19,72 +16,111 @@ class DashboardController extends Controller
         $isSuper = $user->isSuperAdmin();
         $assignedIds = $isSuper ? collect() : $user->kosans()->pluck('product_kosans.id');
 
-        // Statistics
+        // 1. Cakupan Properti & Kamar
         $totalKosan = $isSuper ? ProductKosan::count() : $assignedIds->count();
-        $totalKamar = $isSuper ? ProductKamarKosan::count() : ProductKamarKosan::whereIn('product_kosan_id', $assignedIds)->count();
-
-        $pendingBookingsCount = Tamu::where('status', 'pending')
+        $totalKamar = ProductKamarKosan::query()
             ->when(!$isSuper, function ($q) use ($assignedIds) {
-                $q->whereHas('productKamarKosan', fn($sub) => $sub->whereIn('product_kosan_id', $assignedIds));
+                $q->whereIn('product_kosan_id', $assignedIds);
             })->count();
 
-        $approvedBookingsCount = Tamu::where('status', 'approved')
+        // Kamar Terisi (memiliki penyewa aktif berstatus approved dengan end_date >= hari ini)
+        $occupiedKamar = ProductKamarKosan::whereHas('tamu', function ($q) {
+                $q->where('status', 'approved')
+                  ->whereDate('end_date', '>=', now()->toDateString());
+            })
             ->when(!$isSuper, function ($q) use ($assignedIds) {
-                $q->whereHas('productKamarKosan', fn($sub) => $sub->whereIn('product_kosan_id', $assignedIds));
-            })->count();
+                $q->whereIn('product_kosan_id', $assignedIds);
+            })
+            ->count();
 
-        $totalArtikel = Artikel::count();
-        $totalTestimoni = Testimoni::count();
-        $totalSosmed = SosialMedia::count();
+        // Kamar Kosong & Okupansi
+        $availableKamar = max(0, $totalKamar - $occupiedKamar);
+        $occupancyRate = $totalKamar > 0 ? round(($occupiedKamar / $totalKamar) * 100, 1) : 0;
 
-        // Recent Bookings (Pending first, then latest)
-        $recentBookings = Tamu::with(['productKamarKosan.productKosan'])
+        // 2. Pendapatan (Bulan ini & Total Akumulasi Approved)
+        $currentMonthRevenue = Tamu::where('status', 'approved')
+            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
             ->when(!$isSuper, function ($q) use ($assignedIds) {
                 $q->whereHas('productKamarKosan', fn($sub) => $sub->whereIn('product_kosan_id', $assignedIds));
             })
-            ->orderByRaw("CASE WHEN status = 'pending' THEN 1 ELSE 2 END")
-            ->orderByDesc('created_at')
-            ->take(6)
-            ->get();
+            ->sum('total_price');
 
-        // Recent Kosan Properties with room counts
-        $recentKosans = ProductKosan::withCount('productKamarKosan')
+        $totalRevenue = Tamu::where('status', 'approved')
             ->when(!$isSuper, function ($q) use ($assignedIds) {
-                $q->whereIn('id', $assignedIds);
+                $q->whereHas('productKamarKosan', fn($sub) => $sub->whereIn('product_kosan_id', $assignedIds));
             })
-            ->orderByDesc('created_at')
-            ->take(5)
+            ->sum('total_price');
+
+        // 3. Tindakan Hari Ini Bagian 1: Booking Baru Menunggu Konfirmasi (Pending)
+        $pendingBookings = Tamu::with(['productKamarKosan.productKosan'])
+            ->where('status', 'pending')
+            ->when(!$isSuper, function ($q) use ($assignedIds) {
+                $q->whereHas('productKamarKosan', fn($sub) => $sub->whereIn('product_kosan_id', $assignedIds));
+            })
+            ->orderBy('created_at', 'asc')
             ->get();
 
-        // Recent Articles
-        $recentArtikels = Artikel::orderByDesc('created_at')
-            ->take(4)
-            ->get();
+        $pendingBookingsCount = $pendingBookings->count();
 
-        // Expiring & Overdue Tenancies (Masa sewa mau habis <= 7 hari ke depan, atau jatuh tempo s/d 14 hari lalu)
-        $expiringTenancies = Tamu::with(['productKamarKosan.productKosan'])
+        // 4. Tindakan Hari Ini Bagian 2: Sewa & Pembayaran Jatuh Tempo (H-7 s/d H+30 Overdue)
+        $expiringOrOverdueTenancies = Tamu::with(['productKamarKosan.productKosan'])
             ->where('status', 'approved')
             ->whereDate('end_date', '<=', now()->addDays(7)->toDateString())
-            ->whereDate('end_date', '>=', now()->subDays(14)->toDateString())
+            ->whereDate('end_date', '>=', now()->subDays(30)->toDateString())
             ->when(!$isSuper, function ($q) use ($assignedIds) {
                 $q->whereHas('productKamarKosan', fn($sub) => $sub->whereIn('product_kosan_id', $assignedIds));
             })
             ->orderBy('end_date', 'asc')
-            ->take(6)
             ->get();
+
+        $expiringOrOverdueCount = $expiringOrOverdueTenancies->count();
+        $totalUrgentActions = $pendingBookingsCount + $expiringOrOverdueCount;
+
+        // 5. Ringkasan Performa Seluruh Properti Cabang
+        $propertiesOverview = ProductKosan::with(['productKamarKosan' => function ($q) {
+                $q->withCount(['tamu as active_tenants_count' => function ($sub) {
+                    $sub->where('status', 'approved')
+                        ->whereDate('end_date', '>=', now()->toDateString());
+                }]);
+            }])
+            ->when(!$isSuper, function ($q) use ($assignedIds) {
+                $q->whereIn('id', $assignedIds);
+            })
+            ->orderBy('title', 'asc')
+            ->get()
+            ->map(function ($kosan) {
+                $roomsCount = $kosan->productKamarKosan->count();
+                $occupiedCount = $kosan->productKamarKosan->filter(fn($r) => $r->active_tenants_count > 0)->count();
+                $availableCount = max(0, $roomsCount - $occupiedCount);
+                $rate = $roomsCount > 0 ? round(($occupiedCount / $roomsCount) * 100) : 0;
+
+                return [
+                    'id'              => $kosan->id,
+                    'title'           => $kosan->title,
+                    'slug'            => $kosan->slug,
+                    'wilayah'         => $kosan->wilayah ?? 'Bali',
+                    'rooms_count'     => $roomsCount,
+                    'occupied_count'  => $occupiedCount,
+                    'available_count' => $availableCount,
+                    'occupancy_rate'  => $rate,
+                ];
+            });
 
         return view('backend.dashboard.home', compact(
             'totalKosan',
             'totalKamar',
+            'occupiedKamar',
+            'availableKamar',
+            'occupancyRate',
+            'currentMonthRevenue',
+            'totalRevenue',
+            'pendingBookings',
             'pendingBookingsCount',
-            'approvedBookingsCount',
-            'totalArtikel',
-            'totalTestimoni',
-            'totalSosmed',
-            'recentBookings',
-            'recentKosans',
-            'recentArtikels',
-            'expiringTenancies'
+            'expiringOrOverdueTenancies',
+            'expiringOrOverdueCount',
+            'totalUrgentActions',
+            'propertiesOverview'
         ));
     }
 }
