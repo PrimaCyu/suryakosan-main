@@ -36,7 +36,7 @@
                     <p class="text-muted fs-8 mb-0">Total {{ $bookings->total() }} transaksi booking tercatat.</p>
                 </div>
                 <div class="search-box-responsive">
-                    <form action="{{ route('admin..booking.index') }}" method="GET" class="input-group input-group-sm">
+                    <form action="{{ route('admin.booking.index') }}" method="GET" class="input-group input-group-sm">
                         <span class="input-group-text bg-transparent border-end-0 text-muted">
                             <i class="bi bi-search"></i>
                         </span>
@@ -187,7 +187,7 @@
                 </div>
                 <div class="modal-footer d-flex justify-content-center border-top-0 pt-0 pb-3">
                     <button type="button" class="btn btn-sm btn-secondary px-3" data-bs-dismiss="modal">Batal</button>
-                    <form action="{{ route('admin..booking.approve', $item->id) }}" method="POST" class="d-inline">
+                    <form action="{{ route('admin.booking.approve', $item->id) }}" method="POST" class="d-inline">
                         @csrf
                         @method('PUT')
                         <button type="submit" class="btn btn-sm btn-success px-3">
@@ -214,7 +214,7 @@
                 </div>
                 <div class="modal-footer d-flex justify-content-center border-top-0 pt-0 pb-3">
                     <button type="button" class="btn btn-sm btn-secondary px-3" data-bs-dismiss="modal">Batal</button>
-                    <form action="{{ route('admin..booking.reject', $item->id) }}" method="POST" class="d-inline">
+                    <form action="{{ route('admin.booking.reject', $item->id) }}" method="POST" class="d-inline">
                         @csrf
                         @method('PUT')
                         <button type="submit" class="btn btn-sm btn-danger px-3">

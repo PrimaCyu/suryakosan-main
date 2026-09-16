@@ -142,7 +142,7 @@
             <div class="space-y-4 text-xs sm:text-sm">
               <div>
                 <label class="block font-semibold text-slate-700 mb-1">Tipe Unit Kamar Terpilih</label>
-                <input type="text" value="{{ $kamar->room }} - {{ $kamar->productKosan->title ?? 'NemuKOS' }}" readonly class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl font-medium text-slate-600 focus:outline-none cursor-not-allowed">
+                <input type="text" value="{{ $kamar->room }} - {{ $kamar->productKosan->title ?? 'Sinar Citra Lestari' }}" readonly class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl font-medium text-slate-600 focus:outline-none cursor-not-allowed">
               </div>
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -251,14 +251,16 @@
               </button>
             </div>
 
+            <input type="hidden" name="payment_method" id="input-payment-method" value="qris">
+
             <div id="transfer-method-container" class="space-y-4 pt-2 transition-all">
               <div>
                 <label class="block font-semibold text-xs sm:text-sm text-slate-700 mb-1">Pilih Rekening Tujuan</label>
-                <select id="select-bank" name="payment_method" onchange="toggleQrisDisplay()" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl font-medium text-slate-800 focus:outline-none focus:border-cyan-600">
+                <select id="select-bank" onchange="handleBankChange()" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl font-medium text-slate-800 focus:outline-none focus:border-cyan-600">
                   <option value="qris">QRIS (Semua Bank & E-Wallet: BCA, Mandiri, Dana, GoPay)</option>
-                  <option value="bca">BCA: 1234567890 a/n NemuKOS Management</option>
-                  <option value="mandiri">Mandiri: 0987654321 a/n NemuKOS Management</option>
-                  <option value="bni">BNI: 1111111111 a/n NemuKOS Management</option>
+                  <option value="bca">BCA: 1234567890 a/n Sinar Citra Lestari</option>
+                  <option value="mandiri">Mandiri: 0987654321 a/n Sinar Citra Lestari</option>
+                  <option value="bni">BNI: 1111111111 a/n Sinar Citra Lestari</option>
                 </select>
               </div>
 
@@ -266,7 +268,7 @@
               <div id="qris-display" class="p-5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col items-center justify-center space-y-3 text-center">
                 <span class="text-xs font-bold text-slate-700">Scan QRIS Resmi Pembayaran</span>
                 <div class="p-3 bg-white rounded-2xl border border-slate-200 shadow-md inline-block">
-                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=NemuKOS-Sewa-Kosan" alt="Kode QRIS Pembayaran" class="w-40 h-40 object-contain">
+                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=Sinar-Citra-Lestari-Booking" alt="Kode QRIS Pembayaran" class="w-40 h-40 object-contain">
                 </div>
                 <p class="text-[11px] text-slate-500 max-w-xs leading-relaxed">
                   Buka aplikasi m-Banking atau e-Wallet favorit Anda, pilih menu QRIS / Scan, lalu selesaikan pembayaran sesuai total tagihan.
@@ -368,24 +370,36 @@
 
   </main>
 
-  <!-- 4. MODAL POP-UP FAILED BOOKING -->
-  @if (session('failed'))
+  <!-- 4. MODAL POP-UP FAILED BOOKING & VALIDATION ERRORS -->
+  @if (session('failed') || (isset($errors) && $errors->any()))
     <div id="flash-failed-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4 transition-all">
       <div class="bg-white w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl relative space-y-5 border border-slate-100 animate-in fade-in zoom-in duration-200">
         <button type="button" onclick="closeFailedModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200 hover:text-slate-700 transition-colors">
           <i class="fa-solid fa-xmark text-sm"></i>
         </button>
 
-        <div class="space-y-1 text-center">
+        <div class="space-y-2 text-center">
           <div class="w-16 h-16 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-3">
             <i class="fa-solid fa-circle-xmark text-3xl"></i>
           </div>
-          <h3 class="text-2xl font-extrabold text-slate-900">Booking Gagal</h3>
-          <p class="text-xs sm:text-sm text-slate-500 mt-1">{{ session('failed') }}</p>
+          <h3 class="text-2xl font-extrabold text-slate-900">Pemesanan Belum Berhasil</h3>
+          @if (session('failed'))
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">{{ session('failed') }}</p>
+          @endif
+          @if (isset($errors) && $errors->any())
+            <div class="text-left bg-rose-50 border border-rose-100 rounded-2xl p-3.5 mt-2 space-y-1">
+              <span class="text-xs font-bold text-rose-700 block">Mohon periksa data berikut:</span>
+              <ul class="list-disc list-inside text-xs text-rose-600 space-y-0.5">
+                @foreach ($errors->all() as $error)
+                  <li>{{ $error }}</li>
+                @endforeach
+              </ul>
+            </div>
+          @endif
         </div>
 
         <button type="button" onclick="closeFailedModal()" class="w-full py-3.5 bg-rose-600 hover:bg-rose-700 text-white font-extrabold rounded-2xl transition-all shadow-md active:scale-95 text-xs sm:text-sm">
-          Coba Lagi
+          Perbaiki Data & Coba Lagi
         </button>
       </div>
     </div>
@@ -626,18 +640,35 @@
       const optCod = document.getElementById('opt-cod');
       const transferContainer = document.getElementById('transfer-method-container');
       const codContainer = document.getElementById('cod-method-container');
+      const paymentMethodInput = document.getElementById('input-payment-method');
+      const selectBank = document.getElementById('select-bank');
 
       if (type === 'transfer') {
         optTransfer.className = "p-4 rounded-2xl border-2 border-cyan-500 bg-cyan-50/50 text-left transition-all active:scale-95 shadow-sm";
         optCod.className = "p-4 rounded-2xl border border-slate-200 bg-white text-left transition-all active:scale-95 hover:border-slate-300";
         transferContainer.classList.remove('hidden');
         codContainer.classList.add('hidden');
+        if (paymentMethodInput && selectBank) {
+          paymentMethodInput.value = selectBank.value || 'qris';
+        }
       } else {
         optCod.className = "p-4 rounded-2xl border-2 border-cyan-500 bg-cyan-50/50 text-left transition-all active:scale-95 shadow-sm";
         optTransfer.className = "p-4 rounded-2xl border border-slate-200 bg-white text-left transition-all active:scale-95 hover:border-slate-300";
         transferContainer.classList.add('hidden');
         codContainer.classList.remove('hidden');
+        if (paymentMethodInput) {
+          paymentMethodInput.value = 'cash';
+        }
       }
+    }
+
+    function handleBankChange() {
+      const selectBank = document.getElementById('select-bank');
+      const paymentMethodInput = document.getElementById('input-payment-method');
+      if (selectBank && paymentMethodInput && currentPaymentType === 'transfer') {
+        paymentMethodInput.value = selectBank.value || 'qris';
+      }
+      toggleQrisDisplay();
     }
 
     function handleFileUpload(event) {

@@ -140,7 +140,7 @@
                                     <label for="url_tambah" class="form-label">
                                         URL / Link Lengkap <span class="text-danger">*</span>
                                     </label>
-                                    <input type="url" name="url" id="url_tambah" class="form-control" placeholder="https://instagram.com/nemukos" required>
+                                    <input type="url" name="url" id="url_tambah" class="form-control" placeholder="https://instagram.com/sinarcitralestari" required>
                                 </div>
                             </div>
                         </div>

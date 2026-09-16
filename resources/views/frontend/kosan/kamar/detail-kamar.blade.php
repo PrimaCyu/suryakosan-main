@@ -32,7 +32,7 @@
     <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
 
         @php
-          $namaKosan = $kamar->productKosan->title ?? 'NemuKOS Properti';
+          $namaKosan = $kamar->productKosan->title ?? 'Sinar Citra Lestari';
           $namaKamar = $kamar->room ?? 'Kamar Exclusive';
         @endphp
 
@@ -62,7 +62,7 @@
           <a href="{{ route('form.booking.kamar', $kamar->id) }}" class="w-full sm:flex-1 py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white text-xs sm:text-sm font-extrabold rounded-2xl transition-all shadow-md hover:shadow-cyan-500/25 text-center flex items-center justify-center gap-2 active:scale-95">
             <span>Pesan Kamar Ini Sekarang</span> <i class="fa-solid fa-chevron-right text-xs"></i>
           </a>
-          <a id="btn-tanya-pemilik" href="https://wa.me/6282146138847?text={{ urlencode('Halo Admin NemuKOS, saya ingin bertanya mengenai ketersediaan ' . $namaKamar . ' di ' . $namaKosan) }}" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-8 py-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-800 text-xs sm:text-sm font-extrabold rounded-2xl transition-all shadow-sm hover:shadow text-center flex items-center justify-center gap-2 active:scale-95">
+          <a id="btn-tanya-pemilik" href="https://wa.me/6282146138847?text={{ urlencode('Halo Admin Sinar Citra Lestari, saya ingin bertanya mengenai ketersediaan ' . $namaKamar . ' di ' . $namaKosan) }}" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-8 py-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-800 text-xs sm:text-sm font-extrabold rounded-2xl transition-all shadow-sm hover:shadow text-center flex items-center justify-center gap-2 active:scale-95">
             <i class="fa-brands fa-whatsapp text-emerald-500 text-lg"></i> <span>Tanya Pengelola</span>
           </a>
         </div>

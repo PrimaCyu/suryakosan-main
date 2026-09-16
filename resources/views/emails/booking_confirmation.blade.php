@@ -102,7 +102,7 @@
     <div class="email-container">
         <div class="email-header">
             <h1>Konfirmasi Reservasi Kos</h1>
-            <p>{{ config('app.name', 'NemuKos') }}</p>
+            <p>{{ config('app.name', 'Sinar Citra Lestari') }}</p>
         </div>
 
         <div class="email-body">

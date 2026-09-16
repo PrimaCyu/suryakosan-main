@@ -158,7 +158,7 @@
         </div>
     </section>
 
-    <!-- 4. SECTION: MENGAPA MEMILIH NEMUKOS -->
+    <!-- 4. SECTION: MENGAPA MEMILIH SINAR CITRA LESTARI -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 reveal">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             <!-- Sisi Kiri: Deskripsi Keunggulan -->
@@ -434,7 +434,7 @@
             <div class="lg:w-1/3 space-y-3 shrink-0 text-center lg:text-left">
                 <span class="text-cyan-700 text-xs font-bold uppercase tracking-wider">Ulasan Penghuni</span>
                 <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
-                    Apa Kata Mereka Tentang NemuKOS?
+                    Apa Kata Mereka Tentang Sinar Citra Lestari?
                 </h2>
                 <p class="text-slate-600 text-xs sm:text-sm max-w-sm leading-relaxed">
                     Lebih dari ribuan penyewa telah menemukan hunian idaman mereka dengan mudah dan aman.
@@ -475,7 +475,7 @@
                                 <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
                             </div>
                             <p class="text-slate-600 text-xs leading-relaxed font-medium">
-                                "Sangat mudah menemukan kos yang nyaman dan fasilitas lengkap di NemuKOS. Pelayanannya cepat dan terpercaya!"
+                                "Sangat mudah menemukan kos yang nyaman dan fasilitas lengkap di Sinar Citra Lestari. Pelayanannya cepat dan terpercaya!"
                             </p>
                             <div class="flex items-center gap-3 pt-2 border-t border-slate-100">
                                 <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="Siska Amelia" loading="lazy" class="w-10 h-10 rounded-full object-cover shadow-sm">

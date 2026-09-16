@@ -118,10 +118,10 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function(){
     });
 
     // Booking Approval Management
-    Route::prefix('/booking')->controller(BookingAdminController::class)->name('.booking')->group(function(){
-        Route::get('/index', 'indexBooking')->name('.index');
-        Route::put('/approve/{tamu}', 'approveBooking')->name('.approve');
-        Route::put('/reject/{tamu}', 'rejectBooking')->name('.reject');
+    Route::prefix('/booking')->controller(BookingAdminController::class)->name('booking.')->group(function(){
+        Route::get('/index', 'indexBooking')->name('index');
+        Route::put('/approve/{tamu}', 'approveBooking')->name('approve');
+        Route::put('/reject/{tamu}', 'rejectBooking')->name('reject');
     });
 
     // Social Media

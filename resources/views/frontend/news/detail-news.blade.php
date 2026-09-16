@@ -70,7 +70,7 @@
               <i class="fa-solid fa-user-pen"></i>
             </div>
             <div>
-              <h4 class="text-xs font-bold text-slate-900">Redaksi NemuKOS</h4>
+              <h4 class="text-xs font-bold text-slate-900">Redaksi Sinar Citra Lestari</h4>
               <div class="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5 font-medium">
                 <span>{{ $artikel->created_at ? $artikel->created_at->translatedFormat('d F Y') : 'Terbaru' }}</span>
                 <span>•</span>
@@ -207,7 +207,7 @@
     // Share Functions
     function shareToWhatsApp() {
       const pageUrl = window.location.href;
-      const text = encodeURIComponent(`Baca artikel menarik di NemuKOS: ${pageUrl}`);
+      const text = encodeURIComponent(`Baca artikel menarik di Sinar Citra Lestari: ${pageUrl}`);
       window.open(`https://wa.me/?text=${text}`, '_blank');
     }
 

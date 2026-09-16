@@ -108,7 +108,7 @@
                     Kelola Admin & Cabang
                   @elseif(request()->routeIs('admin.product.kosan.*'))
                     Kelola Kos-kosan
-                  @elseif(request()->routeIs('admin..booking.*'))
+                  @elseif(request()->routeIs('admin.booking.*'))
                     Permintaan Booking
                   @elseif(request()->routeIs('admin.artikel.*'))
                     Artikel Blog
@@ -167,12 +167,12 @@
                       <span class="badge bg-danger rounded-pill px-2 py-0.5" style="font-size: 0.68rem;">{{ $pendingBookingCount }} Baru</span>
                     @endif
                   </div>
-                  <a href="{{ route('admin..booking.index') }}" class="fs-8 text-decoration-none text-primary fw-semibold">Buka Semua</a>
+                  <a href="{{ route('admin.booking.index') }}" class="fs-8 text-decoration-none text-primary fw-semibold">Buka Semua</a>
                 </div>
                 <div class="notification-dropdown-body">
                   @if(isset($navbarPendingBookings) && $navbarPendingBookings->count() > 0)
                     @foreach($navbarPendingBookings as $nb)
-                      <a href="{{ route('admin..booking.index') }}" class="notification-item">
+                      <a href="{{ route('admin.booking.index') }}" class="notification-item">
                         <div class="notification-item-icon">
                           <i class="bi bi-calendar-check-fill"></i>
                         </div>
@@ -199,7 +199,7 @@
                   @endif
                 </div>
                 <div class="notification-dropdown-footer">
-                  <a href="{{ route('admin..booking.index') }}" class="btn btn-xs btn-outline-primary w-100 rounded-pill py-1.5 fw-semibold">
+                  <a href="{{ route('admin.booking.index') }}" class="btn btn-xs btn-outline-primary w-100 rounded-pill py-1.5 fw-semibold">
                     <span>Lihat Seluruh Transaksi Booking</span>
                     <i class="bi bi-arrow-right ms-1"></i>
                   </a>
@@ -383,7 +383,7 @@
               <li class="nav-header">TRANSAKSI & SEWA</li>
 
               <li class="nav-item">
-                <a href="{{ route('admin..booking.index') }}" class="nav-link {{ request()->routeIs('admin..booking.*') ? 'active' : '' }} d-flex align-items-center justify-content-between">
+                <a href="{{ route('admin.booking.index') }}" class="nav-link {{ request()->routeIs('admin.booking.*') ? 'active' : '' }} d-flex align-items-center justify-content-between">
                   <span class="d-flex align-items-center">
                     <i class="nav-icon bi bi-calendar-check-fill"></i>
                     <p class="mb-0">Permintaan Booking</p>
@@ -710,7 +710,7 @@
                 <small class="text-muted fs-9">Daftar properti cabang dan unit kamar</small>
               </div>
             </a>
-            <a href="{{ route('admin..booking.index') }}" class="search-palette-item">
+            <a href="{{ route('admin.booking.index') }}" class="search-palette-item">
               <i class="bi bi-calendar-check-fill"></i>
               <div>
                 <div class="fw-bold fs-8">Permintaan Booking</div>

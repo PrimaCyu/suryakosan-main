@@ -58,7 +58,7 @@
                             </a>
                         @endif
 
-                        <a href="{{ route('admin..booking.index') }}" class="btn-banner btn-banner-warning">
+                        <a href="{{ route('admin.booking.index') }}" class="btn-banner btn-banner-warning">
                             <i class="bi bi-bell-fill"></i>
                             <span>Review Booking</span>
                             @if($pendingBookingsCount > 0)
@@ -154,7 +154,7 @@
                         </div>
                     </div>
                     <div class="border-top pt-2 mt-3">
-                        <a href="{{ route('admin..booking.index') }}" class="text-decoration-none fs-8 fw-bold text-warning d-inline-flex align-items-center gap-1">
+                        <a href="{{ route('admin.booking.index') }}" class="text-decoration-none fs-8 fw-bold text-warning d-inline-flex align-items-center gap-1">
                             <span>Review Booking</span>
                             <i class="bi bi-chevron-right fs-9"></i>
                         </a>
@@ -180,7 +180,7 @@
                         </div>
                     </div>
                     <div class="border-top pt-2 mt-3">
-                        <a href="{{ route('admin..booking.index') }}" class="text-decoration-none fs-8 fw-bold text-info d-inline-flex align-items-center gap-1">
+                        <a href="{{ route('admin.booking.index') }}" class="text-decoration-none fs-8 fw-bold text-info d-inline-flex align-items-center gap-1">
                             <span>Lihat Riwayat Sewa</span>
                             <i class="bi bi-chevron-right fs-9"></i>
                         </a>
@@ -223,7 +223,7 @@
                             <span class="fs-8 text-secondary">Menunggu Review: <strong>{{ $pendingBookingsCount }}</strong> ({{ $pendingPercent }}%)</span>
                         </div>
                         <div>
-                            <a href="{{ route('admin..booking.index') }}" class="text-decoration-none fs-8 text-primary fw-bold d-inline-flex align-items-center gap-1">
+                            <a href="{{ route('admin.booking.index') }}" class="text-decoration-none fs-8 text-primary fw-bold d-inline-flex align-items-center gap-1">
                                 <span>Buka Manajemen Booking</span>
                                 <i class="bi bi-arrow-right fs-9"></i>
                             </a>
@@ -304,7 +304,7 @@
                                 </div>
                             </div>
                             <div>
-                                <a href="{{ route('admin..booking.index') }}" class="btn btn-xs btn-outline-primary fw-semibold px-3 py-1.5 rounded-pill d-inline-flex align-items-center gap-1.5">
+                                <a href="{{ route('admin.booking.index') }}" class="btn btn-xs btn-outline-primary fw-semibold px-3 py-1.5 rounded-pill d-inline-flex align-items-center gap-1.5">
                                     <span>Lihat Semua</span>
                                     <i class="bi bi-arrow-right"></i>
                                 </a>
@@ -369,7 +369,7 @@
                                                             <span class="badge badge-subtle-warning fs-8 px-2 py-1">
                                                                 <i class="bi bi-clock-history me-1"></i> Pending
                                                             </span>
-                                                            <a href="{{ route('admin..booking.index') }}" class="btn btn-xs btn-primary fw-semibold px-2.5 py-0.5 rounded-pill mt-0.5 d-inline-flex align-items-center gap-1">
+                                                            <a href="{{ route('admin.booking.index') }}" class="btn btn-xs btn-primary fw-semibold px-2.5 py-0.5 rounded-pill mt-0.5 d-inline-flex align-items-center gap-1">
                                                                 <i class="bi bi-eye-fill"></i> Review
                                                             </a>
                                                         @elseif($b->status === 'approved')
@@ -707,7 +707,7 @@
                                     </a>
                                 @endif
 
-                                <a href="{{ route('admin..booking.index') }}" class="quick-action-item">
+                                <a href="{{ route('admin.booking.index') }}" class="quick-action-item">
                                     <div class="d-flex align-items-center gap-2.5">
                                         <div class="quick-action-icon bg-warning-subtle text-warning">
                                             <i class="bi bi-check2-circle"></i>
