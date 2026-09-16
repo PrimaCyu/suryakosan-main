@@ -69,6 +69,28 @@
 
     <!-- Summernote CSS -->
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+    <style>
+      @font-face {
+        font-family: 'summernote';
+        src: url('https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/font/summernote.woff2') format('woff2'),
+             url('https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/font/summernote.woff') format('woff'),
+             url('https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/font/summernote.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+      }
+      .note-editor [class*=" note-icon"]:before,
+      .note-editor [class^="note-icon"]:before,
+      .note-editor [class*=" note-icon"]::before,
+      .note-editor [class^="note-icon"]::before,
+      [class*=" note-icon"]:before,
+      [class^="note-icon"]:before {
+        font-family: 'summernote' !important;
+        font-style: normal !important;
+        font-weight: normal !important;
+        display: inline-block !important;
+      }
+    </style>
   </head>
   <!--end::Head-->
 
