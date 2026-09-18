@@ -82,7 +82,21 @@ class TamuBookingController extends Controller
             Log::error('Gagal mengirim email konfirmasi booking / generate PDF: ' . $e->getMessage());
         }
 
-        return to_route('home')->with('success', 'Booking Berhasil! Bukti reservasi telah kami kirimkan ke email Anda.');
+        return redirect()->route('booking.success', $tamu->id)->with('success', 'Booking Berhasil! Simpan bukti reservasi ini.');
+    }
+
+    public function bookingSuccess(Tamu $tamu)
+    {
+        $tamu->load(['productKamarKosan.productKosan', 'productKamarKosan.priceKamar', 'productKamarKosan.productKamarImageKosan']);
+        return view('frontend.kosan.kamar.booking-success', compact('tamu'));
+    }
+
+    public function downloadInvoice(Tamu $tamu)
+    {
+        $tamu->load(['productKamarKosan.productKosan']);
+        $pdf = Pdf::loadView('pdf.booking_invoice', compact('tamu'));
+        $filename = 'Invoice-Booking-' . str_pad($tamu->id, 5, '0', STR_PAD_LEFT) . '.pdf';
+        return $pdf->download($filename);
     }
 }
 

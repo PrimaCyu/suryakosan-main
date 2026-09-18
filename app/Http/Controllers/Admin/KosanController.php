@@ -30,10 +30,21 @@ class KosanController extends Controller
         $isSuper = $user->isSuperAdmin();
         $assignedIds = $isSuper ? collect() : $user->kosans()->pluck('product_kosans.id');
 
-        $query = ProductKosan::with(['productImageKosan', 'productKamarKosan'])
-            ->when(!$isSuper, function ($q) use ($assignedIds) {
-                $q->whereIn('id', $assignedIds);
-            });
+        // Query kosan dengan relasi lengkap kamar & penyewa aktif
+        $query = ProductKosan::with([
+            'productImageKosan',
+            'productKamarKosan' => function ($q) {
+                $q->with([
+                    'priceKamar',
+                    'tamu' => function ($t) {
+                        $t->where('status', 'approved')
+                          ->whereDate('end_date', '>=', now()->toDateString());
+                    }
+                ]);
+            }
+        ])->when(!$isSuper, function ($q) use ($assignedIds) {
+            $q->whereIn('id', $assignedIds);
+        });
 
         if ($request->has('search') && !empty($request->search)) {
             $search = strtolower($request->search);
@@ -46,7 +57,37 @@ class KosanController extends Controller
         }
         $product_kosan = $query->orderByDesc('created_at')->paginate(10, ['*'], 'kosan_page');
 
-        return view('backend.dashboard.kosan.index', compact('product_kosan'));
+        // Hitung Ringkasan Metrik Okupansi (KPI Cards)
+        $allKosansQuery = ProductKosan::with(['productKamarKosan.tamu' => function ($t) {
+            $t->where('status', 'approved')->whereDate('end_date', '>=', now()->toDateString());
+        }])->when(!$isSuper, function ($q) use ($assignedIds) {
+            $q->whereIn('id', $assignedIds);
+        })->get();
+
+        $kpiTotalKosan = $allKosansQuery->count();
+        $kpiTotalCapacity = 0;
+        $kpiTotalOccupied = 0;
+
+        foreach ($allKosansQuery as $k) {
+            $roomCount = $k->productKamarKosan->count();
+            $kpiTotalCapacity += $roomCount;
+            $kpiTotalOccupied += $k->productKamarKosan->filter(function ($room) {
+                return $room->tamu->count() > 0;
+            })->count();
+        }
+
+        $kpiTotalAvailable = max(0, $kpiTotalCapacity - $kpiTotalOccupied);
+        $kpiOccupancyRate = $kpiTotalCapacity > 0 ? round(($kpiTotalOccupied / $kpiTotalCapacity) * 100, 1) : 0;
+
+        $kpiStats = [
+            'total_kosan'    => $kpiTotalKosan,
+            'total_capacity' => $kpiTotalCapacity,
+            'total_occupied' => $kpiTotalOccupied,
+            'total_available'=> $kpiTotalAvailable,
+            'occupancy_rate' => $kpiOccupancyRate,
+        ];
+
+        return view('backend.dashboard.kosan.index', compact('product_kosan', 'kpiStats'));
     }
 
     public function searchKosan(Request $request)
@@ -56,7 +97,18 @@ class KosanController extends Controller
         $assignedIds = $isSuper ? collect() : $user->kosans()->pluck('product_kosans.id');
 
         $search = strtolower($request->get('search'));
-        $product_kosan = ProductKosan::with(['productImageKosan', 'productKamarKosan'])
+        $product_kosan = ProductKosan::with([
+            'productImageKosan',
+            'productKamarKosan' => function ($q) {
+                $q->with([
+                    'priceKamar',
+                    'tamu' => function ($t) {
+                        $t->where('status', 'approved')
+                          ->whereDate('end_date', '>=', now()->toDateString());
+                    }
+                ]);
+            }
+        ])
             ->when(!$isSuper, function ($q) use ($assignedIds) {
                 $q->whereIn('id', $assignedIds);
             })
@@ -170,6 +222,9 @@ class KosanController extends Controller
         ];
 
         $productKosan->update($data);
+        if ($productKosan->productKamarKosan()->count() > 0) {
+            $productKosan->syncAvailableCount();
+        }
 
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
             $path = $request->file('image')->store('kosan/image', 'public');

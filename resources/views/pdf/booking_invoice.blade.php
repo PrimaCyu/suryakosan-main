@@ -15,32 +15,32 @@
         }
         .header-table {
             width: 100%;
-            border-bottom: 2px solid #3b82f6;
+            border-bottom: 3px solid #F3A833;
             padding-bottom: 15px;
             margin-bottom: 20px;
         }
         .logo-title {
             font-size: 24px;
             font-weight: bold;
-            color: #1e40af;
+            color: #3B2314;
             margin: 0;
         }
         .subtitle {
             font-size: 12px;
-            color: #64748b;
+            color: #7B6759;
             margin-top: 4px;
         }
         .invoice-title {
             text-align: right;
             font-size: 20px;
             font-weight: bold;
-            color: #0f172a;
+            color: #3B2314;
             margin: 0;
         }
         .invoice-num {
             text-align: right;
             font-size: 13px;
-            color: #3b82f6;
+            color: #E60049;
             font-weight: bold;
             margin-top: 4px;
         }
@@ -53,9 +53,9 @@
             vertical-align: top;
         }
         .card {
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
+            background-color: #FFF8F1;
+            border: 1px solid #E9DDD2;
+            border-radius: 8px;
             padding: 12px 16px;
             margin-right: 10px;
         }
@@ -64,10 +64,10 @@
             margin-left: 10px;
         }
         .card-header {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
-            color: #1e293b;
-            border-bottom: 1px solid #cbd5e1;
+            color: #3B2314;
+            border-bottom: 1px solid #E9DDD2;
             padding-bottom: 6px;
             margin-bottom: 8px;
             text-transform: uppercase;
@@ -77,12 +77,12 @@
             margin-bottom: 5px;
         }
         .data-label {
-            color: #64748b;
-            font-size: 12px;
+            color: #7B6759;
+            font-size: 11px;
         }
         .data-val {
             font-weight: 600;
-            color: #1e293b;
+            color: #3B2314;
         }
         .status-badge {
             display: inline-block;
@@ -106,7 +106,7 @@
             margin-bottom: 25px;
         }
         .details-table th {
-            background-color: #1e40af;
+            background-color: #3B2314;
             color: #ffffff;
             font-weight: bold;
             font-size: 12px;
@@ -117,11 +117,11 @@
         }
         .details-table td {
             padding: 12px;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 13px;
+            border-bottom: 1px solid #E9DDD2;
+            font-size: 12px;
         }
         .details-table tr:nth-child(even) {
-            background-color: #f8fafc;
+            background-color: #FFF8F1;
         }
         .total-section {
             width: 100%;
@@ -130,19 +130,20 @@
         .total-box {
             float: right;
             width: 260px;
-            background-color: #eff6ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 6px;
+            background-color: #FFF8F1;
+            border: 1px solid #E9DDD2;
+            border-radius: 8px;
             padding: 12px 16px;
         }
         .total-label {
-            font-size: 13px;
-            color: #1e40af;
+            font-size: 12px;
+            color: #7B6759;
             font-weight: bold;
+            text-transform: uppercase;
         }
         .total-amount {
-            font-size: 18px;
-            color: #1d4ed8;
+            font-size: 19px;
+            color: #E60049;
             font-weight: bold;
             text-align: right;
             margin-top: 4px;
@@ -151,13 +152,13 @@
             clear: both;
         }
         .note-box {
-            background-color: #fffbeb;
-            border-left: 4px solid #f59e0b;
+            background-color: #FFF8F1;
+            border-left: 4px solid #F3A833;
             padding: 10px 14px;
             border-radius: 4px;
             margin-top: 20px;
             font-size: 12px;
-            color: #92400e;
+            color: #7B6759;
         }
         .footer {
             margin-top: 40px;

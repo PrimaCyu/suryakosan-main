@@ -61,7 +61,7 @@
     <!--end::Required Plugin(AdminLTE)-->
 
     <!--begin::Custom Modern Admin Design System-->
-    <link rel="stylesheet" href="{{ asset('assets-dashboard-admin/css/custom-admin.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets-dashboard-admin/css/custom-admin.css') }}?v={{ @filemtime(public_path('assets-dashboard-admin/css/custom-admin.css')) ?: '3' }}" />
     <!--end::Custom Modern Admin Design System-->
 
     <!-- jQuery (Required early for views and Summernote) -->
@@ -106,11 +106,12 @@
           <ul class="navbar-nav align-items-center gap-2">
             <li class="nav-item">
               <a
-                class="nav-link"
+                class="nav-action-btn"
                 data-lte-toggle="sidebar"
                 href="#"
                 role="button"
                 aria-label="Toggle sidebar"
+                title="Buka / Tutup Sidebar"
               >
                 <i class="bi bi-list fs-5"></i>
               </a>
@@ -118,66 +119,79 @@
 
             <!-- Breadcrumb Navigation -->
             <li class="nav-item d-none d-md-flex align-items-center">
-              <ol class="header-breadcrumb">
-                <li>
-                  <a href="{{ route('admin.dashboard') }}">Workspace</a>
-                  <i class="bi bi-chevron-right text-muted" style="font-size: 0.65rem;"></i>
-                </li>
-                <li class="active">
-                  @if(request()->routeIs('admin.dashboard'))
-                    Dashboard
-                  @elseif(request()->routeIs('admin.users.*'))
-                    Kelola Admin & Cabang
-                  @elseif(request()->routeIs('admin.product.kosan.*'))
-                    Kelola Kos-kosan
-                  @elseif(request()->routeIs('admin.booking.*'))
-                    Permintaan Booking
-                  @elseif(request()->routeIs('admin.artikel.*'))
-                    Artikel Blog
-                  @elseif(request()->routeIs('admin.testimoni.*'))
-                    Testimoni & Review
-                  @elseif(request()->routeIs('admin.sosial.media.*'))
-                    Sosial Media
-                  @elseif(request()->routeIs('admin.profile.*'))
-                    Pengaturan Akun
-                  @else
-                    Admin Panel
+              <nav class="header-breadcrumb-nav" aria-label="breadcrumb">
+                <ol class="header-breadcrumb">
+                  <li class="header-breadcrumb-item @if(request()->routeIs('admin.dashboard')) active @endif">
+                    <a href="{{ route('admin.dashboard') }}" class="header-breadcrumb-link" title="Menuju Dashboard Utama">
+                      <i class="bi bi-house-door-fill text-muted fs-8"></i>
+                      <span>Dashboard</span>
+                    </a>
+                  </li>
+                  @if(!request()->routeIs('admin.dashboard'))
+                  <li class="header-breadcrumb-sep">
+                    <i class="bi bi-chevron-right"></i>
+                  </li>
+                  <li class="header-breadcrumb-item active" aria-current="page">
+                    <span>
+                      @if(request()->routeIs('admin.users.*'))
+                        Kelola Admin & Cabang
+                      @elseif(request()->routeIs('admin.product.kosan.kamar.*'))
+                        Kelola Kamar Kos
+                      @elseif(request()->routeIs('admin.product.kosan.*'))
+                        Kelola Kos-kosan
+                      @elseif(request()->routeIs('admin.booking.*'))
+                        Permintaan Booking
+                      @elseif(request()->routeIs('admin.artikel.*'))
+                        Artikel Blog
+                      @elseif(request()->routeIs('admin.testimoni.*'))
+                        Testimoni & Review
+                      @elseif(request()->routeIs('admin.sosial.media.*'))
+                        Sosial Media
+                      @elseif(request()->routeIs('admin.profile.*'))
+                        Pengaturan Akun
+                      @else
+                        Admin Panel
+                      @endif
+                    </span>
+                  </li>
                   @endif
-                </li>
-              </ol>
+                </ol>
+              </nav>
             </li>
           </ul>
           <!--end::Start Navbar Links-->
 
           <!--begin::End Navbar Links-->
-          <ul class="navbar-nav ms-auto align-items-center gap-1.5">
+          <ul class="navbar-nav ms-auto align-items-center gap-2">
 
             <!-- Quick Search Palette Trigger -->
-            <li class="nav-item d-none d-sm-inline-block me-1">
-              <a href="#" class="nav-search-trigger" data-bs-toggle="modal" data-bs-target="#globalSearchModal" title="Pencarian Cepat (Ctrl+K)">
-                <i class="bi bi-search text-muted"></i>
-                <span class="d-none d-md-inline">Cari modul...</span>
-                <span class="nav-search-kbd">Ctrl K</span>
-              </a>
+            <li class="nav-item d-none d-sm-inline-block">
+              <button type="button" class="nav-search-btn" data-bs-toggle="modal" data-bs-target="#globalSearchModal" title="Pencarian Cepat (Ctrl+K)">
+                <i class="bi bi-search nav-search-icon"></i>
+                <span class="nav-search-placeholder d-none d-md-inline">Cari modul...</span>
+                <kbd class="nav-search-kbd">
+                  <span>Ctrl</span>
+                  <span>K</span>
+                </kbd>
+              </button>
             </li>
 
             <!-- Public Portal Link -->
             <li class="nav-item d-none d-lg-inline-block">
-              <a href="{{ route('home') }}" target="_blank" class="nav-link text-muted" title="Buka Website Publik">
-                <i class="bi bi-globe2"></i>
-                <span class="fs-8">Web Publik</span>
-                <i class="bi bi-box-arrow-up-right ms-0.5" style="font-size: 0.65rem;"></i>
+              <a href="{{ route('home') }}" target="_blank" class="nav-public-btn" title="Buka Website Publik Sinar Citra Lestari">
+                <i class="bi bi-globe2 text-primary fs-8"></i>
+                <span>Web Publik</span>
+                <i class="bi bi-box-arrow-up-right text-muted" style="font-size: 0.65rem;"></i>
               </a>
             </li>
 
             <!-- Notification Center Popover Dropdown -->
             <li class="nav-item dropdown">
-              <a class="nav-link position-relative" href="#" data-bs-toggle="dropdown" aria-expanded="false" title="Pusat Notifikasi">
-                <i class="bi bi-bell-fill fs-5"></i>
+              <a class="nav-action-btn position-relative" href="#" data-bs-toggle="dropdown" aria-expanded="false" title="Pusat Notifikasi">
+                <i class="bi bi-bell-fill fs-6"></i>
                 @if(isset($pendingBookingCount) && $pendingBookingCount > 0)
-                  <span class="position-absolute top-1 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem;">
+                  <span class="nav-action-badge">
                     {{ $pendingBookingCount > 99 ? '99+' : $pendingBookingCount }}
-                    <span class="visually-hidden">booking pending</span>
                   </span>
                 @endif
               </a>
@@ -233,14 +247,14 @@
             <!--begin::Fullscreen Toggle-->
             <li class="nav-item d-none d-md-inline-block">
               <a
-                class="nav-link"
+                class="nav-action-btn"
                 href="#"
                 data-lte-toggle="fullscreen"
                 aria-label="Toggle fullscreen"
-                title="Fullscreen Mode"
+                title="Mode Layar Penuh"
               >
-                <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i>
-                <i data-lte-icon="minimize" class="bi bi-fullscreen-exit d-none"></i>
+                <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen fs-7"></i>
+                <i data-lte-icon="minimize" class="bi bi-fullscreen-exit fs-7 d-none"></i>
               </a>
             </li>
             <!--end::Fullscreen Toggle-->
@@ -248,16 +262,17 @@
             <!--begin::Color Mode Toggle-->
             <li class="nav-item dropdown">
               <a
-                class="nav-link"
+                class="nav-action-btn"
                 href="#"
                 id="bd-theme"
                 aria-label="Toggle color scheme"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
+                title="Ganti Tema (Terang / Gelap)"
               >
-                <i class="bi bi-sun-fill" data-lte-theme-icon="light"></i>
-                <i class="bi bi-moon-fill d-none" data-lte-theme-icon="dark"></i>
-                <i class="bi bi-circle-half d-none" data-lte-theme-icon="auto"></i>
+                <i class="bi bi-sun-fill fs-7" data-lte-theme-icon="light"></i>
+                <i class="bi bi-moon-fill fs-7 d-none" data-lte-theme-icon="dark"></i>
+                <i class="bi bi-circle-half fs-7 d-none" data-lte-theme-icon="auto"></i>
               </a>
               <ul
                 class="dropdown-menu dropdown-menu-end shadow-sm border-0"
@@ -272,7 +287,7 @@
                     aria-pressed="false"
                   >
                     <i class="bi bi-sun-fill text-warning"></i>
-                    Light
+                    Terang (Light)
                     <i class="bi bi-check-lg ms-auto d-none text-primary"></i>
                   </button>
                 </li>
@@ -284,7 +299,7 @@
                     aria-pressed="false"
                   >
                     <i class="bi bi-moon-fill text-info"></i>
-                    Dark
+                    Gelap (Dark)
                     <i class="bi bi-check-lg ms-auto d-none text-primary"></i>
                   </button>
                 </li>
@@ -296,7 +311,7 @@
                     aria-pressed="true"
                   >
                     <i class="bi bi-circle-half text-secondary"></i>
-                    Auto
+                    Otomatis (Sistem)
                     <i class="bi bi-check-lg ms-auto d-none text-primary"></i>
                   </button>
                 </li>
@@ -306,20 +321,21 @@
 
             <!--begin::User Menu Dropdown-->
             <li class="nav-item dropdown user-menu ms-1">
-              <a href="#" class="nav-link dropdown-toggle d-flex align-items-center gap-2 p-1" data-bs-toggle="dropdown">
-                <div class="user-avatar-badge">
+              <a href="#" class="nav-user-chip" data-bs-toggle="dropdown" aria-expanded="false" title="Menu Akun Admin">
+                <div class="nav-user-avatar">
                   {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}
                 </div>
-                <div class="d-none d-md-block text-start" style="line-height: 1.2;">
-                  <span class="d-block fw-bold text-body-emphasis fs-7">{{ Auth::user()->name ?? 'Admin' }}</span>
-                  <span class="badge {{ Auth::user()->isSuperAdmin() ? 'badge-subtle-danger' : 'badge-subtle-primary' }}" style="font-size: 0.65rem; padding: 0.15rem 0.4rem !important;">
+                <div class="nav-user-meta d-none d-md-flex flex-column text-start">
+                  <span class="nav-user-name">{{ Auth::user()->name ?? 'Admin' }}</span>
+                  <span class="nav-user-role {{ Auth::user()->isSuperAdmin() ? 'role-super-admin' : 'role-admin' }}">
                     {{ Auth::user()->isSuperAdmin() ? 'Super Admin' : 'Admin Cabang' }}
                   </span>
                 </div>
+                <i class="bi bi-chevron-down nav-user-chevron ms-1"></i>
               </a>
-              <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end shadow-lg border-0" style="border-radius: 14px; min-width: 240px;">
+              <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end shadow-lg border-0" style="border-radius: 14px; min-width: 250px;">
                 <li class="p-3 border-bottom text-center bg-body-tertiary">
-                  <div class="user-avatar-badge mx-auto mb-2" style="width: 48px; height: 48px; font-size: 1.2rem;">
+                  <div class="nav-user-avatar mx-auto mb-2" style="width: 48px; height: 48px; font-size: 1.25rem;">
                     {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}
                   </div>
                   <h6 class="mb-0 fw-bold text-body-emphasis">{{ Auth::user()->name ?? 'Administrator' }}</h6>
@@ -364,8 +380,14 @@
               />
             </div>
             <div class="brand-text-wrapper">
-              <span class="brand-title">Sinar Citra</span>
-              <span class="brand-subtitle">Lestari</span>
+              <div class="brand-title">
+                <span class="brand-title-main">Sinar Citra</span>
+                <span class="brand-title-accent">Lestari</span>
+              </div>
+              <div class="brand-subtitle">
+                <span class="brand-status-dot"></span>
+                <span>Residence & Living</span>
+              </div>
             </div>
           </a>
         </div>

@@ -29,6 +29,88 @@
 
         @include('backend.dashboard.kosan.kamar.partials.alerts')
 
+        <!-- KPI METRICS RINGKASAN OKUPANSI KAMAR KOSAN -->
+        @if(isset($kpiStats))
+        <div class="kpi-stat-grid mb-4">
+            <!-- 1. Total Unit Kamar -->
+            <div class="kpi-stat-card">
+                <div class="kpi-stat-icon kpi-icon-primary">
+                    <i class="bi bi-door-closed"></i>
+                </div>
+                <div class="kpi-stat-info">
+                    <div class="kpi-stat-value">{{ $kpiStats['total_kamar'] }} <span class="fs-8 fw-normal text-muted">Unit</span></div>
+                    <div class="kpi-stat-label">Total Unit Kamar</div>
+                    <div class="kpi-stat-sub">Kapasitas tercatat di properti ini</div>
+                </div>
+            </div>
+
+            <!-- 2. Kamar Terisi -->
+            <div class="kpi-stat-card">
+                <div class="kpi-stat-icon kpi-icon-success">
+                    <i class="bi bi-person-check-fill"></i>
+                </div>
+                <div class="kpi-stat-info">
+                    <div class="kpi-stat-value text-success">{{ $kpiStats['terisi_kamar'] }} <span class="fs-8 fw-normal text-muted">Unit</span></div>
+                    <div class="kpi-stat-label">Kamar Terisi</div>
+                    <div class="kpi-stat-sub">Penyewa aktif terverifikasi</div>
+                </div>
+            </div>
+
+            <!-- 3. Kamar Kosong / Siap Huni -->
+            <div class="kpi-stat-card">
+                <div class="kpi-stat-icon kpi-icon-danger">
+                    <i class="bi bi-key-fill"></i>
+                </div>
+                <div class="kpi-stat-info">
+                    <div class="kpi-stat-value text-danger">{{ $kpiStats['kosong_kamar'] }} <span class="fs-8 fw-normal text-muted">Unit</span></div>
+                    <div class="kpi-stat-label">Kamar Kosong / Siap Huni</div>
+                    <div class="kpi-stat-sub">Siap disewakan ke penghuni baru</div>
+                </div>
+            </div>
+
+            <!-- 4. Okupansi Rate -->
+            <div class="kpi-stat-card">
+                <div class="kpi-stat-icon kpi-icon-indigo">
+                    <i class="bi bi-pie-chart-fill"></i>
+                </div>
+                <div class="kpi-stat-info">
+                    <div class="kpi-stat-value">{{ $kpiStats['occupancy_rate'] }}%</div>
+                    <div class="kpi-stat-label">Tingkat Okupansi</div>
+                    <div class="kpi-progress">
+                        <div class="kpi-progress-bar bg-success" role="progressbar" style="width: {{ $kpiStats['occupancy_rate'] }}%" aria-valuenow="{{ $kpiStats['occupancy_rate'] }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <!-- FILTER STATUS KAMAR TABS -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+            <div class="status-filter-nav">
+                <a href="{{ route('admin.product.kosan.kamar.index', array_merge(['product_kosan' => $product_kosan], request()->except(['status', 'page']))) }}"
+                   class="status-filter-btn {{ ($statusFilter ?? 'semua') === 'semua' ? 'active' : '' }}">
+                    Semua Unit <span class="badge bg-secondary-subtle text-secondary rounded-pill ms-1">{{ $kpiStats['total_kamar'] ?? 0 }}</span>
+                </a>
+                <a href="{{ route('admin.product.kosan.kamar.index', array_merge(['product_kosan' => $product_kosan, 'status' => 'kosong'], request()->except(['status', 'page']))) }}"
+                   class="status-filter-btn {{ ($statusFilter ?? '') === 'kosong' ? 'active' : '' }}">
+                    <i class="bi bi-check-circle me-1 text-success"></i> Kosong <span class="badge bg-success-subtle text-success rounded-pill ms-1">{{ $kpiStats['kosong_kamar'] ?? 0 }}</span>
+                </a>
+                <a href="{{ route('admin.product.kosan.kamar.index', array_merge(['product_kosan' => $product_kosan, 'status' => 'terisi'], request()->except(['status', 'page']))) }}"
+                   class="status-filter-btn {{ ($statusFilter ?? '') === 'terisi' ? 'active' : '' }}">
+                    <i class="bi bi-person-fill me-1 text-primary"></i> Terisi <span class="badge bg-primary-subtle text-primary rounded-pill ms-1">{{ $kpiStats['terisi_kamar'] ?? 0 }}</span>
+                </a>
+                <a href="{{ route('admin.product.kosan.kamar.index', array_merge(['product_kosan' => $product_kosan, 'status' => 'pending'], request()->except(['status', 'page']))) }}"
+                   class="status-filter-btn {{ ($statusFilter ?? '') === 'pending' ? 'active' : '' }}">
+                    <i class="bi bi-hourglass-split me-1 text-warning"></i> Pending <span class="badge bg-warning-subtle text-warning rounded-pill ms-1">{{ $kpiStats['pending_kamar'] ?? 0 }}</span>
+                </a>
+            </div>
+            @if(request('status') || request('search'))
+                <a href="{{ route('admin.product.kosan.kamar.index', $product_kosan) }}" class="btn btn-xs btn-outline-secondary">
+                    <i class="bi bi-x-circle me-1"></i> Reset Filter
+                </a>
+            @endif
+        </div>
+
         <div class="card mb-4">
             <div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
                 <div>
@@ -50,14 +132,16 @@
 
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0 table-min-lg">
+                    <table class="table table-hover align-middle mb-0">
                         <thead>
                             <tr>
-                                <th style="width: 45px" class="text-center">No</th>
-                                <th>Tipe / Nama Kamar</th>
-                                <th class="text-center" style="width: 90px">Views</th>
-                                <th>Fasilitas Kamar</th>
-                                <th style="width: 280px" class="text-center">Aksi Manajemen</th>
+                                <th style="width: 40px" class="text-center">No</th>
+                                <th class="text-nowrap" style="min-width: 170px">Unit / Tipe Kamar</th>
+                                <th class="text-nowrap" style="min-width: 130px">Tarif Sewa</th>
+                                <th class="text-center text-nowrap" style="width: 95px">Status</th>
+                                <th class="text-nowrap" style="min-width: 140px">Penghuni & Tempo</th>
+                                <th class="text-nowrap" style="min-width: 130px">Views & Fasilitas</th>
+                                <th style="width: 215px" class="text-center text-nowrap">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="kamar-tbody">
@@ -65,86 +149,168 @@
                                 <tr class="align-middle">
                                     <td class="text-center fw-semibold text-muted">{{ $kamar_kosan->firstItem() + $index }}</td>
                                     <td>
-                                        <div class="table-cell-title">{{ $item->room }}</div>
-                                        @if($item->cumulative_discount)
-                                            <span class="badge badge-subtle-success fs-8 mt-1">
-                                                <i class="bi bi-percent me-1"></i>Diskon {{ $item->cumulative_discount }}%
+                                        <div class="d-flex align-items-center gap-2">
+                                            @if($item->primary_image)
+                                                <img src="{{ asset('storage/' . $item->primary_image->image) }}" alt="{{ $item->room }}" class="table-room-thumb" onerror="this.onerror=null;this.classList.add('d-none');">
+                                            @else
+                                                <div class="table-room-thumb-placeholder" title="Belum ada foto">
+                                                    <i class="bi bi-door-closed"></i>
+                                                </div>
+                                            @endif
+                                            <div>
+                                                <div class="fw-semibold text-dark text-nowrap fs-7">{{ $item->room }}</div>
+                                                @if($item->cumulative_discount)
+                                                    <span class="badge badge-subtle-success fs-8 mt-1">
+                                                        <i class="bi bi-percent me-1"></i>Diskon {{ $item->cumulative_discount }}%
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-nowrap">
+                                        @if($item->monthly_price)
+                                            <div class="fw-bold text-success fs-7">
+                                                Rp {{ number_format($item->monthly_price->price, 0, ',', '.') }}<span class="fs-8 fw-normal text-muted">/bln</span>
+                                            </div>
+                                        @else
+                                            <span class="badge badge-subtle-secondary fs-8">Belum diatur</span>
+                                        @endif
+
+                                        @if($item->yearly_price)
+                                            <div class="fs-8 text-muted mt-0">
+                                                Rp {{ number_format($item->yearly_price->price, 0, ',', '.') }}/thn
+                                            </div>
+                                        @endif
+                                    </td>
+                                    <td class="text-center text-nowrap">
+                                        @if($item->room_status === 'terisi')
+                                            <span class="badge badge-subtle-primary">
+                                                <i class="bi bi-person-fill-check me-1"></i>Terisi
+                                            </span>
+                                        @elseif($item->room_status === 'pending')
+                                            <span class="badge badge-subtle-warning">
+                                                <i class="bi bi-clock-history me-1"></i>Pending
+                                            </span>
+                                        @else
+                                            <span class="badge badge-subtle-success">
+                                                <i class="bi bi-check-circle-fill me-1"></i>Kosong
                                             </span>
                                         @endif
                                     </td>
-                                    <td class="text-center">
-                                        <span class="badge badge-subtle-primary">
-                                            <i class="bi bi-eye-fill me-1"></i>{{ number_format($item->views ?? 0) }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        @if($item->fasilitas)
+                                    <td class="text-nowrap">
+                                        @if($item->active_tenant)
                                             @php
-                                                $fasKamarArr = array_filter(array_map('trim', explode(',', $item->fasilitas)));
+                                                $activeTamu = $item->active_tenant;
+                                                try {
+                                                    $endDate = \Carbon\Carbon::parse($activeTamu->end_date);
+                                                    $daysLeft = ceil(now()->diffInDays($endDate, false));
+                                                } catch (\Exception $e) {
+                                                    $endDate = null;
+                                                    $daysLeft = null;
+                                                }
                                             @endphp
-                                            <div class="d-flex flex-wrap gap-1">
-                                                @foreach(array_slice($fasKamarArr, 0, 2) as $fk)
-                                                    <span class="badge badge-subtle-info fs-8">{{ $fk }}</span>
-                                                @endforeach
-                                                @if(count($fasKamarArr) > 2)
-                                                    <span class="badge badge-subtle-secondary fs-8 text-muted">+{{ count($fasKamarArr) - 2 }}</span>
+                                            <div class="tenant-compact text-nowrap">
+                                                <div class="d-flex align-items-center gap-1.5">
+                                                    <span class="fw-semibold fs-8 text-dark" title="{{ $activeTamu->name }}">
+                                                        {{ Str::limit($activeTamu->name, 14) }}
+                                                    </span>
+                                                    @if($activeTamu->hp)
+                                                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $activeTamu->hp) }}" target="_blank" rel="noopener noreferrer" class="text-success fs-8" title="Chat WA {{ $activeTamu->name }}">
+                                                            <i class="bi bi-whatsapp"></i>
+                                                        </a>
+                                                    @endif
+                                                </div>
+                                                @if($endDate)
+                                                    <div class="fs-8 text-muted d-flex align-items-center gap-1 mt-0">
+                                                        <span>{{ $endDate->format('d/m/y') }}</span>
+                                                        @if($daysLeft >= 0 && $daysLeft <= 7)
+                                                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle py-0 px-1 fs-8 fw-semibold" title="Sisa {{ $daysLeft }} hari">H-{{ $daysLeft }}</span>
+                                                        @elseif($daysLeft < 0)
+                                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle py-0 px-1 fs-8 fw-semibold">Habis</span>
+                                                        @endif
+                                                    </div>
                                                 @endif
+                                            </div>
+                                        @elseif($item->pending_tenant)
+                                            <div class="fs-8 text-warning text-nowrap d-flex align-items-center gap-1">
+                                                <span title="{{ $item->pending_tenant->name }}"><i class="bi bi-hourglass-split me-1"></i>{{ Str::limit($item->pending_tenant->name, 12) }}</span>
+                                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle py-0 px-1 fs-8">Wait</span>
                                             </div>
                                         @else
                                             <span class="text-muted fs-8">-</span>
                                         @endif
                                     </td>
-                                    <td class="text-center">
-                                        <div class="action-btn-group">
-                                            <!-- Sub-fitur Modals Trigger -->
+                                    <td class="text-nowrap">
+                                        <div class="d-flex align-items-center gap-1 text-nowrap">
+                                            <span class="badge badge-subtle-secondary fs-8 py-1" title="Dilihat {{ number_format($item->views ?? 0) }} kali">
+                                                <i class="bi bi-eye me-1"></i>{{ number_format($item->views ?? 0) }}
+                                            </span>
+                                            @if($item->fasilitas)
+                                                @php
+                                                    $fasKamarArr = array_filter(array_map('trim', explode(',', $item->fasilitas)));
+                                                @endphp
+                                                @foreach(array_slice($fasKamarArr, 0, 1) as $fk)
+                                                    <span class="badge badge-subtle-info fs-8 py-1">{{ $fk }}</span>
+                                                @endforeach
+                                                @if(count($fasKamarArr) > 1)
+                                                    <span class="badge badge-subtle-secondary fs-8 py-1" title="{{ implode(', ', array_slice($fasKamarArr, 1)) }}">+{{ count($fasKamarArr) - 1 }}</span>
+                                                @endif
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="text-center text-nowrap">
+                                        <div class="table-action-compact justify-content-center">
+                                            <!-- Edit Quick Button -->
                                             <button type="button"
-                                                    class="btn btn-sm btn-outline-warning py-1 px-2"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#modalImageKamar{{ $item->id }}"
-                                                    title="Galeri Foto">
-                                                <i class="bi bi-images"></i> Galeri
-                                            </button>
-
-                                            <button type="button"
-                                                    class="btn btn-sm btn-outline-success py-1 px-2"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#modalPriceKamar{{ $item->id }}"
-                                                    title="Tarif Harga">
-                                                <i class="bi bi-cash-stack"></i> Harga
-                                            </button>
-
-                                            <button type="button"
-                                                    class="btn btn-sm btn-outline-secondary py-1 px-2"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#modalTamuKamar{{ $item->id }}"
-                                                    title="Riwayat Penghuni">
-                                                <i class="bi bi-people"></i> Penghuni
-                                            </button>
-
-                                            <!-- Edit Button -->
-                                            <button type="button"
-                                                    class="btn btn-sm btn-outline-primary py-1 px-2"
+                                                    class="btn-action-icon act-edit"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#modalEditKamar{{ $item->id }}"
-                                                    title="Edit Kamar">
+                                                    title="Edit Data Kamar">
                                                 <i class="bi bi-pencil-square"></i>
                                             </button>
 
-                                            <!-- Lihat di Web Button -->
+                                            <!-- Tarif Sewa Quick Button -->
+                                            <button type="button"
+                                                    class="btn-action-icon act-price"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalPriceKamar{{ $item->id }}"
+                                                    title="Atur Tarif Sewa">
+                                                <i class="bi bi-cash-stack"></i>
+                                            </button>
+
+                                            <!-- Galeri Foto Quick Button -->
+                                            <button type="button"
+                                                    class="btn-action-icon act-gallery"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalImageKamar{{ $item->id }}"
+                                                    title="Kelola Galeri Foto">
+                                                <i class="bi bi-images"></i>
+                                            </button>
+
+                                            <!-- Riwayat Penghuni Quick Button -->
+                                            <button type="button"
+                                                    class="btn-action-icon act-tenant"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalTamuKamar{{ $item->id }}"
+                                                    title="Riwayat Penghuni">
+                                                <i class="bi bi-people"></i>
+                                            </button>
+
+                                            <!-- Buka di Web Quick Button -->
                                             <a href="{{ route('kamar.detail', $item->id) }}"
                                                target="_blank"
                                                rel="noopener noreferrer"
-                                               class="btn btn-sm btn-outline-info py-1 px-2"
-                                               title="Lihat di Web Frontend">
+                                               class="btn-action-icon act-web"
+                                               title="Buka Halaman Publik">
                                                 <i class="bi bi-box-arrow-up-right"></i>
                                             </a>
 
-                                            <!-- Delete Button -->
+                                            <!-- Hapus Unit Kamar -->
                                             <button type="button"
-                                                    class="btn btn-sm btn-outline-danger py-1 px-2"
+                                                    class="btn-action-icon act-delete"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#modalDeleteKamar{{ $item->id }}"
-                                                    title="Hapus Kamar">
+                                                    title="Hapus Unit Kamar">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
@@ -152,9 +318,9 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted py-5">
+                                    <td colspan="7" class="text-center text-muted py-5">
                                         <i class="bi bi-door-closed display-6 d-block mb-2 opacity-50"></i>
-                                        Belum ada unit kamar yang ditambahkan untuk kosan ini.
+                                        Belum ada unit kamar yang sesuai dengan filter ini.
                                     </td>
                                 </tr>
                             @endforelse
@@ -191,6 +357,39 @@
         let kamarRowIndex = 1;
         const isSuperAdminUser = {{ Auth::user()->isSuperAdmin() ? 'true' : 'false' }};
         const container = document.getElementById('kamarInputContainer');
+
+        // --- PREVIEW FOTO KAMAR UTAMA DI MODAL TERPADU ---
+        const singleRoomInput = document.getElementById('singleRoomImageInput');
+        const singleRoomPlaceholder = document.getElementById('singleRoomPlaceholder');
+        const singleRoomPreviewWrap = document.getElementById('singleRoomPreviewWrap');
+        const singleRoomPreviewImg = document.getElementById('singleRoomPreviewImg');
+        const singleRoomFileName = document.getElementById('singleRoomFileName');
+        const btnCancelSingleImg = document.getElementById('btnCancelSingleImg');
+
+        if (singleRoomInput) {
+            singleRoomInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        singleRoomPreviewImg.src = e.target.result;
+                        singleRoomFileName.textContent = file.name;
+                        singleRoomPlaceholder.classList.add('d-none');
+                        singleRoomPreviewWrap.classList.remove('d-none');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        if (btnCancelSingleImg) {
+            btnCancelSingleImg.addEventListener('click', function() {
+                if (singleRoomInput) singleRoomInput.value = '';
+                if (singleRoomPreviewImg) singleRoomPreviewImg.src = '';
+                if (singleRoomPreviewWrap) singleRoomPreviewWrap.classList.add('d-none');
+                if (singleRoomPlaceholder) singleRoomPlaceholder.classList.remove('d-none');
+            });
+        }
 
         function initSummernote(element) {
             if (typeof $.fn.summernote !== 'undefined') {
@@ -235,17 +434,13 @@
 
                     div.innerHTML = `
                         <div class="row g-3 align-items-center">
-                            <div class="col-md-4">
-                                <label class="form-label mb-1">Nama / Tipe Kamar <span class="text-danger">*</span></label>
+                            <div class="col-md-6">
+                                <label class="form-label fs-8 fw-semibold mb-1">Nama / Tipe Kamar <span class="text-danger">*</span></label>
                                 <input type="text" name="dataKamar[${index}][room]" class="form-control" placeholder="Contoh: Kamar Deluxe B" required>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label mb-1">Diskon Akumulatif (%)</label>
+                            <div class="col-md-5">
+                                <label class="form-label fs-8 fw-semibold mb-1">Diskon Akumulatif (%)</label>
                                 ${discKamarField}
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label mb-1"><i class="bi bi-eye me-1"></i> Views</label>
-                                <input type="number" min="0" name="dataKamar[${index}][views]" class="form-control" placeholder="0" value="0">
                             </div>
                             <div class="col-md-1 text-end align-self-end">
                                 <button type="button" class="btn btn-sm btn-outline-danger btn-remove-kamar-row w-100" title="Hapus Baris">
@@ -253,50 +448,13 @@
                                 </button>
                             </div>
                             <div class="col-12">
-                                <label class="form-label mb-2">Fasilitas Kamar</label>
-                                <div class="p-3 rounded-3 bg-body-tertiary border">
-                                    <div class="row g-2">
-                                        <div class="col-md-4 col-6"><div class="form-check"><input class="form-check-input" type="checkbox" name="dataKamar[${index}][fasilitas][]" value="AC" id="fas_kmr_${index}_0"><label class="form-check-label fs-8" for="fas_kmr_${index}_0">AC</label></div></div>
-                                        <div class="col-md-4 col-6"><div class="form-check"><input class="form-check-input" type="checkbox" name="dataKamar[${index}][fasilitas][]" value="Kamar Mandi Dalam" id="fas_kmr_${index}_1"><label class="form-check-label fs-8" for="fas_kmr_${index}_1">Kamar Mandi Dalam</label></div></div>
-                                        <div class="col-md-4 col-6"><div class="form-check"><input class="form-check-input" type="checkbox" name="dataKamar[${index}][fasilitas][]" value="Water Heater / Air Hangat" id="fas_kmr_${index}_2"><label class="form-check-label fs-8" for="fas_kmr_${index}_2">Water Heater</label></div></div>
-                                        <div class="col-md-4 col-6"><div class="form-check"><input class="form-check-input" type="checkbox" name="dataKamar[${index}][fasilitas][]" value="Kasur Springbed" id="fas_kmr_${index}_3"><label class="form-check-label fs-8" for="fas_kmr_${index}_3">Kasur Springbed</label></div></div>
-                                        <div class="col-md-4 col-6"><div class="form-check"><input class="form-check-input" type="checkbox" name="dataKamar[${index}][fasilitas][]" value="Lemari Pakaian" id="fas_kmr_${index}_4"><label class="form-check-label fs-8" for="fas_kmr_${index}_4">Lemari Pakaian</label></div></div>
-                                        <div class="col-md-4 col-6"><div class="form-check"><input class="form-check-input" type="checkbox" name="dataKamar[${index}][fasilitas][]" value="Meja & Kursi Belajar" id="fas_kmr_${index}_5"><label class="form-check-label fs-8" for="fas_kmr_${index}_5">Meja & Kursi</label></div></div>
-                                        <div class="col-md-4 col-6"><div class="form-check"><input class="form-check-input" type="checkbox" name="dataKamar[${index}][fasilitas][]" value="TV / Smart TV" id="fas_kmr_${index}_6"><label class="form-check-label fs-8" for="fas_kmr_${index}_6">TV / Smart TV</label></div></div>
-                                        <div class="col-md-4 col-6"><div class="form-check"><input class="form-check-input" type="checkbox" name="dataKamar[${index}][fasilitas][]" value="Wastafel" id="fas_kmr_${index}_7"><label class="form-check-label fs-8" for="fas_kmr_${index}_7">Wastafel</label></div></div>
-                                        <div class="col-md-4 col-6"><div class="form-check"><input class="form-check-input" type="checkbox" name="dataKamar[${index}][fasilitas][]" value="Balkon Kamar" id="fas_kmr_${index}_8"><label class="form-check-label fs-8" for="fas_kmr_${index}_8">Balkon</label></div></div>
-                                        <div class="col-md-4 col-6"><div class="form-check"><input class="form-check-input" type="checkbox" name="dataKamar[${index}][fasilitas][]" value="Jendela / Ventilasi Bagus" id="fas_kmr_${index}_9"><label class="form-check-label fs-8" for="fas_kmr_${index}_9">Jendela/Ventilasi</label></div></div>
-                                        <div class="col-md-4 col-6"><div class="form-check"><input class="form-check-input" type="checkbox" name="dataKamar[${index}][fasilitas][]" value="Kipas Angin" id="fas_kmr_${index}_10"><label class="form-check-label fs-8" for="fas_kmr_${index}_10">Kipas Angin</label></div></div>
-                                        <div class="col-md-4 col-6"><div class="form-check"><input class="form-check-input" type="checkbox" name="dataKamar[${index}][fasilitas][]" value="Kulkas Mini" id="fas_kmr_${index}_11"><label class="form-check-label fs-8" for="fas_kmr_${index}_11">Kulkas Mini</label></div></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label mb-1">Deskripsi Kamar</label>
-                                <textarea name="dataKamar[${index}][description]" class="form-control summernote-edit" rows="2" placeholder="Deskripsi kamar..."></textarea>
+                                <label class="form-label fs-8 fw-semibold mb-1">Deskripsi Singkat</label>
+                                <textarea name="dataKamar[${index}][description]" class="form-control" rows="2" placeholder="Deskripsi kamar..."></textarea>
                             </div>
                         </div>
                     `;
                     container.appendChild(div);
                     rebuildBulkKamarIndexes(container);
-
-                    const newTextarea = div.querySelector('.summernote-edit');
-                    if (newTextarea && typeof $.fn.summernote !== 'undefined') {
-                        $(newTextarea).summernote({
-                            placeholder: 'Deskripsi kamar...',
-                            tabsize: 2,
-                            height: 150,
-                            toolbar: [
-                                ['style', ['style']],
-                                ['font', ['bold', 'underline', 'clear']],
-                                ['color', ['color']],
-                                ['para', ['ul', 'ol', 'paragraph']],
-                                ['table', ['table']],
-                                ['insert', ['link']],
-                                ['view', ['fullscreen', 'codeview']]
-                            ]
-                        });
-                    }
                 }
                 return;
             }
@@ -364,21 +522,11 @@
             rows.forEach((row, i) => {
                 const room = row.querySelector('input[name*="[room]"]');
                 const disc = row.querySelector('input[name*="[cumulative_discount]"]');
-                const views = row.querySelector('input[name*="[views]"]');
                 const desc = row.querySelector('textarea[name*="[description]"]');
-                const fasInputs = row.querySelectorAll('input[name*="[fasilitas]"]');
 
                 if (room) room.name = `dataKamar[${i}][room]`;
                 if (disc) disc.name = `dataKamar[${i}][cumulative_discount]`;
-                if (views) views.name = `dataKamar[${i}][views]`;
                 if (desc) desc.name = `dataKamar[${i}][description]`;
-
-                fasInputs.forEach((input, fKey) => {
-                    input.name = `dataKamar[${i}][fasilitas][]`;
-                    input.id = `fas_kmr_${i}_${fKey}`;
-                    const label = input.nextElementSibling;
-                    if (label) label.setAttribute('for', `fas_kmr_${i}_${fKey}`);
-                });
 
                 const btnRemove = row.querySelector('.btn-remove-kamar-row');
                 if (btnRemove) {
@@ -427,7 +575,7 @@
                         if (!items || items.length === 0) {
                             kamarTbody.innerHTML = `
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted py-5">
+                                    <td colspan="7" class="text-center text-muted py-5">
                                         <i class="bi bi-door-closed display-6 d-block mb-2 opacity-50"></i>
                                         Data kamar tidak ditemukan.
                                     </td>
@@ -442,13 +590,64 @@
                                     ? `<span class="badge badge-subtle-success fs-8 mt-1 d-inline-block"><i class="bi bi-percent me-1"></i>Diskon ${item.cumulative_discount}%</span>`
                                     : '';
 
-                                let fasHtml = '<span class="text-muted fs-8">-</span>';
+                                // Thumbnail
+                                let thumbHtml = `<div class="table-room-thumb-placeholder" title="Belum ada foto"><i class="bi bi-door-closed"></i></div>`;
+                                if (item.primary_image && item.primary_image.image) {
+                                    thumbHtml = `<img src="/storage/${item.primary_image.image}" alt="${item.room}" class="table-room-thumb" onerror="this.onerror=null;this.style.display='none';">`;
+                                }
+
+                                // Harga
+                                let priceHtml = `<span class="badge badge-subtle-secondary fs-8">Belum diatur</span>`;
+                                if (item.price_kamar && item.price_kamar.length > 0) {
+                                    const mPrice = item.price_kamar.find(p => p.kategori === 'bulan');
+                                    const yPrice = item.price_kamar.find(p => p.kategori === 'tahun');
+                                    if (mPrice) {
+                                        priceHtml = `<div class="fw-bold text-success fs-7">Rp ${Number(mPrice.price).toLocaleString('id-ID')}<span class="fs-8 fw-normal text-muted">/bln</span></div>`;
+                                    }
+                                    if (yPrice) {
+                                        priceHtml += `<div class="fs-8 text-muted mt-1">Rp ${Number(yPrice.price).toLocaleString('id-ID')}/thn</div>`;
+                                    }
+                                }
+
+                                // Status
+                                let statusHtml = `<span class="badge badge-subtle-success"><i class="bi bi-check-circle-fill me-1"></i>Kosong</span>`;
+                                if (item.room_status === 'terisi') {
+                                    statusHtml = `<span class="badge badge-subtle-primary"><i class="bi bi-person-fill-check me-1"></i>Terisi</span>`;
+                                } else if (item.room_status === 'pending') {
+                                    statusHtml = `<span class="badge badge-subtle-warning"><i class="bi bi-clock-history me-1"></i>Pending</span>`;
+                                }
+
+                                // Penghuni
+                                let tenantHtml = '<span class="text-muted fs-8">-</span>';
+                                if (item.active_tenant) {
+                                    let phoneLink = item.active_tenant.hp ? `<a href="https://wa.me/${item.active_tenant.hp.replace(/[^0-9]/g, '')}" target="_blank" class="text-success fs-8" title="Chat WhatsApp"><i class="bi bi-whatsapp"></i></a>` : '';
+                                    let nameShort = item.active_tenant.name.length > 14 ? item.active_tenant.name.substring(0, 14) + '...' : item.active_tenant.name;
+                                    let dateHtml = '';
+                                    if (item.active_tenant.end_date) {
+                                        dateHtml = `<div class="fs-8 text-muted mt-0 text-nowrap">${item.active_tenant.end_date.substring(0, 10)}</div>`;
+                                    }
+                                    tenantHtml = `
+                                        <div class="tenant-compact text-nowrap">
+                                            <div class="d-flex align-items-center gap-1.5">
+                                                <span class="fw-semibold fs-8 text-dark" title="${item.active_tenant.name}">${nameShort}</span>
+                                                ${phoneLink}
+                                            </div>
+                                            ${dateHtml}
+                                        </div>
+                                    `;
+                                } else if (item.pending_tenant) {
+                                    let pNameShort = item.pending_tenant.name.length > 12 ? item.pending_tenant.name.substring(0, 12) + '...' : item.pending_tenant.name;
+                                    tenantHtml = `<div class="fs-8 text-warning text-nowrap d-flex align-items-center gap-1"><span title="${item.pending_tenant.name}"><i class="bi bi-hourglass-split me-1"></i>${pNameShort}</span><span class="badge bg-warning-subtle text-warning border border-warning-subtle py-0 px-1 fs-8">Wait</span></div>`;
+                                }
+
+                                // Fasilitas
+                                let fasHtml = '';
                                 if (item.fasilitas) {
                                     const fasArr = item.fasilitas.split(',').map(s => s.trim()).filter(Boolean);
                                     if (fasArr.length > 0) {
-                                        const slice = fasArr.slice(0, 2).map(f => `<span class="badge badge-subtle-info fs-8 me-1">${f}</span>`).join('');
-                                        const more = fasArr.length > 2 ? `<span class="badge badge-subtle-secondary fs-8 text-muted">+${fasArr.length - 2}</span>` : '';
-                                        fasHtml = `<div class="d-flex flex-wrap gap-1">${slice}${more}</div>`;
+                                        const slice = fasArr.slice(0, 1).map(f => `<span class="badge badge-subtle-info fs-8 py-1">${f}</span>`).join('');
+                                        const more = fasArr.length > 1 ? `<span class="badge badge-subtle-secondary fs-8 py-1">+${fasArr.length - 1}</span>` : '';
+                                        fasHtml = `${slice}${more}`;
                                     }
                                 }
 
@@ -457,30 +656,41 @@
                                 tr.innerHTML = `
                                     <td class="text-center fw-semibold text-muted">${index + 1}</td>
                                     <td>
-                                        <div class="table-cell-title">${item.room}</div>
-                                        ${discountBadge}
+                                        <div class="d-flex align-items-center gap-2">
+                                            ${thumbHtml}
+                                            <div>
+                                                <div class="fw-semibold text-dark text-nowrap fs-7">${item.room}</div>
+                                                ${discountBadge}
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td class="text-center">
-                                        <span class="badge badge-subtle-primary">
-                                            <i class="bi bi-eye-fill me-1"></i>${viewsCount}
-                                        </span>
+                                    <td class="text-nowrap">${priceHtml}</td>
+                                    <td class="text-center text-nowrap">${statusHtml}</td>
+                                    <td>${tenantHtml}</td>
+                                    <td class="text-nowrap">
+                                        <div class="d-flex align-items-center gap-1 text-nowrap">
+                                            <span class="badge badge-subtle-secondary fs-8 py-1"><i class="bi bi-eye me-1"></i>${viewsCount}</span>
+                                            ${fasHtml}
+                                        </div>
                                     </td>
-                                    <td>${fasHtml}</td>
-                                    <td class="text-center">
-                                        <div class="action-btn-group">
-                                            <button type="button" class="btn btn-sm btn-outline-warning py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalImageKamar${item.id}" title="Galeri Foto">
-                                                <i class="bi bi-images"></i> Galeri
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-outline-success py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalPriceKamar${item.id}" title="Tarif Harga">
-                                                <i class="bi bi-cash-stack"></i> Harga
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalTamuKamar${item.id}" title="Penghuni">
-                                                <i class="bi bi-people"></i> Penghuni
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalEditKamar${item.id}" title="Edit">
+                                    <td class="text-center text-nowrap">
+                                        <div class="table-action-compact justify-content-center">
+                                            <button type="button" class="btn-action-icon act-edit" data-bs-toggle="modal" data-bs-target="#modalEditKamar${item.id}" title="Edit Data Kamar">
                                                 <i class="bi bi-pencil-square"></i>
                                             </button>
-                                            <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalDeleteKamar${item.id}" title="Hapus">
+                                            <button type="button" class="btn-action-icon act-price" data-bs-toggle="modal" data-bs-target="#modalPriceKamar${item.id}" title="Atur Tarif Sewa">
+                                                <i class="bi bi-cash-stack"></i>
+                                            </button>
+                                            <button type="button" class="btn-action-icon act-gallery" data-bs-toggle="modal" data-bs-target="#modalImageKamar${item.id}" title="Kelola Galeri Foto">
+                                                <i class="bi bi-images"></i>
+                                            </button>
+                                            <button type="button" class="btn-action-icon act-tenant" data-bs-toggle="modal" data-bs-target="#modalTamuKamar${item.id}" title="Riwayat Penghuni">
+                                                <i class="bi bi-people"></i>
+                                            </button>
+                                            <a href="/admin/product-kosan/kamar/${item.id}/detail" target="_blank" class="btn-action-icon act-web" title="Buka Halaman Publik">
+                                                <i class="bi bi-box-arrow-up-right"></i>
+                                            </a>
+                                            <button type="button" class="btn-action-icon act-delete" data-bs-toggle="modal" data-bs-target="#modalDeleteKamar${item.id}" title="Hapus Unit Kamar">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>

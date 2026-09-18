@@ -446,6 +446,67 @@
                   </div>
                 </div>
 
+                <!-- BLOK BANK TRANSFER -->
+                <div id="bank-transfer-card" class="hidden rounded-3xl bg-[#3B2314] p-5 sm:p-7 text-white space-y-4 shadow-lg border border-white/10">
+                  <div class="flex items-center justify-between border-b border-white/10 pb-4">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-2xl bg-white text-[#3B2314] font-black flex items-center justify-center text-xs tracking-wider uppercase shadow-md" id="bank-badge-name">
+                        BCA
+                      </div>
+                      <div>
+                        <h3 class="text-sm sm:text-base font-black text-white" id="bank-name-label">Transfer Bank BCA</h3>
+                        <p class="text-[11px] text-white/60">Verifikasi otomatis & konfirmasi instan</p>
+                      </div>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full bg-[#00A896]/20 text-[#6DE2D5] text-[10px] font-bold">
+                      <i class="fa-solid fa-circle-check mr-1"></i> Aktif
+                    </span>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
+                      <span class="text-[10px] uppercase font-bold tracking-wider text-white/50 block">Nomor Rekening Tujuan</span>
+                      <div class="flex items-center justify-between gap-2 mt-1">
+                        <span id="bank-account-number" class="text-base sm:text-lg font-black tracking-wider text-[#F3A833]">1234567890</span>
+                        <button
+                          type="button"
+                          id="btn-copy-rekening"
+                          onclick="copyToClipboard(document.getElementById('bank-account-number').textContent, 'btn-copy-rekening', 'Tersalin! ✅')"
+                          class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-bold text-white transition-all active:scale-95 flex items-center gap-1 shrink-0"
+                          title="Salin Nomor Rekening"
+                        >
+                          <i class="fa-regular fa-copy text-[10px]"></i>
+                          <span>Salin</span>
+                        </button>
+                      </div>
+                      <span class="text-[10px] text-white/60 block mt-1">a/n PT Sinar Citra Lestari</span>
+                    </div>
+
+                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
+                      <span class="text-[10px] uppercase font-bold tracking-wider text-white/50 block">Nominal Harus Ditransfer</span>
+                      <div class="flex items-center justify-between gap-2 mt-1">
+                        <span id="bank-nominal-transfer" class="text-base sm:text-lg font-black text-[#F3A833]">Rp 0</span>
+                        <button
+                          type="button"
+                          id="btn-copy-nominal"
+                          onclick="copyNominalTransfer()"
+                          class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-bold text-white transition-all active:scale-95 flex items-center gap-1 shrink-0"
+                          title="Salin Nominal Transfer"
+                        >
+                          <i class="fa-regular fa-copy text-[10px]"></i>
+                          <span>Salin</span>
+                        </button>
+                      </div>
+                      <span class="text-[10px] text-white/60 block mt-1">Transfer tepat sesuai angka di atas</span>
+                    </div>
+                  </div>
+
+                  <div class="p-3 bg-white/5 rounded-2xl border border-white/10 flex items-start gap-2.5 text-[11px] text-white/70">
+                    <i class="fa-solid fa-circle-info text-[#F3A833] mt-0.5 shrink-0"></i>
+                    <span>Setelah transfer berhasil, simpan dan lampirkan bukti transfer/struk di bawah ini untuk verifikasi admin yang lebih cepat.</span>
+                  </div>
+                </div>
+
                 <div>
                   <label class="block font-bold text-xs sm:text-sm text-[#5D483A] mb-2">Unggah Bukti Transfer / Resi <span class="text-[#E60049]">*</span></label>
                   <div onclick="document.getElementById('file-bukti').click()"
@@ -776,6 +837,11 @@
         grandTotalElem.textContent = formatRupiah(grandTotal);
       }
 
+      const bankNominal = document.getElementById('bank-nominal-transfer');
+      if (bankNominal) {
+        bankNominal.textContent = formatRupiah(grandTotal);
+      }
+
       const hiddenTotalPrice = document.getElementById('input-hidden-total-price');
 
       if (hiddenTotalPrice) {
@@ -790,6 +856,12 @@
         maximumFractionDigits: 0
       }).format(number);
     }
+
+    const bankDetails = {
+      'bca': { name: 'Bank Central Asia (BCA)', code: 'BCA', no: '1234567890' },
+      'mandiri': { name: 'Bank Mandiri', code: 'MDR', no: '0987654321' },
+      'bni': { name: 'Bank Negara Indonesia (BNI)', code: 'BNI', no: '1111111111' }
+    };
 
     window.addEventListener('load', () => {
       const loader = document.getElementById('page-loader');
@@ -808,13 +880,70 @@
     function toggleQrisDisplay() {
       const selectBank = document.getElementById('select-bank');
       const qrisDisplay = document.getElementById('qris-display');
+      const bankCard = document.getElementById('bank-transfer-card');
+      const bankBadge = document.getElementById('bank-badge-name');
+      const bankNameLabel = document.getElementById('bank-name-label');
+      const bankAccNo = document.getElementById('bank-account-number');
 
-      if (selectBank && qrisDisplay) {
-        if (selectBank.value === 'qris') {
-          qrisDisplay.classList.remove('hidden');
-        } else {
-          qrisDisplay.classList.add('hidden');
+      if (!selectBank) return;
+
+      const val = selectBank.value;
+      if (val === 'qris') {
+        if (qrisDisplay) qrisDisplay.classList.remove('hidden');
+        if (bankCard) bankCard.classList.add('hidden');
+      } else if (bankDetails[val]) {
+        if (qrisDisplay) qrisDisplay.classList.add('hidden');
+        if (bankCard) {
+          bankCard.classList.remove('hidden');
+          if (bankBadge) bankBadge.textContent = bankDetails[val].code;
+          if (bankNameLabel) bankNameLabel.textContent = `Transfer ${bankDetails[val].name}`;
+          if (bankAccNo) bankAccNo.textContent = bankDetails[val].no;
         }
+      }
+    }
+
+    function copyToClipboard(text, btnId, successMsg) {
+      const cleanText = text.replace(/[^0-9]/g, '') || text;
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(cleanText).then(() => showBtnFeedback(btnId, successMsg)).catch(() => fallbackClipboardCopy(cleanText, btnId, successMsg));
+      } else {
+        fallbackClipboardCopy(cleanText, btnId, successMsg);
+      }
+    }
+
+    function copyNominalTransfer() {
+      const hiddenPrice = document.getElementById('input-hidden-total-price');
+      const nominal = hiddenPrice ? hiddenPrice.value : '0';
+      copyToClipboard(nominal, 'btn-copy-nominal', 'Tersalin! ✅');
+    }
+
+    function fallbackClipboardCopy(text, btnId, successMsg) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.left = "-999999px";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showBtnFeedback(btnId, successMsg);
+      } catch(e) {}
+      document.body.removeChild(ta);
+    }
+
+    function showBtnFeedback(btnId, msg) {
+      const btn = document.getElementById(btnId);
+      if (!btn) return;
+      const span = btn.querySelector('span');
+      if (span) {
+        const orig = span.textContent;
+        span.textContent = msg || 'Tersalin! ✅';
+        btn.classList.add('bg-emerald-600');
+        setTimeout(() => {
+          span.textContent = orig;
+          btn.classList.remove('bg-emerald-600');
+        }, 2000);
       }
     }
 

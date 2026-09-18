@@ -8,6 +8,10 @@
   <link rel="icon" href="{{ asset('scl.png') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+  <!-- Leaflet.js Interactive Map CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
   <style>
     .reveal {
       opacity: 0;
@@ -48,6 +52,52 @@
     .tab-active {
       color: #E60049;
       border-color: #E60049;
+    }
+
+    /* Custom Leaflet Markers */
+    .custom-kos-marker {
+      background: transparent;
+      border: none;
+    }
+    .marker-pin {
+      width: 42px;
+      height: 42px;
+      border-radius: 50% 50% 50% 0;
+      background: #E60049;
+      position: absolute;
+      transform: rotate(-45deg);
+      left: 50%;
+      top: 50%;
+      margin: -24px 0 0 -21px;
+      box-shadow: 0 4px 15px rgba(230,0,73,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .marker-pin i {
+      transform: rotate(45deg);
+      color: #fff;
+      font-size: 16px;
+    }
+    .marker-pulse {
+      width: 14px;
+      height: 14px;
+      background: rgba(230,0,73,0.4);
+      border-radius: 50%;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      margin: 12px 0 0 -7px;
+      animation: map-pulse 1.8s ease-out infinite;
+    }
+    @keyframes map-pulse {
+      0% { transform: scale(0.5); opacity: 1; }
+      100% { transform: scale(3.5); opacity: 0; }
+    }
+    .leaflet-popup-content-wrapper {
+      border-radius: 1rem !important;
+      padding: 4px !important;
+      box-shadow: 0 10px 30px rgba(59,35,20,0.15) !important;
     }
   </style>
 </head>
@@ -105,46 +155,45 @@
   <!-- MAIN CONTENT CONTAINER -->
   <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-7 space-y-10">
 
-    <!-- 4. GALLERY GRID -->
+    <!-- 4. MODERN BENTO GRID GALLERY -->
     <section class="reveal">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
 
-        <!-- Photo utama dipindahkan ke sisi kanan -->
-        <div class="lg:col-span-8 order-1 lg:order-2">
+        <!-- Photo Utama (Hero Item) -->
+        <div class="lg:col-span-7">
           <div
-            class="relative h-[300px] sm:h-[430px] lg:h-[520px] rounded-[2rem] overflow-hidden cursor-pointer bg-[#EADFD4] group shadow-xl"
+            class="relative h-[280px] sm:h-[400px] lg:h-[474px] rounded-[2rem] overflow-hidden cursor-pointer bg-[#EADFD4] group shadow-lg"
             onclick="openGallery(0)"
           >
             <img
               src="{{ $images[0] }}"
               alt="{{ $kosan->title }}"
-              class="gallery-main w-full h-full object-cover"
+              class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out"
             >
+            <div class="absolute inset-0 bg-gradient-to-t from-[#3B2314]/80 via-[#3B2314]/20 to-transparent pointer-events-none"></div>
 
-            <div class="absolute inset-0 bg-gradient-to-t from-[#3B2314]/75 via-transparent to-transparent pointer-events-none"></div>
-
-            <div class="absolute left-5 bottom-5 sm:left-7 sm:bottom-7 right-5 sm:right-7 flex items-end justify-between gap-4 text-white">
+            <div class="absolute left-4 bottom-4 sm:left-6 sm:bottom-6 right-4 sm:right-6 flex items-end justify-between gap-4 text-white">
               <div>
-                <span class="inline-flex items-center gap-2 px-3 py-1.5 bg-[#E60049] rounded-full text-[10px] font-extrabold uppercase tracking-wider shadow-lg">
+                <span class="inline-flex items-center gap-2 px-3 py-1.5 bg-[#E60049] rounded-full text-[10px] font-black uppercase tracking-wider shadow-md">
                   <i class="fa-solid fa-camera"></i>
-                  Foto Utama
+                  Foto Properti Utama
                 </span>
-                <p class="mt-2 text-sm font-bold">Klik foto untuk melihat galeri</p>
+                <p class="mt-2 text-xs sm:text-sm font-bold text-white/90">Klik foto untuk perbesar layar penuh</p>
               </div>
 
-              <span class="w-11 h-11 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center shrink-0">
+              <span class="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 group-hover:bg-[#E60049] transition-colors">
                 <i class="fa-solid fa-expand text-sm"></i>
               </span>
             </div>
           </div>
         </div>
 
-        <!-- Panel thumbnail dibuat vertikal -->
-        <div class="lg:col-span-4 order-2 lg:order-1 grid grid-cols-2 lg:grid-cols-1 gap-4">
+        <!-- 4 Sub Photos (2x2 Grid) -->
+        <div class="lg:col-span-5 grid grid-cols-2 gap-3 sm:gap-4">
           @for($i = 1; $i <= 4; $i++)
             @if(isset($images[$i]))
               <div
-                class="relative h-32 sm:h-40 lg:h-[119px] overflow-hidden rounded-[1.5rem] bg-[#EADFD4] cursor-pointer group shadow-sm"
+                class="relative h-[135px] sm:h-[195px] lg:h-[231px] overflow-hidden rounded-[1.5rem] bg-[#EADFD4] cursor-pointer group shadow-sm"
                 onclick="openGallery({{ $i }})"
               >
                 <img
@@ -154,15 +203,21 @@
                 >
 
                 @if($i === 4)
-                  <div class="absolute inset-0 bg-[#3B2314]/60 flex flex-col items-center justify-center text-white gap-1">
-                    <i class="fa-regular fa-images text-xl"></i>
-                    <span class="text-xs font-extrabold">{{ count($images) }} Foto</span>
+                  <div class="absolute inset-0 bg-[#3B2314]/65 backdrop-blur-[2px] flex flex-col items-center justify-center text-white gap-1.5 group-hover:bg-[#3B2314]/75 transition-colors">
+                    <span class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+                      <i class="fa-regular fa-images text-base"></i>
+                    </span>
+                    <span class="text-xs font-black tracking-wide">Lihat Semua Foto</span>
+                    <span class="text-[10px] font-semibold text-white/70">({{ count($images) }} Foto)</span>
                   </div>
+                @else
+                  <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
                 @endif
               </div>
             @else
-              <div class="h-32 sm:h-40 lg:h-[119px] rounded-[1.5rem] bg-[#F2E9E1] flex items-center justify-center text-[#B6A393]">
+              <div class="h-[135px] sm:h-[195px] lg:h-[231px] rounded-[1.5rem] bg-[#F2E9E1] flex flex-col items-center justify-center text-[#B6A393] gap-1">
                 <i class="fa-regular fa-image text-xl"></i>
+                <span class="text-[10px] font-bold">Foto Tambahan</span>
               </div>
             @endif
           @endfor
@@ -288,46 +343,99 @@
       </div>
     </section>
 
-    <!-- 7. LOKASI SECTION (GOOGLE MAPS) -->
-    @if($kosan->gmaps)
-      <section id="lokasi" class="reveal">
-        <div class="grid lg:grid-cols-12 gap-6 items-center">
-
-          <div class="lg:col-span-4">
-            <span class="text-[10px] font-extrabold uppercase tracking-[.2em] text-[#E60049]">03 — Lokasi</span>
-            <h3 class="text-2xl sm:text-3xl font-black text-[#3B2314] mt-2">Lihat area properti</h3>
-
-            <div class="mt-5 inline-flex items-center gap-2 px-4 py-2.5 bg-white rounded-xl border border-[#EADFD4] shadow-sm text-xs font-bold text-[#5D493A]">
-              <i class="fa-solid fa-map-location-dot text-[#E60049]"></i>
-              {{ $kosan->wilayah ?? 'Lokasi Terdaftar' }}
-            </div>
-          </div>
-
-          <div class="lg:col-span-8">
-            <div class="rounded-[2rem] overflow-hidden border-4 border-white shadow-xl h-[300px] sm:h-[390px] bg-[#EDE4DC] relative">
-              @if(Str::contains($kosan->gmaps, '<iframe'))
-                @php
-                  $cleanIframe = preg_replace('/width="[^"]*"/', 'width="100%"', $kosan->gmaps);
-                  $cleanIframe = preg_replace('/height="[^"]*"/', 'height="100%"', $cleanIframe);
-                  $cleanIframe = preg_replace('/style="[^"]*"/', '', $cleanIframe);
-                  $cleanIframe = str_replace('<iframe', '<iframe class="w-full h-full border-0"', $cleanIframe);
-                @endphp
-                {!! $cleanIframe !!}
-              @else
-                <iframe
-                  src="{{ $kosan->gmaps }}"
-                  class="w-full h-full border-0"
-                  allowfullscreen=""
-                  loading="lazy"
-                  referrerpolicy="no-referrer-when-downgrade">
-                </iframe>
-              @endif
-            </div>
-          </div>
-
+    <!-- 7. LOKASI & PETA FASILITAS SEKITAR (INTERACTIVE VICINITY MAP) -->
+    <section id="lokasi" class="reveal space-y-6">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <span class="text-[10px] font-extrabold uppercase tracking-[.2em] text-[#E60049]">03 — Lokasi & Fasilitas Sekitar</span>
+          <h3 class="text-2xl sm:text-3xl font-black text-[#3B2314] mt-1">Area strategis & kemudahan akses</h3>
+          <p class="text-xs sm:text-sm text-[#7B6759] mt-1 max-w-xl">
+            Berada di kawasan {{ $kosan->wilayah ?? 'Denpasar' }} dengan akses cepat ke pusat perkantoran, universitas, minimarket, dan fasilitas kesehatan.
+          </p>
         </div>
-      </section>
-    @endif
+
+        <div class="flex items-center gap-2">
+          <div class="inline-flex items-center gap-2 px-3.5 py-2 bg-white rounded-xl border border-[#EADFD4] shadow-sm text-xs font-bold text-[#5D493A]">
+            <i class="fa-solid fa-map-pin text-[#E60049]"></i>
+            <span>{{ $kosan->wilayah ?? 'Bali' }}</span>
+          </div>
+          <a
+            href="https://www.google.com/maps/search/?api=1&query={{ urlencode($kosan->title . ' ' . $kosan->wilayah) }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="px-4 py-2 bg-[#3B2314] hover:bg-[#E60049] text-white text-xs font-black rounded-xl shadow-md transition-all flex items-center gap-2"
+          >
+            <i class="fa-solid fa-diamond-turn-right text-[#F3A833]"></i>
+            <span>Buka Google Maps</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Container Peta Interaktif Leaflet -->
+      <div class="relative rounded-[2rem] overflow-hidden border-4 border-white shadow-xl bg-[#EDE4DC]">
+        <div id="vicinity-map" class="w-full h-[320px] sm:h-[400px] z-10"></div>
+
+        <div class="absolute bottom-3 right-3 z-20 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-[#E9DDD2] text-[10px] font-bold text-[#5D483A] shadow-sm flex items-center gap-2 pointer-events-none">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>Peta Interaktif Sinar Citra Lestari</span>
+        </div>
+      </div>
+
+      <!-- 4 Vicinity POI Distance Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div class="bg-white p-4 rounded-2xl border border-[#E9DDD2] shadow-sm hover:border-[#0284c7] transition-all flex items-start gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 text-base">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <div>
+            <h4 class="text-xs font-extrabold text-[#3B2314]">Kampus / Pendidikan</h4>
+            <p class="text-[11px] text-[#7B6759] mt-0.5">Universitas / Kampus Sekitar</p>
+            <span class="inline-block mt-2 text-[10px] font-black text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md">
+              🚗 ~8 Menit (3.2 km)
+            </span>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl border border-[#E9DDD2] shadow-sm hover:border-emerald-500 transition-all flex items-start gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 text-base">
+            <i class="fa-solid fa-cart-shopping"></i>
+          </div>
+          <div>
+            <h4 class="text-xs font-extrabold text-[#3B2314]">Kebutuhan Harian</h4>
+            <p class="text-[11px] text-[#7B6759] mt-0.5">Indomaret / Alfamart 24 Jam</p>
+            <span class="inline-block mt-2 text-[10px] font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
+              🚶 ~3 Menit (250 m)
+            </span>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl border border-[#E9DDD2] shadow-sm hover:border-rose-500 transition-all flex items-start gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 text-base">
+            <i class="fa-solid fa-heart-pulse"></i>
+          </div>
+          <div>
+            <h4 class="text-xs font-extrabold text-[#3B2314]">Layanan Kesehatan</h4>
+            <p class="text-[11px] text-[#7B6759] mt-0.5">RSUD, Klinik 24 Jam, Apotek</p>
+            <span class="inline-block mt-2 text-[10px] font-black text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md">
+              🚗 ~5 Menit (1.8 km)
+            </span>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl border border-[#E9DDD2] shadow-sm hover:border-amber-500 transition-all flex items-start gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 text-base">
+            <i class="fa-solid fa-mug-hot"></i>
+          </div>
+          <div>
+            <h4 class="text-xs font-extrabold text-[#3B2314]">Kuliner & Laundry</h4>
+            <p class="text-[11px] text-[#7B6759] mt-0.5">Kafe Kopi & Laundry Kiloan</p>
+            <span class="inline-block mt-2 text-[10px] font-black text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md">
+              🚶 ~2 Menit (180 m)
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- 8. KAMAR YANG TERSEDIA SECTION -->
     <section id="kamar-tersedia" class="reveal">
@@ -405,13 +513,23 @@
                   </div>
                 </div>
 
-                <a
-                  href="{{ route('kamar.detail', $kamarItem->id) }}"
-                  class="mt-5 w-full px-5 py-3 bg-[#3B2314] hover:bg-[#E60049] text-white text-xs font-extrabold rounded-2xl transition-all shadow-sm active:scale-[.98] flex items-center justify-center gap-2"
-                >
-                  <span>Lihat Detail Kamar</span>
-                  <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                </a>
+                <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <a
+                    href="{{ route('kamar.detail', $kamarItem->id) }}"
+                    class="w-full px-4 py-3 bg-white hover:bg-[#EDE4DC] text-[#3B2314] border border-[#E9DDD2] text-xs font-black rounded-2xl transition-all shadow-sm active:scale-[.98] flex items-center justify-center gap-1.5"
+                  >
+                    <span>Detail Kamar</span>
+                    <i class="fa-solid fa-arrow-right text-[10px] text-[#7B6759]"></i>
+                  </a>
+
+                  <a
+                    href="{{ route('form.booking.kamar', $kamarItem->id) }}"
+                    class="shine w-full px-4 py-3 bg-[#E60049] hover:bg-[#C90040] text-white text-xs font-black rounded-2xl transition-all shadow-md active:scale-[.98] flex items-center justify-center gap-1.5"
+                  >
+                    <i class="fa-solid fa-bolt text-[#F3A833] text-[11px]"></i>
+                    <span>Pesan Langsung</span>
+                  </a>
+                </div>
               </div>
 
             </div>
@@ -600,6 +718,84 @@
 
     window.addEventListener('scroll', revealOnScroll);
     window.addEventListener('load', revealOnScroll);
+
+    // Leaflet Interactive Vicinity Map Initialization
+    document.addEventListener("DOMContentLoaded", function () {
+      const mapElem = document.getElementById('vicinity-map');
+      if (!mapElem || typeof L === 'undefined') return;
+
+      let kosLat = -8.6500;
+      let kosLng = 115.2167;
+      const wilayahStr = "{{ strtolower($kosan->wilayah ?? '') }}";
+      if (wilayahStr.includes('utara')) {
+        kosLat = -8.6280; kosLng = 115.2120;
+      } else if (wilayahStr.includes('selatan')) {
+        kosLat = -8.6920; kosLng = 115.2280;
+      } else if (wilayahStr.includes('barat')) {
+        kosLat = -8.6590; kosLng = 115.1920;
+      } else if (wilayahStr.includes('timur')) {
+        kosLat = -8.6430; kosLng = 115.2410;
+      }
+
+      const vicinityMap = L.map('vicinity-map', {
+        center: [kosLat, kosLng],
+        zoom: 15,
+        scrollWheelZoom: false
+      });
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        maxZoom: 19
+      }).addTo(vicinityMap);
+
+      // Custom Kos Marker
+      const kosIcon = L.divIcon({
+        className: 'custom-kos-marker',
+        html: '<div class="marker-pin"><i class="fa-solid fa-house"></i></div><div class="marker-pulse"></div>',
+        iconSize: [42, 42],
+        iconAnchor: [21, 42]
+      });
+
+      const kosMarker = L.marker([kosLat, kosLng], { icon: kosIcon }).addTo(vicinityMap);
+      kosMarker.bindPopup('<div class="p-2 text-center"><strong class="text-xs font-black text-[#3B2314] block">{{ $kosan->title }}</strong><span class="text-[10px] text-[#E60049] font-bold">Lokasi Properti Kos</span></div>').openPopup();
+
+      // Vicinity POI Markers
+      const pois = [
+        { title: 'Kampus / Universitas Terdekat', icon: 'fa-graduation-cap', color: '#0284c7', offset: [0.004, 0.003], dist: '🚗 ~8 Menit (3.2 km)' },
+        { title: 'Indomaret / Minimarket 24 Jam', icon: 'fa-cart-shopping', color: '#10b981', offset: [-0.002, 0.0025], dist: '🚶 ~3 Menit (250 m)' },
+        { title: 'RSUD & Apotek 24 Jam', icon: 'fa-heart-pulse', color: '#ef4444', offset: [0.0025, -0.004], dist: '🚗 ~5 Menit (1.8 km)' },
+        { title: 'Kafe & Laundry Kiloan', icon: 'fa-mug-hot', color: '#f59e0b', offset: [-0.0025, -0.002], dist: '🚶 ~2 Menit (180 m)' }
+      ];
+
+      pois.forEach(p => {
+        const poiIcon = L.divIcon({
+          className: 'custom-poi-marker',
+          html: `<div style="background:${p.color};width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,0.25);border:2px solid #fff;"><i class="fa-solid ${p.icon}" style="font-size:12px;"></i></div>`,
+          iconSize: [30, 30],
+          iconAnchor: [15, 15]
+        });
+        L.marker([kosLat + p.offset[0], kosLng + p.offset[1]], { icon: poiIcon })
+          .addTo(vicinityMap)
+          .bindPopup(`<div class="p-1.5 text-xs text-center"><strong class="font-bold text-[#3B2314] block">${p.title}</strong><span class="text-[10px] text-[#7B6759] font-semibold">${p.dist}</span></div>`);
+      });
+    });
   </script>
+
+  <!-- 9. MOBILE FLOATING STICKY BAR (KHUSUS SMARTPHONE) -->
+  <div class="fixed bottom-0 left-0 right-0 z-40 bg-[#FFF8F1]/95 backdrop-blur-md border-t border-[#E9DDD2] p-3 px-4 shadow-[0_-6px_25px_rgba(59,35,20,0.1)] block lg:hidden">
+    <div class="max-w-md mx-auto flex items-center justify-between gap-3">
+      <div>
+        <span class="text-[10px] uppercase font-bold text-[#8E7B6D] tracking-wider block">Ketersediaan Unit</span>
+        <div class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-sm font-black text-[#3B2314]">Sisa {{ $kosan->tersedia }} Kamar Siap Huni</span>
+        </div>
+      </div>
+      <button type="button" onclick="scrollToSection('kamar-tersedia')" class="shine px-5 py-3 bg-[#E60049] hover:bg-[#C90040] text-white font-black text-xs rounded-xl shadow-md active:scale-95 flex items-center gap-1.5 shrink-0">
+        <span>Pilih Kamar</span>
+        <i class="fa-solid fa-arrow-down text-[10px]"></i>
+      </button>
+    </div>
+  </div>
 </body>
 </html>

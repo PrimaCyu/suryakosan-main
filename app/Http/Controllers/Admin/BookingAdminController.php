@@ -40,7 +40,8 @@ class BookingAdminController extends Controller
 
     public function approveBooking($tamu)
     {
-        $dataTamu = Tamu::with('productKamarKosan')->findOrFail($tamu);
+        $id = $tamu instanceof Tamu ? $tamu->id : $tamu;
+        $dataTamu = Tamu::with('productKamarKosan.productKosan')->findOrFail($id);
         $user = auth()->user();
 
         if (!$user->isSuperAdmin()) {
@@ -54,12 +55,17 @@ class BookingAdminController extends Controller
             'status' => 'approved'
         ]);
 
+        if ($dataTamu->productKamarKosan && $dataTamu->productKamarKosan->productKosan) {
+            $dataTamu->productKamarKosan->productKosan->syncAvailableCount();
+        }
+
         return back()->with('success', 'Permintaan booking atas nama ' . $dataTamu->name . ' telah disetujui (Approved).');
     }
 
     public function rejectBooking($tamu)
     {
-        $dataTamu = Tamu::with('productKamarKosan')->findOrFail($tamu);
+        $id = $tamu instanceof Tamu ? $tamu->id : $tamu;
+        $dataTamu = Tamu::with('productKamarKosan.productKosan')->findOrFail($id);
         $user = auth()->user();
 
         if (!$user->isSuperAdmin()) {
@@ -72,6 +78,10 @@ class BookingAdminController extends Controller
         $dataTamu->update([
             'status' => 'reject'
         ]);
+
+        if ($dataTamu->productKamarKosan && $dataTamu->productKamarKosan->productKosan) {
+            $dataTamu->productKamarKosan->productKosan->syncAvailableCount();
+        }
 
         return back()->with('success', 'Permintaan booking atas nama ' . $dataTamu->name . ' telah ditolak (Rejected).');
     }

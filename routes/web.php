@@ -42,6 +42,8 @@ Route::get('/kamar/booking/{product_kamar_kosan}', function($product_kamar_kosan
 })->name('form.booking.kamar');
 
 Route::post('/booking/kamar/{product_kamar_kosan}', [TamuBookingController::class, 'booking'])->middleware('throttle:10,1')->name('tamu.booking');
+Route::get('/booking/success/{tamu}', [TamuBookingController::class, 'bookingSuccess'])->name('booking.success');
+Route::get('/booking/download-invoice/{tamu}', [TamuBookingController::class, 'downloadInvoice'])->name('booking.download.invoice');
 
 Route::get('/check-date/kamar/{id}', function($id) {
     $kamar = ProductKamarKosan::find($id);

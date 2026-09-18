@@ -112,6 +112,32 @@
   <!-- 8. FOOTER -->
   @include('frontend.footer')
 
+  <!-- 9. MOBILE FLOATING STICKY BOOKING BAR (KHUSUS SMARTPHONE) -->
+  @php
+    $monthlyPriceObj = $kamar->monthly_price;
+    $monthlyPriceVal = $monthlyPriceObj ? $monthlyPriceObj->price : null;
+    $monthlyDiscVal = $monthlyPriceObj ? $monthlyPriceObj->discount : 0;
+  @endphp
+  <div class="fixed bottom-0 left-0 right-0 z-40 bg-[#FFF8F1]/95 backdrop-blur-md border-t border-[#E9DDD2] p-3 px-4 shadow-[0_-6px_25px_rgba(59,35,20,0.1)] block lg:hidden">
+    <div class="max-w-md mx-auto flex items-center justify-between gap-3">
+      <div class="space-y-0.5">
+        <span class="text-[10px] uppercase font-bold text-[#8E7B6D] tracking-wider block">Harga Sewa Unit</span>
+        <div class="flex items-baseline gap-1.5">
+          <span class="text-base sm:text-lg font-black text-[#E60049]">
+            {{ $monthlyPriceVal ? 'Rp ' . number_format($monthlyPriceVal, 0, ',', '.') : 'Hubungi Kami' }}
+          </span>
+          @if($monthlyPriceVal)
+            <span class="text-[10px] font-bold text-[#8E7B6D]">/bln</span>
+          @endif
+        </div>
+      </div>
+      <a href="{{ route('form.booking.kamar', $kamar->id) }}" class="shine px-5 py-3 bg-[#E60049] hover:bg-[#C90040] text-white font-black text-xs rounded-xl shadow-md active:scale-95 flex items-center gap-1.5 shrink-0">
+        <span>Booking Kamar</span>
+        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+      </a>
+    </div>
+  </div>
+
   <script>
     window.addEventListener('load',()=>{const loader=document.getElementById('page-loader');if(loader){loader.style.width='100%';setTimeout(()=>loader.style.opacity='0',350)}});
     const revealElements=document.querySelectorAll('.reveal');

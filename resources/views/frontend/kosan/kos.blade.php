@@ -186,19 +186,21 @@
           @endphp
 
           <!-- CARD KOS -->
-          <div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col border border-[#F3A833]/20 hover:-translate-y-1.5 group">
-            <div class="relative h-52 overflow-hidden bg-[#3B2314]/5">
-              <img src="{{ $imgUrl }}" alt="{{ $kos->title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          <div class="bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-[0_20px_50px_rgba(59,35,20,0.12)] transition-all duration-300 flex flex-col border border-[#E9DDD2] hover:border-[#F3A833] hover:-translate-y-2 group">
+            <div class="relative h-56 overflow-hidden bg-[#3B2314]/5">
+              <img src="{{ $imgUrl }}" alt="{{ $kos->title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
 
               <!-- Badges -->
-              <div class="absolute top-3 left-3 flex flex-col items-start gap-1.5 z-10">
-                <span class="bg-[#3B2314]/80 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1.5">
-                  <i class="fa-solid fa-door-open text-xs text-[#00A896]"></i>
-                  @if(is_numeric($kos->tersedia))
-                    Sisa {{ $kos->tersedia }} Kamar
-                  @else
-                    {{ $kos->tersedia ?? 'Tersedia' }}
-                  @endif
+              <div class="absolute top-3.5 left-3.5 flex flex-col items-start gap-1.5 z-10">
+                <span class="bg-[#3B2314]/85 backdrop-blur-md text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider flex items-center gap-2 shadow-lg border border-white/10">
+                  <span class="w-2 h-2 rounded-full {{ is_numeric($kos->tersedia) && $kos->tersedia > 0 ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400' }}"></span>
+                  <span>
+                    @if(is_numeric($kos->tersedia))
+                      {{ $kos->tersedia > 0 ? 'Sisa ' . $kos->tersedia . ' Kamar Siap Huni' : 'Kamar Penuh' }}
+                    @else
+                      {{ $kos->tersedia ?? 'Tersedia' }}
+                    @endif
+                  </span>
                 </span>
               </div>
 

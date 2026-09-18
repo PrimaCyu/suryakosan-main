@@ -21,6 +21,10 @@ class HomeController extends Controller
                         ->get();
         });
 
+        $kosanList = Cache::remember('home_kosan_list', 3600, function () {
+            return ProductKosan::with(['productImageKosan', 'productKamarKosan.priceKamar'])->get();
+        });
+
         $testimonis = Cache::remember('home_testimonis', 3600, function () {
             return Testimoni::orderByDesc('created_at')->get();
         });
@@ -29,7 +33,7 @@ class HomeController extends Controller
             return Artikel::orderByDesc('created_at')->take(3)->get();
         });
 
-        return view('frontend.index', compact('kamarList', 'testimonis', 'artikels'));
+        return view('frontend.index', compact('kamarList', 'kosanList', 'testimonis', 'artikels'));
     }
 
     public function kosanIndex(Request $request)

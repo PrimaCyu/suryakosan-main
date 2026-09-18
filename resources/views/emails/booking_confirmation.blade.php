@@ -21,7 +21,8 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
         .email-header {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            background: linear-gradient(135deg, #3B2314 0%, #54331d 100%);
+            border-bottom: 3px solid #F3A833;
             color: #ffffff;
             padding: 30px 25px;
             text-align: center;
@@ -35,6 +36,8 @@
             margin: 8px 0 0 0;
             font-size: 14px;
             opacity: 0.9;
+            color: #F3A833;
+            font-weight: 600;
         }
         .email-body {
             padding: 30px 25px;
@@ -52,18 +55,19 @@
             margin-bottom: 25px;
         }
         .summary-card {
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
+            background-color: #FFF8F1;
+            border: 1px solid #E9DDD2;
+            border-radius: 12px;
             padding: 18px;
             margin-bottom: 25px;
         }
         .summary-card h3 {
             margin: 0 0 12px 0;
             font-size: 15px;
-            color: #1e40af;
-            border-bottom: 1px solid #e2e8f0;
+            color: #3B2314;
+            border-bottom: 1px solid #E9DDD2;
             padding-bottom: 8px;
+            font-weight: 700;
         }
         .summary-row {
             display: flex;
@@ -79,12 +83,12 @@
             color: #1e293b;
         }
         .attachment-notice {
-            background-color: #eff6ff;
-            border-left: 4px solid #3b82f6;
+            background-color: #f0fdf4;
+            border-left: 4px solid #00A896;
             padding: 12px 16px;
             border-radius: 6px;
             font-size: 13px;
-            color: #1e40af;
+            color: #065f46;
             margin-bottom: 25px;
         }
         .footer {
@@ -109,7 +113,7 @@
             <div class="greeting">Halo, {{ $tamu->name }}! 👋</div>
             
             <p class="message">
-                Terima kasih telah melakukan pemesanan kamar kos melalui website kami. Reservasi Anda telah berhasil tercatat di sistem kami dengan kode booking: <strong>#BOOK-{{ str_pad($tamu->id, 5, '0', STR_PAD_LEFT) }}</strong>.
+                Terima kasih telah melakukan pemesanan kamar kos melalui website kami. Reservasi Anda telah berhasil tercatat di sistem kami dengan kode booking: <strong style="color: #E60049;">#BOOK-{{ str_pad($tamu->id, 5, '0', STR_PAD_LEFT) }}</strong>.
             </p>
 
             <div class="summary-card">
@@ -145,9 +149,9 @@
                             {{ strtoupper($tamu->payment_method) }}
                         </td>
                     </tr>
-                    <tr style="border-top: 1px solid #e2e8f0;">
-                        <td style="padding: 8px 0 0 0; color: #1e40af; font-weight: bold;">Total Bayar:</td>
-                        <td style="padding: 8px 0 0 0; font-weight: bold; text-align: right; color: #1d4ed8; font-size: 15px;">
+                    <tr style="border-top: 1px solid #E9DDD2;">
+                        <td style="padding: 8px 0 0 0; color: #3B2314; font-weight: bold;">Total Bayar:</td>
+                        <td style="padding: 8px 0 0 0; font-weight: 800; text-align: right; color: #E60049; font-size: 16px;">
                             Rp {{ number_format($tamu->total_price, 0, ',', '.') }}
                         </td>
                     </tr>

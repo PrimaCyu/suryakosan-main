@@ -39,13 +39,62 @@ class KamarKosanController extends Controller
     {
         $this->checkKosanAccess($product_kosan);
         $kosan = ProductKosan::findOrFail($product_kosan);
-        $query = ProductKamarKosan::with(['productKamarImageKosan', 'priceKamar', 'tamu'])
-            ->where('product_kosan_id', $product_kosan);
+
+        // Hitung Ringkasan Metrik Okupansi (KPI Cards) untuk Kosan ini
+        $allRooms = ProductKamarKosan::with(['tamu', 'priceKamar'])
+            ->where('product_kosan_id', $product_kosan)
+            ->get();
+
+        $totalKamarCount = $allRooms->count();
+        $occupiedKamarCount = $allRooms->filter(fn($r) => $r->active_tenant !== null)->count();
+        $pendingKamarCount = $allRooms->filter(fn($r) => $r->pending_tenant !== null)->count();
+        $availableKamarCount = max(0, $totalKamarCount - $occupiedKamarCount);
+        $occupancyRate = $totalKamarCount > 0 ? round(($occupiedKamarCount / $totalKamarCount) * 100, 1) : 0;
+
+        $kpiStats = [
+            'total_kamar'     => $totalKamarCount,
+            'occupied_kamar'  => $occupiedKamarCount,
+            'terisi_kamar'    => $occupiedKamarCount,
+            'available_kamar' => $availableKamarCount,
+            'kosong_kamar'    => $availableKamarCount,
+            'pending_kamar'   => $pendingKamarCount,
+            'occupancy_rate'  => $occupancyRate,
+        ];
+
+        // Query tabel kamar dengan relasi lengkap
+        $query = ProductKamarKosan::with([
+            'productKamarImageKosan',
+            'priceKamar',
+            'tamu' => function ($q) {
+                $q->orderByDesc('end_date');
+            }
+        ])->where('product_kosan_id', $product_kosan);
+
         if ($request->has('search') && !empty($request->search)) {
             $query->whereRaw('LOWER(room) LIKE ?', ['%' . strtolower($request->search) . '%']);
         }
-        $kamar_kosan = $query->paginate(10);
-        return view('backend.dashboard.kosan.kamar.index', compact('kamar_kosan', 'product_kosan', 'kosan'));
+
+        // Filter status kamar
+        $statusFilter = $request->get('status', 'semua');
+        if ($statusFilter === 'terisi') {
+            $query->whereHas('tamu', function ($q) {
+                $q->where('status', 'approved')
+                  ->whereDate('end_date', '>=', now()->toDateString());
+            });
+        } elseif ($statusFilter === 'kosong') {
+            $query->whereDoesntHave('tamu', function ($q) {
+                $q->where('status', 'approved')
+                  ->whereDate('end_date', '>=', now()->toDateString());
+            });
+        } elseif ($statusFilter === 'pending') {
+            $query->whereHas('tamu', function ($q) {
+                $q->where('status', 'pending');
+            });
+        }
+
+        $kamar_kosan = $query->orderBy('room', 'asc')->paginate(10);
+
+        return view('backend.dashboard.kosan.kamar.index', compact('kamar_kosan', 'product_kosan', 'kosan', 'kpiStats', 'statusFilter'));
     }
 
     public function searchKamar($product_kosan, Request $request)
@@ -66,37 +115,99 @@ class KamarKosanController extends Controller
     public function insertKamar($product_kosan, Request $request)
     {
         $this->checkKosanAccess($product_kosan);
-        $request->validate([
-            'dataKamar'                       => 'required|array|min:1',
-            'dataKamar.*.room'                => 'required|string|max:255',
-            'dataKamar.*.description'         => 'nullable|string',
-            'dataKamar.*.cumulative_discount' => 'nullable|numeric|min:0',
-            'dataKamar.*.views'               => 'nullable|integer|min:0',
-        ]);
 
-        $isSuperAdmin = auth()->user()->isSuperAdmin();
-        $dataKamar = $request->input('dataKamar', []);
+        // Dukung input single room terpadu dari modal terpadu baru ATAU multi-row array legacy
+        if ($request->has('room')) {
+            $request->validate([
+                'room'                => 'required|string|max:255',
+                'description'         => 'nullable|string',
+                'cumulative_discount' => 'nullable|numeric|min:0',
+                'price_bulan'         => 'nullable|numeric|min:0',
+                'price_tahun'         => 'nullable|numeric|min:0',
+                'image'               => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            ]);
 
-        DB::transaction(function () use ($dataKamar, $product_kosan, $isSuperAdmin) {
-            foreach ($dataKamar as $item) {
-                $fasilitas = $item['fasilitas'] ?? null;
-                if (is_array($fasilitas)) {
-                    $fasilitas = implode(', ', $fasilitas);
+            $isSuperAdmin = auth()->user()->isSuperAdmin();
+            $fasilitas = $request->input('fasilitas');
+            if (is_array($fasilitas)) {
+                $fasilitas = implode(', ', $fasilitas);
+            }
+
+            DB::transaction(function () use ($request, $product_kosan, $fasilitas, $isSuperAdmin) {
+                $kamar = ProductKamarKosan::create([
+                    'product_kosan_id'    => $product_kosan,
+                    'room'                => $request->input('room'),
+                    'description'         => $request->input('description'),
+                    'fasilitas'           => $fasilitas,
+                    'cumulative_discount' => $isSuperAdmin ? ($request->input('cumulative_discount') ?? 0) : 0,
+                    'views'               => 0,
+                ]);
+
+                // Auto-create Tarif Bulanan jika diisi
+                if ($request->filled('price_bulan') && (float)$request->input('price_bulan') > 0) {
+                    PriceKamar::create([
+                        'product_kamar_kosan_id' => $kamar->id,
+                        'kategori'               => 'bulan',
+                        'price'                  => (float)$request->input('price_bulan'),
+                        'discount'               => 0,
+                    ]);
                 }
 
-                ProductKamarKosan::create([
-                    'product_kosan_id'    => $product_kosan,
-                    'room'                => $item['room'],
-                    'description'         => $item['description'] ?? null,
-                    'fasilitas'           => $fasilitas,
-                    'cumulative_discount' => $isSuperAdmin ? ($item['cumulative_discount'] ?? 0) : 0,
-                    'views'               => $item['views'] ?? 0,
-                ]);
-            }
-        });
+                // Auto-create Tarif Tahunan jika diisi
+                if ($request->filled('price_tahun') && (float)$request->input('price_tahun') > 0) {
+                    PriceKamar::create([
+                        'product_kamar_kosan_id' => $kamar->id,
+                        'kategori'               => 'tahun',
+                        'price'                  => (float)$request->input('price_tahun'),
+                        'discount'               => 0,
+                    ]);
+                }
+
+                // Auto-upload Foto Utama Kamar jika disertakan
+                if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                    $path = $request->file('image')->store('kosan/kamar', 'public');
+                    ProductKamarImageKosan::create([
+                        'product_kamar_kosan_id' => $kamar->id,
+                        'image'                  => $path,
+                    ]);
+                }
+            });
+        } elseif ($request->has('dataKamar')) {
+            $request->validate([
+                'dataKamar'                       => 'required|array|min:1',
+                'dataKamar.*.room'                => 'required|string|max:255',
+                'dataKamar.*.description'         => 'nullable|string',
+                'dataKamar.*.cumulative_discount' => 'nullable|numeric|min:0',
+                'dataKamar.*.views'               => 'nullable|integer|min:0',
+            ]);
+
+            $isSuperAdmin = auth()->user()->isSuperAdmin();
+            $dataKamar = $request->input('dataKamar', []);
+
+            DB::transaction(function () use ($dataKamar, $product_kosan, $isSuperAdmin) {
+                foreach ($dataKamar as $item) {
+                    $fasilitas = $item['fasilitas'] ?? null;
+                    if (is_array($fasilitas)) {
+                        $fasilitas = implode(', ', $fasilitas);
+                    }
+
+                    ProductKamarKosan::create([
+                        'product_kosan_id'    => $product_kosan,
+                        'room'                => $item['room'],
+                        'description'         => $item['description'] ?? null,
+                        'fasilitas'           => $fasilitas,
+                        'cumulative_discount' => $isSuperAdmin ? ($item['cumulative_discount'] ?? 0) : 0,
+                        'views'               => $item['views'] ?? 0,
+                    ]);
+                }
+            });
+        } else {
+            return back()->with('failed', 'Data kamar tidak valid.');
+        }
 
         $kosan = ProductKosan::find($product_kosan);
         if ($kosan) {
+            $kosan->syncAvailableCount();
             \Illuminate\Support\Facades\Cache::forget('home_kamar_list');
             \Illuminate\Support\Facades\Cache::forget("kosan_detail_{$kosan->slug}");
         }
@@ -137,6 +248,7 @@ class KamarKosanController extends Controller
 
         $kosan = ProductKosan::find($product_kosan);
         if ($kosan) {
+            $kosan->syncAvailableCount();
             \Illuminate\Support\Facades\Cache::forget('home_kamar_list');
             \Illuminate\Support\Facades\Cache::forget("kosan_detail_{$kosan->slug}");
         }
@@ -156,11 +268,12 @@ class KamarKosanController extends Controller
         $kamar_kosan->delete();
 
         if ($kosan) {
+            $kosan->syncAvailableCount();
             \Illuminate\Support\Facades\Cache::forget('home_kamar_list');
             \Illuminate\Support\Facades\Cache::forget("kosan_detail_{$kosan->slug}");
         }
 
-        return back()->with('success', 'delete success');
+        return back()->with('success', 'Kamar berhasil dihapus.');
     }
 
     // FASILITAS KAMAR
@@ -395,6 +508,11 @@ class KamarKosanController extends Controller
 
         $dataTamu->update($data);
 
+        $kosan = ProductKosan::find($product_kosan);
+        if ($kosan) {
+            $kosan->syncAvailableCount();
+        }
+
         $formattedEndDate = \Carbon\Carbon::parse($bookingDate['end'])->isoFormat('D MMMM Y');
         return back()->with('success', "Masa sewa atas nama {$dataTamu->name} berhasil diperpanjang hingga {$formattedEndDate}.");
     }
@@ -407,6 +525,12 @@ class KamarKosanController extends Controller
             Storage::disk('public')->delete($dataTamu->proof_of_transfer);
         }
         $dataTamu->delete();
-        return back()->with('success', 'tamu delete success');
+
+        $kosan = ProductKosan::find($product_kosan);
+        if ($kosan) {
+            $kosan->syncAvailableCount();
+        }
+
+        return back()->with('success', 'Data penyewa berhasil dihapus.');
     }
 }

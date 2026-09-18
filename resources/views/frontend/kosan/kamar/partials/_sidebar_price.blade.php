@@ -12,62 +12,62 @@
     ];
 @endphp
 
-<div class="lg:col-span-5 reveal lg:sticky lg:top-24">
-    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl space-y-5">
+@php
+    $pricesByKategori = [];
+    if ($kamar && $kamar->priceKamar) {
+        foreach ($kamar->priceKamar as $p) {
+            $pricesByKategori[strtolower($p->kategori)] = $p;
+        }
+    }
 
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2 text-slate-900 font-extrabold text-sm">
-                <i class="fa-solid fa-tags text-cyan-600"></i>
-                <span>Rincian Tarif Kamar</span>
-            </div>
-            <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-700 bg-cyan-50 px-2.5 py-1 rounded-full border border-cyan-100">
-                Tarif Resmi
-            </span>
-        </div>
+    $kategoriOrdered = [
+        'bulan' => ['title' => 'Per Bulan (Bulanan)', 'unit' => 'bulan', 'icon' => 'fa-calendar'],
+        'tahun' => ['title' => 'Per Tahun (Tahunan)', 'unit' => 'tahun', 'icon' => 'fa-calendar-days'],
+    ];
+@endphp
 
-        <div class="space-y-3">
-            @foreach($kategoriOrdered as $katKey => $meta)
-                @if(isset($pricesByKategori[$katKey]))
-                    @php $priceObj = $pricesByKategori[$katKey]; @endphp
-                    <div class="bg-slate-50 hover:bg-cyan-50/50 p-4 rounded-2xl border border-slate-100 hover:border-cyan-200 transition-all duration-200 relative overflow-hidden group">
-                        <div class="flex justify-between items-center">
-                            <div class="space-y-0.5">
-                                <span class="text-xs text-slate-500 font-semibold flex items-center gap-1.5">
-                                    <i class="fa-regular {{ $meta['icon'] }} text-cyan-600 text-xs"></i>
-                                    {{ $meta['title'] }}
-                                </span>
-                                <div class="text-lg font-extrabold text-slate-900">
-                                    Rp {{ number_format($priceObj->price, 0, ',', '.') }} <span class="text-xs text-slate-400 font-normal">/{{ $meta['unit'] }}</span>
-                                </div>
+<div class="space-y-4">
+    <div class="space-y-3">
+        @foreach($kategoriOrdered as $katKey => $meta)
+            @if(isset($pricesByKategori[$katKey]))
+                @php $priceObj = $pricesByKategori[$katKey]; @endphp
+                <div class="bg-[#FFF8F1] hover:bg-[#F3A833]/15 p-4 sm:p-5 rounded-2xl border border-[#E9DDD2] hover:border-[#F3A833] transition-all duration-200 relative overflow-hidden group shadow-sm">
+                    <div class="flex justify-between items-center gap-3">
+                        <div class="space-y-1">
+                            <span class="text-xs text-[#7B6759] font-bold flex items-center gap-2">
+                                <i class="fa-regular {{ $meta['icon'] }} text-[#00A896]"></i>
+                                {{ $meta['title'] }}
+                            </span>
+                            <div class="text-xl sm:text-2xl font-black text-[#3B2314]">
+                                Rp {{ number_format($priceObj->price, 0, ',', '.') }} <span class="text-xs text-[#9A887A] font-bold">/{{ $meta['unit'] }}</span>
                             </div>
-                            @if($priceObj->discount > 0)
-                                <div class="text-[11px] bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full shadow-sm">
-                                    Hemat {{ $priceObj->discount }}%
-                                </div>
-                            @endif
                         </div>
+                        @if($priceObj->discount > 0)
+                            <div class="text-[11px] bg-[#E60049] text-white font-black px-3 py-1.5 rounded-full shadow-md shrink-0">
+                                Diskon {{ $priceObj->discount }}%
+                            </div>
+                        @endif
                     </div>
-                @endif
-            @endforeach
-
-            @if(empty($pricesByKategori))
-                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-center py-6 text-slate-400 text-xs">
-                    <i class="fa-solid fa-circle-exclamation text-2xl text-slate-300 mb-2 block"></i>
-                    Harga resmi belum ditentukan untuk unit ini. Hubungi pemilik untuk informasi lebih lanjut.
                 </div>
             @endif
-        </div>
+        @endforeach
 
-        <div class="pt-2 border-t border-slate-100">
-            <a href="{{ route('form.booking.kamar', $kamar->id) }}" class="w-full py-3.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-extrabold rounded-2xl transition-all shadow-md hover:shadow-cyan-500/25 flex items-center justify-center gap-2 active:scale-95 text-xs sm:text-sm">
-                <span>Pesan Sekarang</span> <i class="fa-solid fa-arrow-right text-xs"></i>
-            </a>
-        </div>
-
-        <p class="text-[10px] text-slate-400 flex items-start gap-1.5 leading-relaxed pt-1">
-            <i class="fa-solid fa-shield-check text-cyan-600 text-xs mt-0.5 shrink-0"></i>
-            <span>Harga di atas belum termasuk PPN 12% dan akan dihitung otomatis saat pengisian durasi sewa.</span>
-        </p>
-
+        @if(empty($pricesByKategori))
+            <div class="bg-[#FFF8F1] p-6 rounded-2xl border border-[#E9DDD2] text-center py-6 text-[#9A887A] text-xs">
+                <i class="fa-solid fa-circle-exclamation text-2xl text-[#F3A833] mb-2 block"></i>
+                Harga resmi belum ditentukan untuk unit ini. Hubungi pemilik untuk informasi lebih lanjut.
+            </div>
+        @endif
     </div>
+
+    <div class="pt-3 border-t border-[#E9DDD2]">
+        <a href="{{ route('form.booking.kamar', $kamar->id) }}" class="shine w-full py-4 bg-[#E60049] hover:bg-[#C90040] text-white font-black rounded-2xl transition-all shadow-lg hover:shadow-[#E60049]/30 flex items-center justify-center gap-2 active:scale-95 text-xs sm:text-sm">
+            <span>Pesan Unit Ini Sekarang</span> <i class="fa-solid fa-arrow-right text-xs"></i>
+        </a>
+    </div>
+
+    <p class="text-[10px] text-[#8E7B6D] flex items-start gap-2 leading-relaxed pt-1">
+        <i class="fa-solid fa-shield-halved text-[#00A896] text-xs mt-0.5 shrink-0"></i>
+        <span>Harga belum termasuk PPN 12% dan akan dihitung otomatis saat konfirmasi durasi sewa di halaman booking.</span>
+    </p>
 </div>

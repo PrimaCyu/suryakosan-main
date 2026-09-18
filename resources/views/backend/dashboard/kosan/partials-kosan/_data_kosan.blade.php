@@ -30,7 +30,7 @@
                             <th>Fasilitas Unggulan</th>
                             <th class="text-center">Views</th>
                             <th class="text-center">Kamar</th>
-                            <th class="text-center" style="width: 230px">Aksi Manajemen</th>
+                            <th class="text-center text-nowrap" style="width: 195px">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="kosan-tbody">
@@ -73,39 +73,55 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    @if($item->tersedia !== null)
-                                        <span class="badge badge-subtle-success">
-                                            <i class="bi bi-door-closed me-1"></i>{{ $item->tersedia }} Unit
-                                        </span>
+                                    @php
+                                        $totalRooms = $item->total_rooms_count;
+                                        $occupiedRooms = $item->occupied_rooms_count;
+                                        $availRooms = $item->available_rooms_count;
+                                        $occRate = $item->occupancy_rate;
+                                    @endphp
+                                    @if($totalRooms > 0)
+                                        <div class="d-inline-flex flex-column align-items-center">
+                                            <div class="d-flex align-items-center gap-1.5 mb-1">
+                                                <span class="badge {{ $availRooms > 0 ? 'badge-subtle-success' : 'badge-subtle-danger' }}" title="Kamar kosong siap huni">
+                                                    <i class="bi bi-door-open me-1"></i>{{ $availRooms }} Kosong
+                                                </span>
+                                                <span class="text-muted fs-8">/ {{ $totalRooms }} Unit</span>
+                                            </div>
+                                            <div class="progress w-100" style="height: 4px; min-width: 85px;" title="Okupansi {{ $occRate }}%">
+                                                <div class="progress-bar {{ $occRate >= 80 ? 'bg-danger' : ($occRate >= 50 ? 'bg-primary' : 'bg-success') }}" style="width: {{ $occRate }}%"></div>
+                                            </div>
+                                        </div>
                                     @else
-                                        <span class="text-muted fs-8">-</span>
+                                        <span class="badge badge-subtle-secondary" title="Belum ada unit kamar didaftarkan">
+                                            <i class="bi bi-door-closed me-1"></i>{{ $item->tersedia ?? 0 }} Unit (Manual)
+                                        </span>
                                     @endif
                                 </td>
-                                <td class="text-center">
-                                    <div class="action-btn-group">
-                                        <!-- Kamar Button -->
-                                        <a href="{{ route('admin.product.kosan.kamar.index', $item->id) }}" class="btn btn-sm btn-primary py-1 px-2" title="Kelola Kamar">
-                                            <i class="bi bi-door-closed"></i> Kamar
+                                <td class="text-center text-nowrap">
+                                    <div class="table-action-compact justify-content-center">
+                                        <!-- Kamar Button (Primary CTA) -->
+                                        <a href="{{ route('admin.product.kosan.kamar.index', $item->id) }}" class="btn btn-sm btn-primary" title="Kelola Unit Kamar">
+                                            <i class="bi bi-door-closed me-1"></i>Kamar
                                         </a>
 
-                                        <!-- Image Button -->
-                                        <button type="button" class="btn btn-sm btn-outline-warning py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalImageKosan{{ $item->id }}" title="Galeri Foto">
-                                            <i class="bi bi-images"></i> Galeri
-                                        </button>
-
                                         <!-- Edit Button -->
-                                        <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalEdit{{ $item->id }}" title="Edit Kosan">
+                                        <button type="button" class="btn-action-icon act-edit" data-bs-toggle="modal" data-bs-target="#modalEdit{{ $item->id }}" title="Edit Info Kosan">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
 
-                                        <!-- Lihat di Web Button -->
-                                        <a href="{{ route('kosan.detail', $item->slug) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-info py-1 px-2" title="Lihat di Web Frontend">
+                                        <!-- Galeri Foto Button -->
+                                        <button type="button" class="btn-action-icon act-gallery" data-bs-toggle="modal" data-bs-target="#modalImageKosan{{ $item->id }}" title="Kelola Galeri Foto">
+                                            <i class="bi bi-images"></i>
+                                        </button>
+
+                                        <!-- Buka di Web Frontend -->
+                                        <a href="{{ route('kosan.detail', $item->slug) }}" target="_blank" rel="noopener noreferrer" class="btn-action-icon act-web" title="Buka Halaman Publik">
                                             <i class="bi bi-box-arrow-up-right"></i>
                                         </a>
 
-                                        <!-- Delete Button -->
+                                        <!-- Hapus Kosan (SuperAdmin Only) -->
                                         @if(Auth::user()->isSuperAdmin())
-                                        <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalDelete{{ $item->id }}" title="Hapus Kosan">
+                                        <button type="button" class="btn-action-icon act-delete" data-bs-toggle="modal" data-bs-target="#modalDelete{{ $item->id }}" title="Hapus Kosan">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                         @endif

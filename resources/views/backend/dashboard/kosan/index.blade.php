@@ -29,6 +29,71 @@
     <div class="container-fluid">
         @include('backend.dashboard.kosan.kamar.partials.alerts')
 
+        <!-- KPI Metrics Okupansi Seluruh Properti -->
+        @if(isset($kpiStats))
+        <div class="kpi-stat-grid">
+            <!-- 1. Total Properti Kosan -->
+            <div class="kpi-stat-card">
+                <div class="kpi-stat-icon kpi-icon-indigo">
+                    <i class="bi bi-buildings-fill"></i>
+                </div>
+                <div class="kpi-stat-content">
+                    <div class="kpi-stat-label">Total Properti Kos</div>
+                    <div class="kpi-stat-value">{{ number_format($kpiStats['total_kosan']) }} <span class="fs-7 fw-normal text-muted">Cabang</span></div>
+                    <div class="kpi-stat-sub">
+                        <i class="bi bi-geo-alt-fill text-primary"></i> Seluruh unit terdaftar
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Total Kapasitas Kamar -->
+            <div class="kpi-stat-card">
+                <div class="kpi-stat-icon kpi-icon-primary">
+                    <i class="bi bi-door-closed-fill"></i>
+                </div>
+                <div class="kpi-stat-content">
+                    <div class="kpi-stat-label">Total Kapasitas</div>
+                    <div class="kpi-stat-value">{{ number_format($kpiStats['total_capacity']) }} <span class="fs-7 fw-normal text-muted">Kamar</span></div>
+                    <div class="kpi-stat-sub">
+                        <i class="bi bi-layer-forward text-info"></i> Kapasitas seluruh cabang
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Ketersediaan Kamar -->
+            <div class="kpi-stat-card">
+                <div class="kpi-stat-icon kpi-icon-success">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <div class="kpi-stat-content">
+                    <div class="kpi-stat-label">Kamar Kosong (Siap Huni)</div>
+                    <div class="kpi-stat-value text-success">{{ number_format($kpiStats['total_available']) }} <span class="fs-7 fw-normal text-muted">Unit</span></div>
+                    <div class="kpi-stat-sub">
+                        <span>{{ number_format($kpiStats['total_occupied']) }} Terisi saat ini</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Rata-rata Okupansi -->
+            <div class="kpi-stat-card">
+                <div class="kpi-stat-icon {{ $kpiStats['occupancy_rate'] >= 75 ? 'kpi-icon-success' : ($kpiStats['occupancy_rate'] >= 50 ? 'kpi-icon-primary' : 'kpi-icon-warning') }}">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
+                <div class="kpi-stat-content">
+                    <div class="kpi-stat-label">Tingkat Okupansi</div>
+                    <div class="kpi-stat-value">{{ $kpiStats['occupancy_rate'] }}%</div>
+                    <div class="kpi-progress">
+                        <div class="kpi-progress-bar {{ $kpiStats['occupancy_rate'] >= 75 ? 'bg-success' : ($kpiStats['occupancy_rate'] >= 50 ? 'bg-primary' : 'bg-warning') }}"
+                             style="width: {{ min(100, $kpiStats['occupancy_rate']) }}%"></div>
+                    </div>
+                    <div class="kpi-stat-sub mt-1">
+                        <small>{{ $kpiStats['total_occupied'] }} dari {{ $kpiStats['total_capacity'] }} kamar tersewa</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
         <div class="tab-content" id="kosanTabContent">
             <!-- Partial: Tab Data Kos-kosan -->
             @include('backend.dashboard.kosan.partials-kosan._data_kosan')
@@ -174,13 +239,15 @@
 
                                 @if(Auth::user()->isSuperAdmin())
                                 const deleteBtnHtml = `
-                                    <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalDelete${item.id}" title="Hapus Kosan">
+                                    <button type="button" class="btn-action-icon act-delete" data-bs-toggle="modal" data-bs-target="#modalDelete${item.id}" title="Hapus Kosan">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 `;
                                 @else
                                 const deleteBtnHtml = '';
                                 @endif
+
+                                const webUrl = `/kosan/${item.slug || ''}`;
 
                                 const tr = document.createElement('tr');
                                 tr.className = 'align-middle';
@@ -194,17 +261,24 @@
                                     <td>${fasilitasText}</td>
                                     <td class="text-center">${viewText}</td>
                                     <td class="text-center">${kamarTersediaText}</td>
-                                    <td class="text-center">
-                                        <div class="action-btn-group">
-                                            <a href="${kamarRoute}" class="btn btn-sm btn-primary py-1 px-2" title="Kelola Kamar">
-                                                <i class="bi bi-door-closed"></i> Kamar
+                                    <td class="text-center text-nowrap">
+                                        <div class="table-action-compact justify-content-center">
+                                            <!-- Kamar Button -->
+                                            <a href="${kamarRoute}" class="btn btn-sm btn-primary" title="Kelola Unit Kamar">
+                                                <i class="bi bi-door-closed me-1"></i>Kamar
                                             </a>
-                                            <button type="button" class="btn btn-sm btn-outline-warning py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalImageKosan${item.id}" title="Galeri Foto">
-                                                <i class="bi bi-images"></i> Galeri
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2" data-bs-toggle="modal" data-bs-target="#modalEdit${item.id}" title="Edit Kosan">
+                                            <!-- Edit Button -->
+                                            <button type="button" class="btn-action-icon act-edit" data-bs-toggle="modal" data-bs-target="#modalEdit${item.id}" title="Edit Info Kosan">
                                                 <i class="bi bi-pencil-square"></i>
                                             </button>
+                                            <!-- Galeri Button -->
+                                            <button type="button" class="btn-action-icon act-gallery" data-bs-toggle="modal" data-bs-target="#modalImageKosan${item.id}" title="Kelola Galeri Foto">
+                                                <i class="bi bi-images"></i>
+                                            </button>
+                                            <!-- Web Button -->
+                                            <a href="${webUrl}" target="_blank" rel="noopener noreferrer" class="btn-action-icon act-web" title="Buka Halaman Publik">
+                                                <i class="bi bi-box-arrow-up-right"></i>
+                                            </a>
                                             ${deleteBtnHtml}
                                         </div>
                                     </td>
@@ -333,6 +407,40 @@
                 }
             }
         });
+        // --- PREVIEW FOTO UTAMA MODAL TAMBAH KOSAN ---
+        const kosanImageInput = document.getElementById('kosanImageInput');
+        const kosanDropzone = document.getElementById('kosanDropzone');
+        const kosanPlaceholder = document.getElementById('kosanPlaceholder');
+        const kosanPreviewWrap = document.getElementById('kosanPreviewWrap');
+        const kosanPreviewImg = document.getElementById('kosanPreviewImg');
+        const kosanFileName = document.getElementById('kosanFileName');
+        const btnCancelKosanImg = document.getElementById('btnCancelKosanImg');
+
+        if (kosanImageInput) {
+            kosanImageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(evt) {
+                        if (kosanPreviewImg) kosanPreviewImg.src = evt.target.result;
+                        if (kosanFileName) kosanFileName.textContent = file.name;
+                        if (kosanPlaceholder) kosanPlaceholder.classList.add('d-none');
+                        if (kosanPreviewWrap) kosanPreviewWrap.classList.remove('d-none');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        if (btnCancelKosanImg) {
+            btnCancelKosanImg.addEventListener('click', function() {
+                if (kosanImageInput) kosanImageInput.value = '';
+                if (kosanPreviewImg) kosanPreviewImg.src = '';
+                if (kosanFileName) kosanFileName.textContent = '';
+                if (kosanPreviewWrap) kosanPreviewWrap.classList.add('d-none');
+                if (kosanPlaceholder) kosanPlaceholder.classList.remove('d-none');
+            });
+        }
     });
 </script>
 
