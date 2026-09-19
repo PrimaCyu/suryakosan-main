@@ -17,8 +17,20 @@ class Tamu extends Model
         'payment_method',
         'proof_of_transfer',
         'total_price',
-        'status'
+        'status',
+        'access_token',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($tamu) {
+            if (empty($tamu->access_token)) {
+                $tamu->access_token = bin2hex(random_bytes(32));
+            }
+        });
+    }
 
     public function productKamarKosan(){
         return $this->belongsTo(ProductKamarKosan::class,'product_kamar_kosan_id');

@@ -265,7 +265,7 @@
           
           <!-- PDF INVOICE DOWNLOAD -->
           <a
-            href="{{ route('booking.download.invoice', $tamu->id) }}"
+            href="{{ route('booking.download.invoice', $tamu->access_token) }}"
             target="_blank"
             class="shine w-full sm:w-auto px-6 py-3.5 bg-[#E60049] hover:bg-[#C90040] text-white font-extrabold text-xs sm:text-sm rounded-2xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2.5"
           >

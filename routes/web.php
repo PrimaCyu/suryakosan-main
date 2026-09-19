@@ -12,7 +12,6 @@ use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\SosialMediaController;
 use App\Http\Controllers\TamuBookingController;
 use App\Http\Controllers\TestimoniController;
-use App\Models\ProductKamarKosan;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -36,27 +35,13 @@ Route::get('/kamar/detail/{product_kamar_kosan?}', [HomeController::class, 'kama
 Route::get('/news', [HomeController::class, 'newsIndex'])->name('news.index');
 Route::get('/news/detail/{slug}', [HomeController::class, 'newsDetail'])->name('news.detail');
 
-Route::get('/kamar/booking/{product_kamar_kosan}', function($product_kamar_kosan){
-    $kamar = ProductKamarKosan::with(['priceKamar','productKosan','tamu','productKamarImageKosan'])->find($product_kamar_kosan);
-    return view('frontend.kosan.kamar.form-booking', compact('kamar'));
-})->name('form.booking.kamar');
+Route::get('/kamar/booking/{product_kamar_kosan}', [HomeController::class, 'formBooking'])->name('form.booking.kamar');
 
 Route::post('/booking/kamar/{product_kamar_kosan}', [TamuBookingController::class, 'booking'])->middleware('throttle:10,1')->name('tamu.booking');
-Route::get('/booking/success/{tamu}', [TamuBookingController::class, 'bookingSuccess'])->name('booking.success');
-Route::get('/booking/download-invoice/{tamu}', [TamuBookingController::class, 'downloadInvoice'])->name('booking.download.invoice');
+Route::get('/booking/success/{token}', [TamuBookingController::class, 'bookingSuccess'])->name('booking.success');
+Route::get('/booking/download-invoice/{token}', [TamuBookingController::class, 'downloadInvoice'])->name('booking.download.invoice');
 
-Route::get('/check-date/kamar/{id}', function($id) {
-    $kamar = ProductKamarKosan::find($id);
-    if (!$kamar) {
-        return response()->json([], 404);
-    }
-    $tamu = $kamar->tamu()
-                    ->whereIn('status', ['approved', 'pending'])
-                    ->select('start_date', 'end_date')
-                    ->get();
-
-    return response()->json($tamu);
-})->name('check.date.kamar');
+Route::get('/check-date/kamar/{id}', [HomeController::class, 'checkDateKamar'])->name('check.date.kamar');
 
 /*
 |--------------------------------------------------------------------------

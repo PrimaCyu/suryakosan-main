@@ -19,13 +19,16 @@ class ProcessBookingDate
      */
     public function calculateBookingRange($product_kamar_kosan, Request $request, $ignoreTamuId = null)
     {
+        $jam    = max(0, (int) $request->input('jam', 0));
+        $hari   = max(0, (int) $request->input('hari', 0));
+        $minggu = max(0, (int) $request->input('minggu', 0));
         $bulan  = max(0, (int) $request->input('bulan', 0));
         $tahun  = max(0, (int) $request->input('tahun', 0));
 
-        if (($bulan + $tahun) <= 0) {
+        if (($jam + $hari + $minggu + $bulan + $tahun) <= 0) {
             return [
                 'status'  => false,
-                'message' => 'Pilih minimal salah satu durasi sewa (bulan atau tahun).'
+                'message' => 'Pilih minimal salah satu durasi sewa (jam, hari, minggu, bulan, atau tahun).'
             ];
         }
 
@@ -41,7 +44,10 @@ class ProcessBookingDate
 
         $endDate = $startDate->copy()
                     ->addYears($tahun)
-                    ->addMonths($bulan);
+                    ->addMonths($bulan)
+                    ->addWeeks($minggu)
+                    ->addDays($hari)
+                    ->addHours($jam);
 
         // Dua interval waktu [A_start, A_end] dan [B_start, B_end] saling bertabrakan jika:
         // A_start < B_end DAN A_end > B_start
@@ -80,6 +86,9 @@ class ProcessBookingDate
     public function calculateBookingPrice(ProductKamarKosan $kamar, Request $request): float
     {
         $durationMap = [
+            'jam'    => max(0, (int) $request->input('jam', 0)),
+            'hari'   => max(0, (int) $request->input('hari', 0)),
+            'minggu' => max(0, (int) $request->input('minggu', 0)),
             'bulan'  => max(0, (int) $request->input('bulan', 0)),
             'tahun'  => max(0, (int) $request->input('tahun', 0)),
         ];
