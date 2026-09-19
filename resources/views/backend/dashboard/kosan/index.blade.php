@@ -407,27 +407,39 @@
                 }
             }
         });
-        // --- PREVIEW FOTO UTAMA MODAL TAMBAH KOSAN ---
+        // --- PREVIEW FOTO-FOTO MODAL TAMBAH KOSAN (MULTI-IMAGE) ---
         const kosanImageInput = document.getElementById('kosanImageInput');
-        const kosanDropzone = document.getElementById('kosanDropzone');
         const kosanPlaceholder = document.getElementById('kosanPlaceholder');
         const kosanPreviewWrap = document.getElementById('kosanPreviewWrap');
-        const kosanPreviewImg = document.getElementById('kosanPreviewImg');
         const kosanFileName = document.getElementById('kosanFileName');
+        const kosanImagesGrid = document.getElementById('kosanImagesGrid');
         const btnCancelKosanImg = document.getElementById('btnCancelKosanImg');
 
         if (kosanImageInput) {
             kosanImageInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file && file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(evt) {
-                        if (kosanPreviewImg) kosanPreviewImg.src = evt.target.result;
-                        if (kosanFileName) kosanFileName.textContent = file.name;
-                        if (kosanPlaceholder) kosanPlaceholder.classList.add('d-none');
-                        if (kosanPreviewWrap) kosanPreviewWrap.classList.remove('d-none');
-                    };
-                    reader.readAsDataURL(file);
+                const files = Array.from(e.target.files);
+                if (files.length > 0) {
+                    if (kosanImagesGrid) kosanImagesGrid.innerHTML = '';
+                    if (kosanFileName) kosanFileName.textContent = `${files.length} Foto Dipilih`;
+                    
+                    files.forEach((file, index) => {
+                        if (file.type.startsWith('image/')) {
+                            const reader = new FileReader();
+                            reader.onload = function(evt) {
+                                const card = document.createElement('div');
+                                card.className = 'multi-image-card';
+                                card.innerHTML = `
+                                    <span class="badge-idx">#${index + 1}</span>
+                                    <img src="${evt.target.result}" alt="${file.name}">
+                                `;
+                                if (kosanImagesGrid) kosanImagesGrid.appendChild(card);
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+
+                    if (kosanPlaceholder) kosanPlaceholder.classList.add('d-none');
+                    if (kosanPreviewWrap) kosanPreviewWrap.classList.remove('d-none');
                 }
             });
         }
@@ -435,8 +447,8 @@
         if (btnCancelKosanImg) {
             btnCancelKosanImg.addEventListener('click', function() {
                 if (kosanImageInput) kosanImageInput.value = '';
-                if (kosanPreviewImg) kosanPreviewImg.src = '';
-                if (kosanFileName) kosanFileName.textContent = '';
+                if (kosanImagesGrid) kosanImagesGrid.innerHTML = '';
+                if (kosanFileName) kosanFileName.textContent = '0 Foto Dipilih';
                 if (kosanPreviewWrap) kosanPreviewWrap.classList.add('d-none');
                 if (kosanPlaceholder) kosanPlaceholder.classList.remove('d-none');
             });

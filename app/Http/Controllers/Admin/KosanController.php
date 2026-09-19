@@ -152,6 +152,9 @@ class KosanController extends Controller
             'tersedia'    => 'nullable|numeric',
             'view'        => 'nullable|numeric',
             'gmaps'       => 'nullable|string',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'images'      => 'nullable|array',
+            'images.*'    => 'image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
         $fasilitas = $request->fasilitas;
@@ -174,7 +177,18 @@ class KosanController extends Controller
 
         $kosan = ProductKosan::create($data);
 
-        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+        // Dukung multi-image upload atau single image fallback
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                if ($file && $file->isValid()) {
+                    $path = $file->store('kosan/image', 'public');
+                    ProductImageKosan::create([
+                        'product_kosan_id' => $kosan->id,
+                        'image'            => $path,
+                    ]);
+                }
+            }
+        } elseif ($request->hasFile('image') && $request->file('image')->isValid()) {
             $path = $request->file('image')->store('kosan/image', 'public');
             ProductImageKosan::create([
                 'product_kosan_id' => $kosan->id,
@@ -201,6 +215,8 @@ class KosanController extends Controller
             'view'        => 'nullable|numeric',
             'gmaps'       => 'nullable|string',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'images'      => 'nullable|array',
+            'images.*'    => 'image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
         $fasilitas = $request->fasilitas;
@@ -226,7 +242,18 @@ class KosanController extends Controller
             $productKosan->syncAvailableCount();
         }
 
-        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+        // Dukung multi-image upload atau single image fallback
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                if ($file && $file->isValid()) {
+                    $path = $file->store('kosan/image', 'public');
+                    ProductImageKosan::create([
+                        'product_kosan_id' => $productKosan->id,
+                        'image'            => $path,
+                    ]);
+                }
+            }
+        } elseif ($request->hasFile('image') && $request->file('image')->isValid()) {
             $path = $request->file('image')->store('kosan/image', 'public');
             ProductImageKosan::create([
                 'product_kosan_id' => $productKosan->id,

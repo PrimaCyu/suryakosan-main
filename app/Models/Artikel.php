@@ -29,4 +29,39 @@ class Artikel extends Model
         'deskripsi',
         'view',
     ];
+
+    protected $appends = [
+        'reading_time',
+        'word_count',
+        'short_deskripsi',
+        'formatted_date',
+        'image_url',
+    ];
+
+    public function getReadingTimeAttribute(): string
+    {
+        $words = str_word_count(strip_tags($this->deskripsi ?? ''));
+        $minutes = max(1, ceil($words / 180));
+        return "{$minutes} mnt baca";
+    }
+
+    public function getWordCountAttribute(): int
+    {
+        return str_word_count(strip_tags($this->deskripsi ?? ''));
+    }
+
+    public function getShortDeskripsiAttribute(): string
+    {
+        return \Illuminate\Support\Str::limit(strip_tags($this->deskripsi ?? ''), 120);
+    }
+
+    public function getFormattedDateAttribute(): string
+    {
+        return $this->created_at ? $this->created_at->isoFormat('D MMM Y') : '-';
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->image ? asset('storage/' . $this->image) : null;
+    }
 }

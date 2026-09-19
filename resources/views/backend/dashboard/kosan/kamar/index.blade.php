@@ -358,26 +358,39 @@
         const isSuperAdminUser = {{ Auth::user()->isSuperAdmin() ? 'true' : 'false' }};
         const container = document.getElementById('kamarInputContainer');
 
-        // --- PREVIEW FOTO KAMAR UTAMA DI MODAL TERPADU ---
+        // --- PREVIEW FOTO-FOTO KAMAR (MULTI-IMAGE) DI MODAL TERPADU ---
         const singleRoomInput = document.getElementById('singleRoomImageInput');
         const singleRoomPlaceholder = document.getElementById('singleRoomPlaceholder');
         const singleRoomPreviewWrap = document.getElementById('singleRoomPreviewWrap');
-        const singleRoomPreviewImg = document.getElementById('singleRoomPreviewImg');
         const singleRoomFileName = document.getElementById('singleRoomFileName');
+        const singleRoomImagesGrid = document.getElementById('singleRoomImagesGrid');
         const btnCancelSingleImg = document.getElementById('btnCancelSingleImg');
 
         if (singleRoomInput) {
             singleRoomInput.addEventListener('change', function() {
-                if (this.files && this.files[0]) {
-                    const file = this.files[0];
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        singleRoomPreviewImg.src = e.target.result;
-                        singleRoomFileName.textContent = file.name;
-                        singleRoomPlaceholder.classList.add('d-none');
-                        singleRoomPreviewWrap.classList.remove('d-none');
-                    };
-                    reader.readAsDataURL(file);
+                const files = Array.from(this.files || []);
+                if (files.length > 0) {
+                    if (singleRoomImagesGrid) singleRoomImagesGrid.innerHTML = '';
+                    if (singleRoomFileName) singleRoomFileName.textContent = `${files.length} Foto Dipilih`;
+
+                    files.forEach((file, index) => {
+                        if (file.type.startsWith('image/')) {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                const card = document.createElement('div');
+                                card.className = 'multi-image-card';
+                                card.innerHTML = `
+                                    <span class="badge-idx">#${index + 1}</span>
+                                    <img src="${e.target.result}" alt="${file.name}">
+                                `;
+                                if (singleRoomImagesGrid) singleRoomImagesGrid.appendChild(card);
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+
+                    if (singleRoomPlaceholder) singleRoomPlaceholder.classList.add('d-none');
+                    if (singleRoomPreviewWrap) singleRoomPreviewWrap.classList.remove('d-none');
                 }
             });
         }
@@ -385,7 +398,8 @@
         if (btnCancelSingleImg) {
             btnCancelSingleImg.addEventListener('click', function() {
                 if (singleRoomInput) singleRoomInput.value = '';
-                if (singleRoomPreviewImg) singleRoomPreviewImg.src = '';
+                if (singleRoomImagesGrid) singleRoomImagesGrid.innerHTML = '';
+                if (singleRoomFileName) singleRoomFileName.textContent = '0 Foto Dipilih';
                 if (singleRoomPreviewWrap) singleRoomPreviewWrap.classList.add('d-none');
                 if (singleRoomPlaceholder) singleRoomPlaceholder.classList.remove('d-none');
             });

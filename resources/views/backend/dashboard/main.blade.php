@@ -659,6 +659,7 @@
           // Apply attribute & style
           document.documentElement.setAttribute('data-bs-theme', resolved);
           document.documentElement.style.colorScheme = resolved;
+          window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme, resolved } }));
 
           // Update checkmarks in dropdown
           themeToggles.forEach(btn => {

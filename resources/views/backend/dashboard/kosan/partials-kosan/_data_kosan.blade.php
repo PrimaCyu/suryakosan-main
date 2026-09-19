@@ -177,106 +177,108 @@
             <!-- MODAL EDIT KOSAN -->
             <div class="modal fade modalEditKosan" id="modalEdit{{ $item->id }}" tabindex="-1" aria-labelledby="modalEditLabel{{ $item->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                    <div class="modal-content border-0 shadow-lg">
+                    <form action="{{ route('admin.product.kosan.update', $item->id) }}" method="POST" enctype="multipart/form-data" class="modal-content border-0 shadow-lg">
+                        @csrf
+                        @method('PUT')
                         <div class="modal-header">
                             <h5 class="modal-title" id="modalEditLabel{{ $item->id }}">
                                 <i class="bi bi-pencil-square text-secondary me-2"></i> Edit Kosan: {{ $item->title }}
                             </h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                         </div>
-                        <form action="{{ route('admin.product.kosan.update', $item->id) }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            @method('PUT')
-                            <div class="modal-body p-3 p-md-4">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label for="edit_title_{{ $item->id }}" class="form-label">
-                                            Nama Kos / Judul <span class="text-danger">*</span>
-                                        </label>
-                                        <input type="text" name="title" id="edit_title_{{ $item->id }}" class="form-control" value="{{ old('title', $item->title) }}" required>
-                                    </div>
+                        <div class="modal-body p-3 p-md-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="edit_title_{{ $item->id }}" class="form-label">
+                                        Nama Kos / Judul <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" name="title" id="edit_title_{{ $item->id }}" class="form-control" value="{{ old('title', $item->title) }}" required>
+                                </div>
 
-                                    <div class="col-md-6">
-                                        <label for="select_wilayah_edit_{{ $item->id }}" class="form-label">
-                                            Wilayah (Bali) <span class="text-danger">*</span>
-                                        </label>
-                                        <select name="wilayah" id="select_wilayah_edit_{{ $item->id }}" class="form-select select-wilayah-edit" data-current-value="{{ $item->wilayah }}" required>
-                                            <option value="{{ $item->wilayah }}" selected>{{ $item->wilayah ?? '-- Pilih Wilayah --' }}</option>
-                                        </select>
-                                    </div>
+                                <div class="col-md-6">
+                                    <label for="select_wilayah_edit_{{ $item->id }}" class="form-label">
+                                        Wilayah (Bali) <span class="text-danger">*</span>
+                                    </label>
+                                    <select name="wilayah" id="select_wilayah_edit_{{ $item->id }}" class="form-select select-wilayah-edit" data-current-value="{{ $item->wilayah }}" required>
+                                        <option value="{{ $item->wilayah }}" selected>{{ $item->wilayah ?? '-- Pilih Wilayah --' }}</option>
+                                    </select>
+                                </div>
 
-                                    <div class="col-md-6">
-                                        <label for="edit_alamat_{{ $item->id }}" class="form-label">Alamat Lengkap</label>
-                                        <input type="text" name="alamat" id="edit_alamat_{{ $item->id }}" class="form-control" value="{{ old('alamat', $item->alamat) }}" placeholder="Jl. Contoh No. 123...">
-                                    </div>
+                                <div class="col-md-6">
+                                    <label for="edit_alamat_{{ $item->id }}" class="form-label">Alamat Lengkap</label>
+                                    <input type="text" name="alamat" id="edit_alamat_{{ $item->id }}" class="form-control" value="{{ old('alamat', $item->alamat) }}" placeholder="Jl. Contoh No. 123...">
+                                </div>
 
-                                    <div class="col-md-6">
-                                        <label for="edit_google_maps_{{ $item->id }}" class="form-label">Google Maps URL / Embed</label>
-                                        <input type="text" name="google_maps" id="edit_google_maps_{{ $item->id }}" class="form-control" value="{{ old('google_maps', $item->google_maps) }}" placeholder="https://maps.app.goo.gl/...">
-                                    </div>
+                                <div class="col-md-6">
+                                    <label for="edit_google_maps_{{ $item->id }}" class="form-label">Google Maps URL / Embed</label>
+                                    <input type="text" name="google_maps" id="edit_google_maps_{{ $item->id }}" class="form-control" value="{{ old('google_maps', $item->google_maps) }}" placeholder="https://maps.app.goo.gl/...">
+                                </div>
 
-                                    <div class="col-md-6">
-                                        <label for="edit_tersedia_{{ $item->id }}" class="form-label">Jumlah Kamar Tersedia</label>
-                                        <input type="number" name="tersedia" id="edit_tersedia_{{ $item->id }}" class="form-control" value="{{ old('tersedia', $item->tersedia) }}" min="0" placeholder="0">
-                                    </div>
+                                <div class="col-md-6">
+                                    <label for="edit_tersedia_{{ $item->id }}" class="form-label">Jumlah Kamar Tersedia</label>
+                                    <input type="number" name="tersedia" id="edit_tersedia_{{ $item->id }}" class="form-control" value="{{ old('tersedia', $item->tersedia) }}" min="0" placeholder="0">
+                                </div>
 
-                                    <div class="col-md-6">
-                                        <label for="edit_view_{{ $item->id }}" class="form-label">Jumlah Views Awal</label>
-                                        <input type="number" name="view" id="edit_view_{{ $item->id }}" class="form-control" value="{{ old('view', $item->view ?? 0) }}" min="0" placeholder="0">
-                                    </div>
+                                <div class="col-md-6">
+                                    <label for="edit_view_{{ $item->id }}" class="form-label">Jumlah Views Awal</label>
+                                    <input type="number" name="view" id="edit_view_{{ $item->id }}" class="form-control" value="{{ old('view', $item->view ?? 0) }}" min="0" placeholder="0">
+                                </div>
 
-                                    <div class="col-12">
-                                        <label for="edit_description_{{ $item->id }}" class="form-label">Deskripsi Lengkap Kosan</label>
-                                        <textarea name="description" id="edit_description_{{ $item->id }}" class="form-control summernote-edit" rows="3">{{ old('description', $item->description) }}</textarea>
-                                    </div>
+                                <div class="col-12">
+                                    <label for="edit_description_{{ $item->id }}" class="form-label">Deskripsi Lengkap Kosan</label>
+                                    <textarea name="description" id="edit_description_{{ $item->id }}" class="form-control summernote-edit" rows="3">{{ old('description', $item->description) }}</textarea>
+                                </div>
 
-                                    <div class="col-12">
-                                        <label class="form-label mb-1">Fasilitas Bersama / Properti Kos</label>
-                                        <p class="text-muted fs-8 mb-2">Centang fasilitas umum yang tersedia di properti kos ini:</p>
-                                        <div class="p-3 rounded-3 bg-body-tertiary border">
-                                            @php
-                                                $selectedFasilitas = $item->fasilitas ? array_map('trim', explode(',', $item->fasilitas)) : [];
-                                                $daftarFasilitas = [
-                                                    'WiFi Cepat / Internet', 'Dapur Bersama', 'Parkir Motor Luas', 'Parkir Mobil',
-                                                    'CCTV 24 Jam', 'Penjaga Kos / Security', 'Mesin Cuci Bersama', 'Kulkas Bersama',
-                                                    'Ruang Tamu / Santai', 'Akses Kunci 24 Jam', 'Dispenser Air Minum', 'Area Jemuran Luas'
-                                                ];
-                                            @endphp
-                                            <div class="row g-2">
-                                                @foreach($daftarFasilitas as $fIndex => $fas)
-                                                    <div class="col-md-4 col-6">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" name="fasilitas[]" value="{{ $fas }}" id="edit_fas_{{ $item->id }}_{{ $fIndex }}" {{ in_array($fas, $selectedFasilitas) ? 'checked' : '' }}>
-                                                            <label class="form-check-label fs-8" for="edit_fas_{{ $item->id }}_{{ $fIndex }}">
-                                                                {{ $fas }}
-                                                            </label>
-                                                        </div>
+                                <div class="col-12">
+                                    <label class="form-label mb-1">Fasilitas Bersama / Properti Kos</label>
+                                    <p class="text-muted fs-8 mb-2">Centang fasilitas umum yang tersedia di properti kos ini:</p>
+                                    <div class="p-3 rounded-3 bg-body-tertiary border">
+                                        @php
+                                            $selectedFasilitas = $item->fasilitas ? array_map('trim', explode(',', $item->fasilitas)) : [];
+                                            $daftarFasilitas = [
+                                                'WiFi Cepat / Internet', 'Dapur Bersama', 'Parkir Motor Luas', 'Parkir Mobil',
+                                                'CCTV 24 Jam', 'Penjaga Kos / Security', 'Mesin Cuci Bersama', 'Kulkas Bersama',
+                                                'Ruang Tamu / Santai', 'Akses Kunci 24 Jam', 'Dispenser Air Minum', 'Area Jemuran Luas'
+                                            ];
+                                        @endphp
+                                        <div class="row g-2">
+                                            @foreach($daftarFasilitas as $fIndex => $fas)
+                                                <div class="col-md-4 col-6">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="fasilitas[]" value="{{ $fas }}" id="edit_fas_{{ $item->id }}_{{ $fIndex }}" {{ in_array($fas, $selectedFasilitas) ? 'checked' : '' }}>
+                                                        <label class="form-check-label fs-8" for="edit_fas_{{ $item->id }}_{{ $fIndex }}">
+                                                            {{ $fas }}
+                                                        </label>
                                                     </div>
-                                                @endforeach
-                                            </div>
+                                                </div>
+                                            @endforeach
                                         </div>
                                     </div>
+                                </div>
 
-                                    <div class="col-12">
-                                        <label class="form-label">Gambar Denah Kosan (Opsional)</label>
-                                        <input type="file" name="image" class="form-control" accept="image/*">
-                                        @if($item->image)
-                                            <div class="mt-2">
-                                                <small class="text-muted d-block mb-1">Denah Saat Ini:</small>
-                                                <img src="{{ asset('storage/' . $item->image) }}" alt="Denah" class="rounded-2 border" style="max-height: 100px; object-fit: contain;">
-                                            </div>
-                                        @endif
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label mb-0">Tambah Foto Galeri / Denah</label>
+                                        <span class="badge bg-primary-subtle text-primary fs-8">Bisa Multi-Foto</span>
                                     </div>
+                                    <input type="file" name="images[]" class="form-control" accept="image/*" multiple>
+                                    <div class="form-text fs-8 text-muted">Pilih satu atau lebih foto baru untuk ditambahkan ke galeri foto kos ini.</div>
+                                    @if($item->image)
+                                        <div class="mt-2">
+                                            <small class="text-muted d-block mb-1">Denah Saat Ini:</small>
+                                            <img src="{{ asset('storage/' . $item->image) }}" alt="Denah" class="rounded-2 border" style="max-height: 90px; object-fit: contain;">
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                <button type="submit" class="btn btn-sm btn-primary">
-                                    <i class="bi bi-check-lg me-1"></i> Simpan Perubahan
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-sm btn-primary">
+                                <i class="bi bi-check-lg me-1"></i> Simpan Perubahan
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
 

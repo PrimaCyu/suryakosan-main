@@ -100,30 +100,33 @@
 
                             <hr class="my-3 opacity-25">
 
-                            <!-- Bagian 3: Foto Utama Kamar (Upload Instan dengan Preview) -->
+                            <!-- Bagian 3: Foto Kamar (Multi-Image Upload & Preview) -->
                             <div class="mb-4">
                                 <div class="d-flex align-items-center justify-content-between mb-2">
                                     <div class="d-flex align-items-center gap-2">
                                         <span class="badge bg-warning-subtle text-warning rounded-pill px-2 py-1 fs-8">3</span>
-                                        <h6 class="fw-bold mb-0 fs-7">Foto Utama Kamar</h6>
+                                        <h6 class="fw-bold mb-0 fs-7">Koleksi Foto Kamar</h6>
+                                        <span class="badge bg-primary-subtle text-primary fs-8">Multi-Foto</span>
                                     </div>
-                                    <span class="text-muted fs-8">JPG, PNG, WEBP (Maks 5MB)</span>
+                                    <span class="text-muted fs-8">Bisa pilih banyak foto (JPG, PNG, WEBP, Maks 5MB)</span>
                                 </div>
-                                <div class="p-3 border border-2 border-dashed rounded-3 text-center position-relative bg-body-tertiary" id="singleRoomDropzone">
-                                    <input type="file" name="image" id="singleRoomImageInput" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" accept="image/*">
+                                <div class="multi-image-dropzone" id="singleRoomDropzone">
+                                    <input type="file" name="images[]" id="singleRoomImageInput" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" accept="image/*" multiple>
                                     <div id="singleRoomPlaceholder">
-                                        <i class="bi bi-camera display-6 text-muted mb-2 d-block"></i>
-                                        <p class="fs-7 fw-semibold mb-1">Klik atau seret foto utama kamar ke sini</p>
-                                        <p class="text-muted fs-8 mb-0">Foto ini akan menjadi thumbnail utama unit di katalog dan pencarian.</p>
+                                        <i class="bi bi-images display-6 text-primary mb-2 d-block opacity-75"></i>
+                                        <p class="fs-7 fw-semibold mb-1">Klik atau seret foto-foto unit kamar ke sini</p>
+                                        <p class="text-muted fs-8 mb-0">Pilih 1 atau lebih foto (sudut ruangan, kamar mandi, kasur, dll).</p>
                                     </div>
                                     <div id="singleRoomPreviewWrap" class="d-none mt-2">
-                                        <img id="singleRoomPreviewImg" src="" alt="Preview Foto Kamar" class="img-fluid rounded-3 shadow-sm" style="max-height: 180px; object-fit: cover;">
-                                        <div class="mt-2 d-flex justify-content-center align-items-center gap-2">
-                                            <span class="badge bg-success fs-8" id="singleRoomFileName"></span>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="multi-image-badge-count" id="singleRoomBadgeCount">
+                                                <i class="bi bi-check2-circle text-success"></i> <span id="singleRoomFileName">0 Foto Dipilih</span>
+                                            </span>
                                             <button type="button" class="btn btn-xs btn-outline-danger" id="btnCancelSingleImg">
-                                                <i class="bi bi-x-circle me-1"></i> Ganti Foto
+                                                <i class="bi bi-x-circle me-1"></i> Reset / Pilih Ulang
                                             </button>
                                         </div>
+                                        <div class="multi-image-grid" id="singleRoomImagesGrid"></div>
                                     </div>
                                 </div>
                             </div>

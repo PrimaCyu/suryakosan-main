@@ -123,134 +123,90 @@
     <!-- MODAL PERPANJANG (RENEW) TAMU -->
     <div class="modal fade" id="modalRenewTamu{{ $tamu->id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content border-0 shadow-lg">
+            <form action="{{ route('admin.product.kosan.kamar.tamu.renew',['product_kosan' => $product_kosan, 'product_kamar_kosan' => $item->id, 'tamu' => $tamu->id]) }}" method="POST" enctype="multipart/form-data" class="modal-content border-0 shadow-lg">
+                @csrf
+                @method('PUT')
                 <div class="modal-header modal-header-success text-white">
                     <h5 class="modal-title fs-6 fw-bold">
                         <i class="bi bi-arrow-repeat me-2"></i> Perpanjang Sewa: {{ $tamu->name }}
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="{{ route('admin.product.kosan.kamar.tamu.renew',['product_kosan' => $product_kosan, 'product_kamar_kosan' => $item->id, 'tamu' => $tamu->id]) }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
-                    <div class="modal-body p-4" style="max-height: 75vh; overflow-y: auto;">
-
-                        <!-- SEKSI INFORMASI TAMU -->
-                        <h6 class="fw-bold text-dark mb-3 pb-1 border-bottom">
-                            <i class="bi bi-person-badge text-primary me-1"></i> Informasi Data Tamu
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <h6 class="fw-bold text-dark mb-1">
+                            <i class="bi bi-hourglass-split text-warning me-1"></i> Durasi Perpanjangan Sewa
                         </h6>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label">Nama Tamu <span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control" value="{{ $tamu->name }}" placeholder="Nama Lengkap" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">No. Telepon / WhatsApp <span class="text-danger">*</span></label>
-                                <input type="text" name="telp" class="form-control" value="{{ $tamu->telp }}" placeholder="08xxxxxxxxxx" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Alamat Email <span class="text-danger">*</span></label>
-                                <input type="email" name="email" class="form-control" value="{{ $tamu->email }}" placeholder="tamu@example.com" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Waktu Masuk <span class="text-danger">*</span></label>
-                                <input type="time" name="start_time" class="form-control" value="{{ $tamu->start_time }}" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Tanggal Mulai Perpanjangan <span class="text-danger">*</span></label>
-                                @php
-                                    $endDate = $tamu->end_date;
-                                    $parts = explode(' ',$endDate);
-                                @endphp
-                                <input type="date" name="start_date" class="form-control" value="{{ $parts[0] }}" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Total Harga Tambahan (Rp) <span class="text-danger">*</span></label>
-                                <input type="number" name="total_price" class="form-control" value="{{ $tamu->total_price }}" required>
-                            </div>
-                        </div>
-
-                        <!-- SEKSI DURASI PERPANJANGAN -->
-                        <div class="d-flex align-items-center justify-content-between mb-2 pb-1 border-bottom">
-                            <h6 class="fw-bold text-dark mb-0">
-                                <i class="bi bi-hourglass-split text-warning me-1"></i> Durasi Perpanjangan Sewa
-                            </h6>
-                            <small class="text-muted">Pilih durasi sewa tambahan</small>
-                        </div>
-
-                        <!-- PILIHAN DURASI CEPAT -->
-                        <div class="mb-3 p-2.5 rounded-3 bg-body-tertiary border">
-                            <label class="form-label d-block mb-1.5 fs-8 fw-semibold text-secondary">
-                                Pilih Durasi Tambahan:
-                            </label>
-                            <div class="d-flex flex-wrap gap-1.5">
-                                <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-1" onclick="document.getElementById('renew_tahun_{{ $tamu->id }}').value=0; document.getElementById('renew_bulan_{{ $tamu->id }}').value=1;">
-                                    +1 Bulan
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-1" onclick="document.getElementById('renew_tahun_{{ $tamu->id }}').value=0; document.getElementById('renew_bulan_{{ $tamu->id }}').value=3;">
-                                    +3 Bulan
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-1" onclick="document.getElementById('renew_tahun_{{ $tamu->id }}').value=0; document.getElementById('renew_bulan_{{ $tamu->id }}').value=6;">
-                                    +6 Bulan
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-1" onclick="document.getElementById('renew_tahun_{{ $tamu->id }}').value=1; document.getElementById('renew_bulan_{{ $tamu->id }}').value=0;">
-                                    +1 Tahun
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Tahun</label>
-                                <div class="input-group input-group-sm">
-                                    <input type="number" id="renew_tahun_{{ $tamu->id }}" name="tahun" class="form-control" placeholder="0" min="0" value="0">
-                                    <span class="input-group-text bg-body-tertiary">Thn</span>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Bulan</label>
-                                <div class="input-group input-group-sm">
-                                    <input type="number" id="renew_bulan_{{ $tamu->id }}" name="bulan" class="form-control" placeholder="0" min="0" value="1">
-                                    <span class="input-group-text bg-body-tertiary">Bln</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- SEKSI METODE PEMBAYARAN -->
-                        <h6 class="fw-bold text-dark mb-3 pb-1 border-bottom mt-4">
-                            <i class="bi bi-credit-card text-secondary me-1"></i> Pembayaran Perpanjangan
-                        </h6>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Metode Pembayaran <span class="text-danger">*</span></label>
-                                <select name="payment_method" class="form-select" required>
-                                    <option value="cash" selected>Tunai / Cash (Di Tempat)</option>
-                                    <option value="transfer">Transfer Bank</option>
-                                    <option value="qris">QRIS</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Unggah Bukti Pembayaran (Opsional)</label>
-                                <input type="file" name="proof_of_transfer" class="form-control" accept="image/jpeg,image/png,image/webp,image/jpg">
-                                <small class="text-muted fs-9">Format JPG, PNG, WEBP (Maks. 2MB)</small>
-                            </div>
-                        </div>
-
+                        <small class="text-muted">Pilih durasi sewa tambahan</small>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#modalTamuKamar{{ $item->id }}">Kembali</button>
-                        <button type="submit" class="btn btn-sm btn-primary">
-                            <i class="bi bi-save me-1"></i> Simpan Perpanjangan
-                        </button>
+
+                    <!-- PILIHAN DURASI CEPAT -->
+                    <div class="mb-3 p-2.5 rounded-3 bg-body-tertiary border">
+                        <label class="form-label d-block mb-1.5 fs-8 fw-semibold text-secondary">
+                            Pilih Durasi Tambahan:
+                        </label>
+                        <div class="d-flex flex-wrap gap-1.5">
+                            <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-1" onclick="document.getElementById('renew_tahun_{{ $tamu->id }}').value=0; document.getElementById('renew_bulan_{{ $tamu->id }}').value=1;">
+                                +1 Bulan
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-1" onclick="document.getElementById('renew_tahun_{{ $tamu->id }}').value=0; document.getElementById('renew_bulan_{{ $tamu->id }}').value=3;">
+                                +3 Bulan
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-1" onclick="document.getElementById('renew_tahun_{{ $tamu->id }}').value=0; document.getElementById('renew_bulan_{{ $tamu->id }}').value=6;">
+                                +6 Bulan
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-1" onclick="document.getElementById('renew_tahun_{{ $tamu->id }}').value=1; document.getElementById('renew_bulan_{{ $tamu->id }}').value=0;">
+                                +1 Tahun
+                            </button>
+                        </div>
                     </div>
-                </form>
-            </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Tahun</label>
+                            <div class="input-group input-group-sm">
+                                <input type="number" id="renew_tahun_{{ $tamu->id }}" name="tahun" class="form-control" placeholder="0" min="0" value="0">
+                                <span class="input-group-text bg-body-tertiary">Thn</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Bulan</label>
+                            <div class="input-group input-group-sm">
+                                <input type="number" id="renew_bulan_{{ $tamu->id }}" name="bulan" class="form-control" placeholder="0" min="0" value="1">
+                                <span class="input-group-text bg-body-tertiary">Bln</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SEKSI METODE PEMBAYARAN -->
+                    <h6 class="fw-bold text-dark mb-3 pb-1 border-bottom mt-4">
+                        <i class="bi bi-credit-card text-secondary me-1"></i> Pembayaran Perpanjangan
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Metode Pembayaran <span class="text-danger">*</span></label>
+                            <select name="payment_method" class="form-select" required>
+                                <option value="cash" selected>Tunai / Cash (Di Tempat)</option>
+                                <option value="transfer">Transfer Bank</option>
+                                <option value="qris">QRIS</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Unggah Bukti Pembayaran (Opsional)</label>
+                            <input type="file" name="proof_of_transfer" class="form-control" accept="image/jpeg,image/png,image/webp,image/jpg">
+                            <small class="text-muted fs-9">Format JPG, PNG, WEBP (Maks. 2MB)</small>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#modalTamuKamar{{ $item->id }}">Kembali</button>
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="bi bi-save me-1"></i> Simpan Perpanjangan
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 

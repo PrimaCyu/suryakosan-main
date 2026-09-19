@@ -125,6 +125,8 @@ class KamarKosanController extends Controller
                 'price_bulan'         => 'nullable|numeric|min:0',
                 'price_tahun'         => 'nullable|numeric|min:0',
                 'image'               => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+                'images'              => 'nullable|array',
+                'images.*'            => 'image|mimes:jpeg,png,jpg,webp|max:5120',
             ]);
 
             $isSuperAdmin = auth()->user()->isSuperAdmin();
@@ -163,8 +165,18 @@ class KamarKosanController extends Controller
                     ]);
                 }
 
-                // Auto-upload Foto Utama Kamar jika disertakan
-                if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                // Auto-upload Foto Kamar (multi-image atau single image fallback)
+                if ($request->hasFile('images')) {
+                    foreach ($request->file('images') as $file) {
+                        if ($file && $file->isValid()) {
+                            $path = $file->store('kosan/kamar', 'public');
+                            ProductKamarImageKosan::create([
+                                'product_kamar_kosan_id' => $kamar->id,
+                                'image'                  => $path,
+                            ]);
+                        }
+                    }
+                } elseif ($request->hasFile('image') && $request->file('image')->isValid()) {
                     $path = $request->file('image')->store('kosan/kamar', 'public');
                     ProductKamarImageKosan::create([
                         'product_kamar_kosan_id' => $kamar->id,
@@ -228,6 +240,9 @@ class KamarKosanController extends Controller
             'cumulative_discount' => 'nullable|numeric|min:0',
             'description'         => 'nullable|string',
             'views'               => 'nullable|integer|min:0',
+            'image'               => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'images'              => 'nullable|array',
+            'images.*'            => 'image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
         $isSuperAdmin = auth()->user()->isSuperAdmin();
@@ -244,6 +259,25 @@ class KamarKosanController extends Controller
                 'fasilitas'           => $fasilitas,
                 'views'               => $request->input('views', $kamar_kosan->views ?? 0),
             ]);
+
+            // Auto-upload Foto Kamar saat update (multi-image atau single image fallback)
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $file) {
+                    if ($file && $file->isValid()) {
+                        $path = $file->store('kosan/kamar', 'public');
+                        ProductKamarImageKosan::create([
+                            'product_kamar_kosan_id' => $kamar_kosan->id,
+                            'image'                  => $path,
+                        ]);
+                    }
+                }
+            } elseif ($request->hasFile('image') && $request->file('image')->isValid()) {
+                $path = $request->file('image')->store('kosan/kamar', 'public');
+                ProductKamarImageKosan::create([
+                    'product_kamar_kosan_id' => $kamar_kosan->id,
+                    'image'                  => $path,
+                ]);
+            }
         });
 
         $kosan = ProductKosan::find($product_kosan);
