@@ -26,12 +26,232 @@
       opacity: 1;
       transform: translateY(0);
     }
-    .article-copy p { margin-bottom: 1rem; }
-    .article-copy img { border-radius: 1.25rem; margin: 1.5rem 0; max-width: 100%; }
+
+    /* Rich Article Typography & Formatting */
+    .article-copy {
+      font-size: 1.05rem;
+      line-height: 1.9;
+      color: #4A3728;
+      word-break: break-word;
+    }
+    .article-copy p {
+      margin-bottom: 1.35rem;
+      line-height: 1.9;
+    }
+    .article-copy h1,
+    .article-copy h2,
+    .article-copy h3,
+    .article-copy h4,
+    .article-copy h5,
+    .article-copy h6 {
+      font-weight: 800;
+      color: #2D1A0E;
+      line-height: 1.3;
+      margin-top: 2.2rem;
+      margin-bottom: 0.85rem;
+      letter-spacing: -0.02em;
+    }
+    .article-copy h1 { font-size: 2rem; border-bottom: 2px solid #F3EAE1; padding-bottom: 0.5rem; }
+    .article-copy h2 { font-size: 1.65rem; border-bottom: 2px solid #F3EAE1; padding-bottom: 0.4rem; }
+    .article-copy h3 { font-size: 1.35rem; }
+    .article-copy h4 { font-size: 1.15rem; }
+    .article-copy h5, .article-copy h6 { font-size: 1rem; }
+    
+    .article-copy ul {
+      list-style-type: disc !important;
+      padding-left: 1.6rem !important;
+      margin-top: 0.5rem !important;
+      margin-bottom: 1.35rem !important;
+    }
+    .article-copy ol {
+      list-style-type: decimal !important;
+      padding-left: 1.6rem !important;
+      margin-top: 0.5rem !important;
+      margin-bottom: 1.35rem !important;
+    }
+    .article-copy li {
+      margin-bottom: 0.5rem;
+      line-height: 1.8;
+      display: list-item !important;
+    }
+    .article-copy li > ul, .article-copy li > ol {
+      margin-top: 0.35rem !important;
+      margin-bottom: 0.35rem !important;
+    }
+    .article-copy strong, .article-copy b {
+      font-weight: 800;
+      color: #2D1A0E;
+    }
+    .article-copy em, .article-copy i {
+      font-style: italic;
+    }
+    .article-copy u {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .article-copy blockquote {
+      border-left: 4px solid #E60049;
+      background: #FFF9F3;
+      padding: 1rem 1.35rem;
+      margin: 1.6rem 0;
+      border-radius: 0 1rem 1rem 0;
+      font-style: italic;
+      color: #6D4C3D;
+      box-shadow: 0 2px 10px rgba(59,35,20,0.03);
+    }
+    .article-copy a {
+      color: #00A896;
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color 0.2s ease;
+    }
+    .article-copy a:hover {
+      color: #E60049;
+    }
+    .article-copy hr {
+      border: 0;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #DCCEC1, transparent);
+      margin: 2.2rem 0;
+    }
+    .article-copy img {
+      border-radius: 1.25rem;
+      margin: 1.6rem auto;
+      max-width: 100%;
+      height: auto;
+      box-shadow: 0 8px 25px rgba(59,35,20,0.08);
+      display: block;
+    }
+    .article-copy table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.6rem 0;
+      font-size: 0.95rem;
+      border-radius: 0.85rem;
+      overflow: hidden;
+      border: 1px solid #EADFD6;
+    }
+    .article-copy th, .article-copy td {
+      padding: 0.8rem 1rem;
+      border: 1px solid #EADFD6;
+      text-align: left;
+    }
+    .article-copy th {
+      background-color: #F8F2EC;
+      font-weight: 700;
+      color: #3B2314;
+    }
+    .article-copy tr:nth-child(even) {
+      background-color: #FCF8F5;
+    }
+    .article-copy code {
+      background: #F3EAE1;
+      color: #C0003D;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.88em;
+      padding: 0.2em 0.45em;
+      border-radius: 0.35rem;
+      font-weight: 600;
+    }
+    .article-copy pre {
+      background: #2D1A0E;
+      color: #FFF8F1;
+      padding: 1.25rem;
+      border-radius: 1rem;
+      overflow-x: auto;
+      margin: 1.6rem 0;
+      font-size: 0.9rem;
+    }
+    .article-copy pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
     .share-pop { animation: sharePop .25s ease-out; }
     @keyframes sharePop {
       from { opacity: 0; transform: translateY(5px) scale(.96); }
       to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Custom Slim Scrollbar for Sidebar */
+    .sidebar-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+    .sidebar-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .sidebar-scroll::-webkit-scrollbar-thumb {
+      background: #E4D5C9;
+      border-radius: 9999px;
+    }
+    /* TOC Modern Timeline Styling */
+    .toc-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      padding: 0.4rem 0.65rem;
+      border-radius: 0.65rem;
+      color: #795F4D;
+      font-weight: 600;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      text-decoration: none;
+      word-break: break-word;
+      position: relative;
+    }
+    .toc-item:hover {
+      background-color: #FFF5EB;
+      color: #E60049;
+    }
+    .toc-item .toc-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 9999px;
+      background-color: #D6C2B4;
+      margin-top: 0.38rem;
+      flex-shrink: 0;
+      transition: all 0.25s ease;
+    }
+    .toc-item:hover .toc-dot {
+      background-color: #E60049;
+      transform: scale(1.15);
+    }
+    .toc-item.active {
+      background: linear-gradient(90deg, #FFF0D9 0%, #FFF9F2 100%);
+      color: #2D1A0E;
+      font-weight: 800;
+      box-shadow: 0 1px 3px rgba(230, 0, 73, 0.05);
+    }
+    .toc-item.active .toc-dot {
+      background-color: #E60049;
+      box-shadow: 0 0 0 3px rgba(230, 0, 73, 0.2);
+      transform: scale(1.25);
+    }
+    .toc-item-h3 {
+      padding-left: 1.35rem;
+      font-size: 0.77rem;
+      opacity: 0.92;
+    }
+    .toc-item-h3 .toc-dot {
+      width: 5px;
+      height: 5px;
+      margin-top: 0.42rem;
+    }
+
+    /* Heading Highlight Flash upon jump */
+    @keyframes headingPulse {
+      0% { background-color: rgba(243, 168, 51, 0.28); }
+      100% { background-color: transparent; }
+    }
+    .heading-flash {
+      animation: headingPulse 1.8s ease-out;
+      border-radius: 0.5rem;
+      padding: 0.2rem 0.4rem;
+      margin-left: -0.4rem;
+      margin-right: -0.4rem;
     }
   </style>
 </head>
@@ -49,20 +269,20 @@
   @endphp
 
   <!-- MAIN CONTENT WRAPPER -->
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-7">
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-7 items-start">
 
       <!-- KOLOM UTAMA (ARTIKEL DETAIL) -->
       <article class="lg:col-span-8 reveal">
 
         <!-- Judul Berita -->
-        <h1 class="text-3xl sm:text-5xl font-black text-[#3B2314] leading-[1.08] tracking-tight max-w-4xl">
+        <h1 class="text-2xl sm:text-4xl lg:text-[2.65rem] font-black text-[#3B2314] leading-[1.14] tracking-tight">
           {{ $artikel->title }}
         </h1>
 
         <!-- Author, Views, Date, & Social Share Bar -->
-        <div class="mt-6 flex flex-col sm:flex-row sm:items-end justify-between gap-5">
+        <div class="mt-5 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <!-- Author Info & Viewer Stats -->
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 rounded-2xl bg-[#E60049] text-white flex items-center justify-center text-sm shadow-md rotate-[-3deg]">
@@ -98,76 +318,141 @@
         </div>
 
         <!-- Featured Image Detail -->
-        <div class="mt-7 relative rounded-[2rem] overflow-hidden shadow-xl h-[300px] sm:h-[470px] bg-[#EADFD6] group">
+        <div class="mt-6 relative rounded-2xl overflow-hidden shadow-lg h-[260px] sm:h-[430px] bg-[#EADFD6] group">
           <img src="{{ $imgUrl }}" alt="{{ $artikel->title }}" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.025]">
           <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#3B2314]/40 to-transparent pointer-events-none"></div>
         </div>
 
-        <!-- Isi Konten Artikel -->
-        <div class="mt-7 grid grid-cols-1 sm:grid-cols-[8px_1fr] gap-5 items-stretch">
-          <div class="hidden sm:block rounded-full bg-gradient-to-b from-[#E60049] via-[#F3A833] to-[#00A896]"></div>
-          <div class="article-copy text-sm sm:text-base text-[#5B4537] leading-[1.9] bg-white p-6 sm:p-9 rounded-[2rem] border border-[#EADFD6] shadow-sm">
-            {!! nl2br(e($artikel->deskripsi ?? 'Konten artikel belum ditambahkan.')) !!}
+        <!-- MOBILE ACCORDION DAFTAR ISI (Khusus Layar HP / Tablet) -->
+        <div id="mobile-toc-container" class="lg:hidden mt-6 mb-2 bg-white rounded-2xl border border-[#EADFD6] overflow-hidden shadow-sm">
+          <button type="button" id="mobile-toc-toggle" onclick="toggleMobileToc()" class="w-full px-4.5 py-3.5 flex items-center justify-between text-left hover:bg-[#FFF8F1] transition-colors">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-8 h-8 rounded-xl bg-[#FFF0D9] text-[#E60049] flex items-center justify-center text-xs shrink-0 shadow-sm">
+                <i class="fa-solid fa-list-ol"></i>
+              </span>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-black text-[#3B2314] tracking-tight">Daftar Isi Artikel</span>
+                  <span id="mobile-toc-count" class="text-[10px] font-extrabold text-[#E60049] bg-[#FFF0D9] px-2 py-0.5 rounded-full"></span>
+                </div>
+                <p id="mobile-toc-subtitle" class="text-[11px] text-[#8A6B58] truncate mt-0.5">Ketuk untuk lihat bab pembahasan</p>
+              </div>
+            </div>
+            <span class="w-7 h-7 rounded-lg bg-[#FAF3EC] flex items-center justify-center text-[#8A6B58] shrink-0 ml-2">
+              <i id="mobile-toc-arrow" class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
+            </span>
+          </button>
+          <div id="mobile-toc-content" class="hidden px-4 pb-4 pt-2 border-t border-[#F5EBE1] space-y-1.5 max-h-72 overflow-y-auto sidebar-scroll text-xs">
+            <!-- Diisi otomatis oleh JavaScript -->
           </div>
+        </div>
+
+        <!-- Isi Konten Artikel (Rata Sempurna Tanpa Margin Buatan) -->
+        <div class="mt-6 article-copy text-sm sm:text-base text-[#5B4537] leading-[1.85] sm:leading-[1.9] bg-white p-4.5 sm:p-7 md:p-9 rounded-2xl border border-[#EADFD6] shadow-sm">
+          {!! $artikel->parsed_deskripsi ?: '<p class="text-[#9A8170] italic">Konten artikel belum ditambahkan.</p>' !!}
         </div>
 
       </article>
 
-      <!-- SIDEBAR DESKTOP SEARCH & BERITA LAIN -->
-      <aside class="hidden lg:block lg:col-span-4 sticky top-28 reveal">
-        <div class="space-y-5">
-
-          <div class="rounded-[2rem] bg-[#3B2314] p-6 text-[#FFF8F1] shadow-lg overflow-hidden relative">
-            <div class="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-[#E60049]/30"></div>
-            <div class="absolute -right-2 bottom-[-35px] w-24 h-24 rounded-full bg-[#F3A833]/20"></div>
-
-            <div class="relative">
-              <span class="text-[10px] uppercase tracking-[.2em] font-bold text-[#F3A833]">Eksplorasi</span>
-              <h3 class="text-xl font-black mt-2 leading-tight">Temukan bacaan lainnya.</h3>
-              <p class="text-xs text-[#E8D9CD] mt-2 leading-relaxed">Cari informasi, tips, dan kabar terbaru seputar kosan.</p>
-
-              <form action="{{ route('news.index') }}" method="GET" class="mt-5">
-                <div class="relative">
-                  <input type="text" name="search" placeholder="Ketik kata kunci..." class="w-full px-4 py-3 pr-11 bg-[#FFF8F1] text-[#3B2314] text-xs rounded-2xl border-0 focus:outline-none focus:ring-2 focus:ring-[#F3A833] font-medium placeholder-[#9A8170]">
-                  <button type="submit" class="absolute right-1.5 top-1.5 w-9 h-9 rounded-xl bg-[#E60049] hover:bg-[#C90040] text-white transition-all flex items-center justify-center">
-                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
-                  </button>
-                </div>
-              </form>
+      <!-- SIDEBAR DESKTOP MODERN: PROGRES BACA, DAFTAR ISI & EKSPLORASI -->
+      <aside class="hidden lg:block lg:col-span-4 sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto sidebar-scroll pr-1 space-y-4 reveal">
+        
+        <!-- 1. WIDGET DAFTAR ISI & PROGRES BACA INTERAKTIF -->
+        <div id="toc-container" class="bg-white p-4.5 sm:p-5 rounded-2xl border border-[#EADFD6] shadow-sm transition-all duration-300">
+          <!-- Header Progres Membaca -->
+          <div class="flex items-center justify-between pb-2.5 border-b border-[#F5EBE1]">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#E60049] animate-pulse"></span>
+              <span class="text-[10px] uppercase tracking-wider font-extrabold text-[#795F4D]">Progres Membaca</span>
             </div>
+            <span id="reading-percent-badge" class="text-[11px] font-black text-[#E60049] bg-[#FFF0D9] px-2.5 py-0.5 rounded-full">0%</span>
+          </div>
+          
+          <!-- Progress Bar Grafis -->
+          <div class="w-full bg-[#F5EBE1] h-1.5 rounded-full overflow-hidden mt-2.5 mb-3">
+            <div id="reading-progress-bar" class="h-full bg-gradient-to-r from-[#F3A833] via-[#E60049] to-[#00A896] transition-all duration-150 rounded-full" style="width: 0%;"></div>
           </div>
 
-          <div class="bg-white p-6 rounded-[2rem] border border-[#EADFD6] shadow-sm">
-            <div class="flex items-center justify-between mb-5">
-              <div>
-                <span class="text-[10px] uppercase tracking-wider font-bold text-[#00A896]">Pilihan bacaan</span>
-                <h3 class="font-black text-[#3B2314] text-base mt-1">Artikel Lainnya</h3>
-              </div>
-              <span class="w-8 h-8 rounded-xl bg-[#FFF0D9] text-[#F3A833] flex items-center justify-center">
-                <i class="fa-solid fa-book-open text-xs"></i>
-              </span>
-            </div>
-
-            <div class="space-y-2">
-              @forelse($beritaLainnya as $itemLain)
-                @php
-                  $imgLain = $itemLain->image ? asset('storage/' . $itemLain->image) : 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80';
-                @endphp
-                <a href="{{ route('news.detail', $itemLain->slug) }}" class="flex items-center gap-3 group p-2.5 rounded-2xl hover:bg-[#FFF8F1] transition-all">
-                  <img src="{{ $imgLain }}" alt="{{ $itemLain->title }}" loading="lazy" class="w-16 h-16 rounded-xl object-cover shrink-0 group-hover:scale-[1.03] transition-transform">
-                  <div class="min-w-0">
-                    <span class="text-[9px] font-bold text-[#E60049] uppercase">Artikel</span>
-                    <h5 class="text-xs font-extrabold text-[#3B2314] leading-snug group-hover:text-[#E60049] transition-colors line-clamp-2">{{ $itemLain->title }}</h5>
-                    <span class="text-[10px] text-[#9A8170] mt-1 block">{{ $itemLain->created_at ? $itemLain->created_at->format('d M Y') : '' }}</span>
-                  </div>
-                </a>
-              @empty
-                <p class="text-xs text-[#9A8170] py-2">Berita lainnya belum tersedia.</p>
-              @endforelse
-            </div>
+          <!-- Judul Daftar Isi -->
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="font-black text-[#3B2314] text-xs uppercase tracking-wide flex items-center gap-1.5">
+              <i class="fa-solid fa-list-ul text-[#F3A833] text-xs"></i>
+              Daftar Isi Artikel
+            </h4>
+            <span id="toc-count-badge" class="text-[10px] font-bold text-[#8A6B58] bg-[#FFF8F1] px-2 py-0.5 rounded-lg border border-[#EADFD6]"></span>
           </div>
 
+          <!-- Kontainer Navigasi Bab yang Aktif Mengikuti Posisi Scroll -->
+          <div class="relative pl-1 my-2">
+            <nav id="toc-list" class="space-y-1 max-h-[320px] overflow-y-auto pr-1 sidebar-scroll text-xs">
+              <!-- Diisi otomatis secara dinamis oleh JavaScript dari tag H2 & H3 -->
+            </nav>
+          </div>
+
+          <!-- Tombol Pintas: Kembali ke Atas & Bagikan -->
+          <div class="mt-3 pt-2.5 border-t border-[#F5EBE1] flex items-center justify-between text-[11px] text-[#8A6B58]">
+            <button type="button" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="hover:text-[#E60049] font-bold flex items-center gap-1.5 transition-colors px-2 py-1 rounded-lg hover:bg-[#FFF8F1]">
+              <i class="fa-solid fa-arrow-up text-[10px]"></i> Ke Atas
+            </button>
+            <span class="text-[#D0C0B2]">•</span>
+            <button type="button" onclick="copyPageUrl()" class="hover:text-[#00A896] font-bold flex items-center gap-1.5 transition-colors px-2 py-1 rounded-lg hover:bg-[#FFF8F1]">
+              <i class="fa-solid fa-link text-[10px]"></i> Salin Tautan
+            </button>
+          </div>
         </div>
+
+        <!-- 2. WIDGET PENCARIAN MODERN & HANGAT -->
+        <div class="rounded-2xl bg-gradient-to-br from-[#2E180C] via-[#3B2314] to-[#24130A] p-4.5 sm:p-5 text-white shadow-md border border-[#523522] relative overflow-hidden">
+          <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-[#E60049]/20 blur-xl pointer-events-none"></div>
+          <div class="absolute -right-2 bottom-[-30px] w-20 h-20 rounded-full bg-[#F3A833]/15 blur-lg pointer-events-none"></div>
+
+          <div class="relative">
+            <span class="text-[10px] uppercase tracking-[.2em] font-black text-[#F3A833]">Eksplorasi</span>
+            <h3 class="text-sm sm:text-base font-black mt-1 leading-tight text-white">Temukan bacaan lainnya.</h3>
+            <p class="text-[11px] text-[#E0D0C4] mt-1 leading-relaxed">Cari informasi, tips, dan kabar terbaru seputar kosan.</p>
+
+            <form action="{{ route('news.index') }}" method="GET" class="mt-3.5">
+              <div class="relative flex items-center">
+                <input type="text" name="search" placeholder="Ketik kata kunci..." class="w-full pl-3.5 pr-10 py-2.5 bg-white text-[#3B2314] text-xs rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-[#F3A833] font-medium placeholder-[#9A8170] shadow-sm">
+                <button type="submit" class="absolute right-1 w-8 h-8 rounded-lg bg-[#E60049] hover:bg-[#C90040] text-white transition-all flex items-center justify-center shadow-sm" title="Cari">
+                  <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- 3. WIDGET ARTIKEL LAINNYA -->
+        <div class="bg-white p-4.5 sm:p-5 rounded-2xl border border-[#EADFD6] shadow-sm">
+          <div class="flex items-center justify-between mb-3.5">
+            <div>
+              <span class="text-[10px] uppercase tracking-wider font-bold text-[#00A896]">Pilihan bacaan</span>
+              <h3 class="font-black text-[#3B2314] text-sm mt-0.5">Artikel Terkait</h3>
+            </div>
+            <span class="w-7 h-7 rounded-xl bg-[#FFF0D9] text-[#F3A833] flex items-center justify-center">
+              <i class="fa-solid fa-book-open text-xs"></i>
+            </span>
+          </div>
+
+          <div class="space-y-1.5">
+            @forelse($beritaLainnya as $itemLain)
+              @php
+                $imgLain = $itemLain->image ? asset('storage/' . $itemLain->image) : 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80';
+              @endphp
+              <a href="{{ route('news.detail', $itemLain->slug) }}" class="flex items-center gap-3 group p-2 rounded-xl hover:bg-[#FFF8F1] transition-all">
+                <img src="{{ $imgLain }}" alt="{{ $itemLain->title }}" loading="lazy" class="w-14 h-14 rounded-xl object-cover shrink-0 group-hover:scale-[1.03] transition-transform">
+                <div class="min-w-0">
+                  <span class="text-[9px] font-bold text-[#E60049] uppercase">Artikel</span>
+                  <h5 class="text-xs font-extrabold text-[#3B2314] leading-snug group-hover:text-[#E60049] transition-colors line-clamp-2">{{ $itemLain->title }}</h5>
+                  <span class="text-[10px] text-[#9A8170] mt-0.5 block">{{ $itemLain->created_at ? $itemLain->created_at->format('d M Y') : '' }}</span>
+                </div>
+              </a>
+            @empty
+              <p class="text-xs text-[#9A8170] py-2">Berita lainnya belum tersedia.</p>
+            @endforelse
+          </div>
+        </div>
+
       </aside>
 
     </div>
@@ -226,6 +511,35 @@
   <!-- FOOTER -->
   @include('frontend.footer')
 
+  <!-- 4. FLOATING MOBILE READING ISLAND (Khusus Layar HP & Tablet) -->
+  <div id="mobile-reading-pill" class="lg:hidden fixed bottom-4 inset-x-3 sm:inset-x-6 max-w-sm mx-auto z-40 bg-[#2D1A0E]/95 backdrop-blur-md text-white rounded-full p-2 pl-3.5 pr-2 shadow-2xl border border-white/15 flex items-center justify-between gap-2.5 transition-all duration-300 transform translate-y-24 opacity-0 pointer-events-none">
+    <div class="flex items-center gap-2.5 min-w-0 flex-1">
+      <!-- Mini Circular Progress Indicator -->
+      <div class="relative w-8 h-8 shrink-0 flex items-center justify-center">
+        <svg class="w-8 h-8 transform -rotate-90" viewBox="0 0 36 36">
+          <path class="text-white/20" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+          <path id="mobile-float-circle" class="text-[#E60049] transition-all duration-150" stroke-dasharray="0, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+        </svg>
+        <span id="mobile-float-percent" class="absolute text-[9px] font-black">0%</span>
+      </div>
+      <!-- Current Chapter Name -->
+      <div class="min-w-0 flex-1">
+        <span class="text-[9px] uppercase tracking-wider text-[#F3A833] font-extrabold block">Sedang Dibaca</span>
+        <span id="mobile-float-title" class="text-xs font-bold text-white truncate block">Pengantar Artikel</span>
+      </div>
+    </div>
+    <!-- Quick Actions -->
+    <div class="flex items-center gap-1.5 shrink-0">
+      <button type="button" onclick="openMobileTocAccordion()" class="px-2.5 py-1.5 rounded-full bg-white/10 hover:bg-[#E60049] text-white text-[11px] font-bold flex items-center gap-1 transition-all" title="Buka Bab Pembahasan">
+        <i class="fa-solid fa-list-ul text-[10px]"></i>
+        <span>Bab</span>
+      </button>
+      <button type="button" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="w-7 h-7 rounded-full bg-white/10 hover:bg-[#F3A833] hover:text-[#3B2314] text-white text-[11px] flex items-center justify-center transition-all" title="Ke Atas">
+        <i class="fa-solid fa-arrow-up text-[10px]"></i>
+      </button>
+    </div>
+  </div>
+
   <!-- JAVASCRIPT SYSTEM LOGIC -->
   <script>
     // Loading Bar
@@ -273,6 +587,38 @@
       });
     }
 
+    // Toggle Mobile TOC Accordion
+    function toggleMobileToc() {
+      const content = document.getElementById('mobile-toc-content');
+      const arrow = document.getElementById('mobile-toc-arrow');
+      if (!content) return;
+      const isHidden = content.classList.contains('hidden');
+      if (isHidden) {
+        content.classList.remove('hidden');
+        if (arrow) arrow.style.transform = 'rotate(180deg)';
+      } else {
+        content.classList.add('hidden');
+        if (arrow) arrow.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // Open Mobile TOC and Scroll to Accordion
+    function openMobileTocAccordion() {
+      const container = document.getElementById('mobile-toc-container');
+      const content = document.getElementById('mobile-toc-content');
+      const arrow = document.getElementById('mobile-toc-arrow');
+      if (container) {
+        const navbarOffset = 80;
+        const elementPosition = container.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - navbarOffset;
+        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+      }
+      if (content && content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        if (arrow) arrow.style.transform = 'rotate(180deg)';
+      }
+    }
+
     // Scroll Reveal
     const revealElements = document.querySelectorAll('.reveal');
     const revealOnScroll = () => {
@@ -286,6 +632,203 @@
 
     window.addEventListener('scroll', revealOnScroll);
     window.addEventListener('load', revealOnScroll);
+
+    // Dynamic Table of Contents (Daftar Isi Otomatis) & Live Reading Progress
+    document.addEventListener('DOMContentLoaded', () => {
+      const articleBody = document.querySelector('.article-copy');
+      const tocContainer = document.getElementById('toc-container');
+      const tocList = document.getElementById('toc-list');
+      const tocCountBadge = document.getElementById('toc-count-badge');
+      const mobileTocContent = document.getElementById('mobile-toc-content');
+      const mobileTocCount = document.getElementById('mobile-toc-count');
+      const mobileTocSubtitle = document.getElementById('mobile-toc-subtitle');
+      const progressBar = document.getElementById('reading-progress-bar');
+      const progressPercentBadge = document.getElementById('reading-percent-badge');
+      const mobileReadingPill = document.getElementById('mobile-reading-pill');
+      const mobileFloatCircle = document.getElementById('mobile-float-circle');
+      const mobileFloatPercent = document.getElementById('mobile-float-percent');
+      const mobileFloatTitle = document.getElementById('mobile-float-title');
+
+      if (!articleBody) return;
+
+      const headings = articleBody.querySelectorAll('h2, h3');
+
+      if (headings.length < 1) {
+        if (tocList) {
+          tocList.innerHTML = `
+            <div class="py-2.5 px-2 text-[11px] text-[#9A8170] italic leading-relaxed">
+              Bacalah naskah dengan panduan progres di atas.
+            </div>
+          `;
+        }
+        if (tocCountBadge) tocCountBadge.textContent = 'Ringkasan';
+        if (mobileTocCount) mobileTocCount.textContent = 'Ringkas';
+      } else {
+        if (tocCountBadge) tocCountBadge.textContent = `${headings.length} Bab`;
+        if (mobileTocCount) mobileTocCount.textContent = `${headings.length} Bab`;
+
+        headings.forEach((heading, idx) => {
+          if (!heading.id) {
+            heading.id = 'section-heading-' + (idx + 1);
+          }
+
+          const isH3 = heading.tagName.toLowerCase() === 'h3';
+          const rawText = heading.textContent.trim();
+
+          // A. Desktop Link (Timeline Style with Dot)
+          if (tocList) {
+            const link = document.createElement('a');
+            link.href = '#' + heading.id;
+            link.className = 'toc-item' + (isH3 ? ' toc-item-h3' : '');
+            link.dataset.targetId = heading.id;
+            link.title = rawText;
+            link.innerHTML = `
+              <span class="toc-dot"></span>
+              <span class="line-clamp-2 leading-snug">${rawText}</span>
+            `;
+
+            link.addEventListener('click', (e) => {
+              e.preventDefault();
+              const targetEl = document.getElementById(heading.id);
+              if (targetEl) {
+                const navbarOffset = 90;
+                const elementPosition = targetEl.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - navbarOffset;
+                window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+
+                targetEl.classList.remove('heading-flash');
+                void targetEl.offsetWidth; // trigger reflow
+                targetEl.classList.add('heading-flash');
+              }
+            });
+
+            tocList.appendChild(link);
+          }
+
+          // B. Mobile Accordion Link (Touch Friendly)
+          if (mobileTocContent) {
+            const mLink = document.createElement('a');
+            mLink.href = '#' + heading.id;
+            mLink.className = `flex items-center gap-2.5 p-2 rounded-xl text-[#6D5445] hover:text-[#E60049] hover:bg-[#FFF8F1] transition-colors font-semibold ${isH3 ? 'pl-6 text-[11px]' : 'text-xs'}`;
+            mLink.dataset.targetId = heading.id;
+            mLink.innerHTML = `
+              <span class="w-1.5 h-1.5 rounded-full ${isH3 ? 'bg-[#9A8170]' : 'bg-[#E60049]'} shrink-0"></span>
+              <span class="line-clamp-1">${rawText}</span>
+            `;
+
+            mLink.addEventListener('click', (e) => {
+              e.preventDefault();
+              const targetEl = document.getElementById(heading.id);
+              if (targetEl) {
+                const navbarOffset = 80;
+                const elementPosition = targetEl.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - navbarOffset;
+                window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+
+                targetEl.classList.remove('heading-flash');
+                void targetEl.offsetWidth; // trigger reflow
+                targetEl.classList.add('heading-flash');
+
+                // Auto collapse mobile accordion after selection
+                setTimeout(() => {
+                  mobileTocContent.classList.add('hidden');
+                  const arrow = document.getElementById('mobile-toc-arrow');
+                  if (arrow) arrow.style.transform = 'rotate(0deg)';
+                }, 200);
+              }
+            });
+
+            mobileTocContent.appendChild(mLink);
+          }
+        });
+      }
+
+      // Live Reading Progress, Active Heading & Floating Mobile Pill
+      const updateReadingTracker = () => {
+        const articleRect = articleBody.getBoundingClientRect();
+        const articleTop = articleRect.top + window.scrollY;
+        const articleHeight = articleBody.offsetHeight;
+        const windowHeight = window.innerHeight;
+        const currentScrollY = window.scrollY;
+
+        let percent = 0;
+        if (currentScrollY > articleTop - 120) {
+          const scrolledPast = currentScrollY - (articleTop - 120);
+          const totalScrollable = Math.max(1, articleHeight - windowHeight / 2);
+          percent = Math.min(100, Math.max(0, Math.round((scrolledPast / totalScrollable) * 100)));
+        }
+
+        // Update Desktop Progress Bar & Badge
+        if (progressBar) progressBar.style.width = percent + '%';
+        if (progressPercentBadge) progressPercentBadge.textContent = percent + '%';
+
+        // Update Mobile Floating Pill Progress
+        if (mobileFloatCircle) mobileFloatCircle.setAttribute('stroke-dasharray', `${percent}, 100`);
+        if (mobileFloatPercent) mobileFloatPercent.textContent = percent + '%';
+
+        // Show/Hide Mobile Floating Pill
+        if (mobileReadingPill) {
+          if (currentScrollY > 320 && percent < 98) {
+            mobileReadingPill.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+            mobileReadingPill.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+          } else {
+            mobileReadingPill.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+            mobileReadingPill.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+          }
+        }
+
+        // Active Heading Detection
+        if (headings.length > 0) {
+          let currentActiveId = null;
+          let currentActiveText = 'Pengantar Artikel';
+
+          headings.forEach(heading => {
+            const top = heading.getBoundingClientRect().top;
+            if (top <= 160) {
+              currentActiveId = heading.id;
+              currentActiveText = heading.textContent.trim();
+            }
+          });
+
+          if (!currentActiveId && headings[0].getBoundingClientRect().top < windowHeight * 0.75) {
+            currentActiveId = headings[0].id;
+            currentActiveText = headings[0].textContent.trim();
+          }
+
+          // Update Desktop Active Link with Smooth Auto-Scroll
+          if (tocList) {
+            const tocLinks = tocList.querySelectorAll('.toc-item');
+            let activeEl = null;
+            tocLinks.forEach(link => {
+              if (link.dataset.targetId === currentActiveId) {
+                if (!link.classList.contains('active')) {
+                  link.classList.add('active');
+                  activeEl = link;
+                }
+              } else {
+                link.classList.remove('active');
+              }
+            });
+
+            // Smoothly scroll active element into view inside the TOC container without jumping!
+            if (activeEl) {
+              activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+          }
+
+          // Update Mobile Preview Subtitle and Floating Pill Title
+          if (mobileFloatTitle) {
+            mobileFloatTitle.textContent = currentActiveText;
+          }
+          if (mobileTocSubtitle && currentActiveId) {
+            mobileTocSubtitle.textContent = `Aktif: ${currentActiveText}`;
+          }
+        }
+      };
+
+      window.addEventListener('scroll', updateReadingTracker, { passive: true });
+      updateReadingTracker();
+    });
   </script>
 </body>
 </html>

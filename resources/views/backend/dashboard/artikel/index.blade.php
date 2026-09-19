@@ -10,13 +10,77 @@
         z-index: 1060 !important;
     }
     .note-editor.note-frame {
-        border-color: var(--dash-border, #e2e8f0) !important;
-        border-radius: 8px !important;
+        border-color: var(--dash-border, #cbd5e1) !important;
+        border-radius: 10px !important;
         overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        background-color: #ffffff;
     }
     .note-toolbar {
         background-color: var(--dash-bg-subtle, #f8fafc) !important;
         border-bottom: 1px solid var(--dash-border, #e2e8f0) !important;
+        padding: 6px 10px !important;
+    }
+    .note-editable {
+        min-height: 420px !important;
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+        font-size: 0.95rem !important;
+        line-height: 1.85 !important;
+        color: #334155 !important;
+        padding: 20px 24px !important;
+    }
+    .note-editable h1, .note-editable h2, .note-editable h3 {
+        font-weight: 700;
+        color: #0f172a;
+        margin-top: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+    .note-editable p {
+        margin-bottom: 1rem;
+    }
+    .note-editable ul {
+        list-style-type: disc;
+        padding-left: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .note-editable ol {
+        list-style-type: decimal;
+        padding-left: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .note-editable blockquote {
+        border-left: 4px solid #4f46e5;
+        padding: 8px 16px;
+        background-color: #f8fafc;
+        color: #475569;
+        font-style: italic;
+        margin: 1rem 0;
+        border-radius: 0 8px 8px 0;
+    }
+
+    /* Fullscreen Mode Optimization for Long-form Writing */
+    .note-editor.note-frame.fullscreen {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        z-index: 100000 !important;
+        border-radius: 0 !important;
+        background: #ffffff !important;
+    }
+    .note-editor.note-frame.fullscreen .note-editable {
+        height: calc(100vh - 110px) !important;
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 30px 40px !important;
+    }
+    .note-editor.note-frame.fullscreen .note-toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 100001;
+        background-color: #f1f5f9 !important;
+        border-bottom: 1px solid #cbd5e1 !important;
     }
 </style>
 
@@ -267,16 +331,16 @@
 <!-- 1. MODAL TAMBAH ARTIKEL -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalTambahArtikel" tabindex="-1" aria-labelledby="modalTambahArtikelLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
         <form action="{{ route('admin.artikel.insert') }}" method="POST" enctype="multipart/form-data" id="formTambahArtikel" class="modal-content border-0 shadow-lg" style="border-radius: 14px;">
             @csrf
-            <div class="modal-header border-bottom py-3">
+            <div class="modal-header border-bottom py-3 px-4 bg-body-tertiary">
                 <h5 class="modal-title fs-6 fw-bold" id="modalTambahArtikelLabel">
                     <i class="bi bi-pencil-square text-primary me-2"></i> Tulis Artikel Baru
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
-            <div class="modal-body p-3 p-md-4">
+            <div class="modal-body p-4">
                 <div class="row g-3">
                     <!-- Judul Artikel -->
                     <div class="col-12">
@@ -288,7 +352,7 @@
                             name="title"
                             id="title_tambah"
                             class="form-control form-control-sm"
-                            placeholder="Contoh: 5 Tips Memilih Kos Nyaman Dekat Kampus..."
+                            placeholder="Contoh: 5 Tips Memilih Kos Nyaman & Hemat untuk Mahasiswa..."
                             required
                             oninput="updateSlugPreview(this.value, 'slug-preview-tambah')"
                         >
@@ -319,21 +383,46 @@
                         </div>
                     </div>
 
+                    <!-- Tips Menulis Artikel -->
+                    <div class="col-12">
+                        <div class="alert alert-light border d-flex align-items-start gap-2.5 p-2.5 mb-0 rounded-3 text-secondary fs-8">
+                            <i class="bi bi-lightbulb-fill text-warning fs-6 mt-0.5 shrink-0"></i>
+                            <div>
+                                <strong class="text-dark">Tips Menulis Artikel Rapi & Menarik:</strong>
+                                Gunakan <strong>Heading 2 / 3</strong> untuk judul bab, <strong>Bullet/Numbered List</strong> untuk poin penting, dan tombol <strong>Fullscreen</strong> (<i class="bi bi-arrows-fullscreen"></i>) di pojok kanan toolbar untuk menulis naskah panjang tanpa gangguan.
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Isi Konten Summernote -->
                     <div class="col-12">
-                        <label class="form-label fw-bold fs-8 text-body-emphasis">
-                            Konten / Isi Lengkap Artikel <span class="text-danger">*</span>
-                        </label>
+                        <div class="d-flex align-items-center justify-content-between mb-1.5">
+                            <label class="form-label fw-bold fs-8 text-body-emphasis mb-0">
+                                Konten / Isi Lengkap Naskah Artikel <span class="text-danger">*</span>
+                            </label>
+                            <div class="d-flex align-items-center gap-2 fs-9 text-muted">
+                                <span id="counter_tambah"><i class="bi bi-fonts me-1"></i>0 kata</span>
+                                <span>•</span>
+                                <span id="time_tambah"><i class="bi bi-clock me-1"></i>1 mnt baca</span>
+                            </div>
+                        </div>
                         <textarea name="deskripsi" id="summernote_deskripsi_tambah" class="form-control"></textarea>
-                        <div class="form-text fs-9 text-muted">
-                            Format teks, masukkan poin, tautan, dan gambar pendukung menggunakan editor di atas.
+                        <div class="d-flex justify-content-between align-items-center mt-1.5 fs-9 text-muted">
+                            <div>
+                                <i class="bi bi-shield-check text-success me-1"></i>Format teks otomatis dibersihkan saat menyalin dari luar (AI / Word).
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fs-9 text-secondary" onclick="cleanEditorFormat('tambah')">
+                                    <i class="bi bi-eraser me-1"></i>Bersihkan Gaya Inline
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer border-top py-2.5">
-                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="submit" class="btn btn-sm btn-primary px-3 shadow-sm" id="btn-submit-tambah">
+            <div class="modal-footer border-top py-2.5 px-4 bg-body-tertiary">
+                <button type="button" class="btn btn-sm btn-secondary px-3" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-sm btn-primary px-4 shadow-sm" id="btn-submit-tambah">
                     <i class="bi bi-send-fill me-1"></i> Publikasikan Artikel
                 </button>
             </div>
@@ -345,17 +434,17 @@
 <!-- 2. SINGLE UNIFIED MODAL EDIT ARTIKEL -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalEditArtikel" tabindex="-1" aria-labelledby="modalEditArtikelLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
         <form action="" method="POST" enctype="multipart/form-data" id="formEditArtikel" class="modal-content border-0 shadow-lg" style="border-radius: 14px;">
             @csrf
             @method('PUT')
-            <div class="modal-header border-bottom py-3">
+            <div class="modal-header border-bottom py-3 px-4 bg-body-tertiary">
                 <h5 class="modal-title fs-6 fw-bold" id="modalEditArtikelLabel">
                     <i class="bi bi-pencil-square text-primary me-2"></i> Edit Artikel
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
-            <div class="modal-body p-3 p-md-4">
+            <div class="modal-body p-4">
                 <div class="row g-3">
                     <!-- Judul Artikel -->
                     <div class="col-12">
@@ -397,18 +486,46 @@
                         </div>
                     </div>
 
+                    <!-- Tips Menulis Artikel -->
+                    <div class="col-12">
+                        <div class="alert alert-light border d-flex align-items-start gap-2.5 p-2.5 mb-0 rounded-3 text-secondary fs-8">
+                            <i class="bi bi-lightbulb-fill text-warning fs-6 mt-0.5 shrink-0"></i>
+                            <div>
+                                <strong class="text-dark">Tips Menulis Artikel Rapi & Menarik:</strong>
+                                Gunakan <strong>Heading 2 / 3</strong> untuk judul bab, <strong>Bullet/Numbered List</strong> untuk poin penting, dan tombol <strong>Fullscreen</strong> (<i class="bi bi-arrows-fullscreen"></i>) di pojok kanan toolbar untuk menulis naskah panjang tanpa gangguan.
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Isi Konten Summernote -->
                     <div class="col-12">
-                        <label class="form-label fw-bold fs-8 text-body-emphasis">
-                            Konten / Isi Lengkap Artikel <span class="text-danger">*</span>
-                        </label>
+                        <div class="d-flex align-items-center justify-content-between mb-1.5">
+                            <label class="form-label fw-bold fs-8 text-body-emphasis mb-0">
+                                Konten / Isi Lengkap Naskah Artikel <span class="text-danger">*</span>
+                            </label>
+                            <div class="d-flex align-items-center gap-2 fs-9 text-muted">
+                                <span id="counter_edit"><i class="bi bi-fonts me-1"></i>0 kata</span>
+                                <span>•</span>
+                                <span id="time_edit"><i class="bi bi-clock me-1"></i>1 mnt baca</span>
+                            </div>
+                        </div>
                         <textarea name="deskripsi" id="summernote_deskripsi_edit" class="form-control"></textarea>
+                        <div class="d-flex justify-content-between align-items-center mt-1.5 fs-9 text-muted">
+                            <div>
+                                <i class="bi bi-shield-check text-success me-1"></i>Format teks otomatis dibersihkan saat menyalin dari luar (AI / Word).
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fs-9 text-secondary" onclick="cleanEditorFormat('edit')">
+                                    <i class="bi bi-eraser me-1"></i>Bersihkan Gaya Inline
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer border-top py-2.5">
-                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="submit" class="btn btn-sm btn-primary px-3 shadow-sm" id="btn-submit-edit">
+            <div class="modal-footer border-top py-2.5 px-4 bg-body-tertiary">
+                <button type="button" class="btn btn-sm btn-secondary px-3" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-sm btn-primary px-4 shadow-sm" id="btn-submit-edit">
                     <i class="bi bi-check-lg me-1"></i> Simpan Perubahan
                 </button>
             </div>
@@ -498,6 +615,131 @@
         }
     }
 
+    // Common Summernote Config for Long-Form Articles
+    const summernoteConfig = {
+        placeholder: 'Tuliskan judul bab, paragraf, poin edukasi, atau panduan lengkap artikel di sini...',
+        tabsize: 2,
+        minHeight: 420,
+        dialogsInBody: true,
+        dialogsFade: true,
+        toolbar: [
+            ['style', ['style']],
+            ['font', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript', 'clear']],
+            ['fontsize', ['fontsize']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['height', ['height']],
+            ['table', ['table']],
+            ['insert', ['link', 'picture', 'video', 'hr']],
+            ['view', ['fullscreen', 'codeview', 'undo', 'redo']]
+        ],
+        styleTags: [
+            'p',
+            { title: 'Judul Utama (H2)', tag: 'h2', className: 'fw-bold fs-4 text-dark', value: 'h2' },
+            { title: 'Sub Judul (H3)', tag: 'h3', className: 'fw-bold fs-5 text-dark', value: 'h3' },
+            { title: 'Sub Bagian (H4)', tag: 'h4', className: 'fw-semibold fs-6 text-dark', value: 'h4' },
+            { title: 'Kutipan Menarik (Quote)', tag: 'blockquote', className: 'blockquote', value: 'blockquote' },
+            { title: 'Blok Kode / Catatan', tag: 'pre', className: 'bg-light p-2', value: 'pre' }
+        ],
+        fontSizes: ['11', '12', '13', '14', '15', '16', '18', '20', '24', '28', '32', '36'],
+        lineHeights: ['1.0', '1.2', '1.4', '1.6', '1.8', '2.0'],
+        callbacks: {
+            onPaste: function (e) {
+                const bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('text/html');
+                if (bufferText) {
+                    e.preventDefault();
+                    const div = document.createElement('div');
+                    div.innerHTML = bufferText;
+                    
+                    // Clean aggressive styles that break formatting while keeping semantic tags
+                    div.querySelectorAll('*').forEach(el => {
+                        if (el.style) {
+                            el.style.fontFamily = '';
+                            el.style.lineHeight = '';
+                            el.style.fontSize = '';
+                            el.style.backgroundColor = '';
+                        }
+                        Array.from(el.attributes).forEach(attr => {
+                            if (attr.name.startsWith('_ng') || attr.name.startsWith('data-')) {
+                                el.removeAttribute(attr.name);
+                            }
+                        });
+                    });
+                    
+                    document.execCommand('insertHTML', false, div.innerHTML);
+                }
+            },
+            onChange: function(contents, $editable) {
+                if ($editable.closest('#modalTambahArtikel').length) {
+                    updateWordCounter('tambah');
+                } else if ($editable.closest('#modalEditArtikel').length) {
+                    updateWordCounter('edit');
+                }
+            }
+        }
+    };
+
+    function initSummernoteArtikel(selector) {
+        const $el = $(selector);
+        if ($el.length && !$el.next('.note-editor').length) {
+            $el.summernote(summernoteConfig);
+        }
+    }
+
+    function updateWordCounter(type) {
+        const selector = type === 'edit' ? '#summernote_deskripsi_edit' : '#summernote_deskripsi_tambah';
+        const counterEl = document.getElementById(type === 'edit' ? 'counter_edit' : 'counter_tambah');
+        const timeEl = document.getElementById(type === 'edit' ? 'time_edit' : 'time_tambah');
+        if (!counterEl || !timeEl || !$(selector).length) return;
+
+        const html = $(selector).summernote('code') || '';
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+        const text = (temp.textContent || temp.innerText || '').trim();
+        const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
+        const minutes = Math.max(1, Math.ceil(words / 180));
+
+        counterEl.innerHTML = `<i class="bi bi-fonts me-1"></i>${words} kata`;
+        timeEl.innerHTML = `<i class="bi bi-clock me-1"></i>${minutes} mnt baca`;
+    }
+
+    function cleanEditorFormat(type) {
+        const selector = type === 'edit' ? '#summernote_deskripsi_edit' : '#summernote_deskripsi_tambah';
+        const $el = $(selector);
+        if (!$el.length) return;
+
+        let html = $el.summernote('code');
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+
+        temp.querySelectorAll('*').forEach(node => {
+            if (node.style) {
+                node.style.fontFamily = '';
+                node.style.lineHeight = '';
+                node.style.fontSize = '';
+                node.style.backgroundColor = '';
+            }
+            Array.from(node.attributes).forEach(attr => {
+                if (attr.name.startsWith('_ng') || attr.name.startsWith('data-')) {
+                    node.removeAttribute(attr.name);
+                }
+            });
+        });
+
+        $el.summernote('code', temp.innerHTML);
+        updateWordCounter(type);
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Format Dirapikan',
+            text: 'Gaya inline dan atribut berlebih berhasil dibersihkan.',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
+
     // Open Unified Edit Modal
     function openEditModal(id) {
         const artikel = window.artikelDataMap[id];
@@ -535,8 +777,12 @@
             imgContainer.classList.add('d-none');
         }
 
+        // Initialize Summernote first if needed
+        initSummernoteArtikel('#summernote_deskripsi_edit');
+
         // Set Summernote content safely
         $('#summernote_deskripsi_edit').summernote('code', artikel.deskripsi || '');
+        updateWordCounter('edit');
 
         const modalEl = document.getElementById('modalEditArtikel');
         const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
@@ -577,41 +823,23 @@
 
     // Document Ready: Summernote & AJAX Live Search
     document.addEventListener("DOMContentLoaded", function() {
-        
-        // Common Summernote Config
-        const summernoteConfig = {
-            placeholder: 'Tuliskan isi atau deskripsi lengkap artikel di sini...',
-            tabsize: 2,
-            height: 250,
-            dialogsInBody: true,
-            toolbar: [
-                ['style', ['style']],
-                ['font', ['bold', 'italic', 'underline', 'clear']],
-                ['color', ['color']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['table', ['table']],
-                ['insert', ['link', 'picture', 'video', 'hr']],
-                ['view', ['fullscreen', 'codeview']]
-            ]
-        };
-
         // Initialize Summernote for Tambah
         $('#modalTambahArtikel').on('shown.bs.modal', function () {
-            if (!$('#summernote_deskripsi_tambah').next('.note-editor').length) {
-                $('#summernote_deskripsi_tambah').summernote(summernoteConfig);
-            }
+            initSummernoteArtikel('#summernote_deskripsi_tambah');
+            updateWordCounter('tambah');
         });
 
         // Initialize Summernote for Edit
         $('#modalEditArtikel').on('shown.bs.modal', function () {
-            if (!$('#summernote_deskripsi_edit').next('.note-editor').length) {
-                $('#summernote_deskripsi_edit').summernote(summernoteConfig);
-            }
+            initSummernoteArtikel('#summernote_deskripsi_edit');
+            updateWordCounter('edit');
         });
 
-        // Form Validation on Submit: Prevent empty Summernote
+        // Form Validation on Submit: Prevent empty Summernote and sync content
         document.getElementById('formTambahArtikel').addEventListener('submit', function(e) {
-            const content = $('#summernote_deskripsi_tambah').summernote('isEmpty');
+            const editor = $('#summernote_deskripsi_tambah');
+            editor.val(editor.summernote('code'));
+            const content = editor.summernote('isEmpty');
             if (content) {
                 e.preventDefault();
                 Swal.fire({
@@ -624,7 +852,9 @@
         });
 
         document.getElementById('formEditArtikel').addEventListener('submit', function(e) {
-            const content = $('#summernote_deskripsi_edit').summernote('isEmpty');
+            const editor = $('#summernote_deskripsi_edit');
+            editor.val(editor.summernote('code'));
+            const content = editor.summernote('isEmpty');
             if (content) {
                 e.preventDefault();
                 Swal.fire({

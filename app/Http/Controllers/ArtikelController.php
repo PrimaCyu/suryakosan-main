@@ -144,7 +144,7 @@ class ArtikelController extends Controller
             'title'     => strip_tags($request->title),
             'slug'      => $this->generateUniqueSlug($request->title),
             'image'     => $imagePath,
-            'deskripsi' => $request->deskripsi,
+            'deskripsi' => Artikel::sanitizeHtml($request->deskripsi),
             'view'      => 0,
         ]);
 
@@ -184,7 +184,7 @@ class ArtikelController extends Controller
             'title'     => strip_tags($request->title),
             'slug'      => $newSlug,
             'image'     => $imagePath,
-            'deskripsi' => $request->deskripsi,
+            'deskripsi' => Artikel::sanitizeHtml($request->deskripsi),
         ]);
 
         Cache::forget("artikel_detail_{$oldSlug}");
