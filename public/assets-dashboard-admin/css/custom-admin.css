@@ -1626,40 +1626,77 @@ p, span, label, input, select, textarea, td, th, .btn, .badge {
    -------------------------------------------------------------------------- */
 .kpi-stat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(1, 1fr);
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
+@media (min-width: 576px) {
+  .kpi-stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 992px) {
+  .kpi-stat-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 .kpi-stat-card {
-  background-color: var(--dash-card-bg);
-  border: 1px solid var(--dash-border);
+  background-color: var(--dash-card-bg, #ffffff);
+  border: 1px solid var(--dash-border, #e2e8f0);
   border-radius: 12px;
   padding: 1.15rem 1.25rem;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
   display: flex;
-  align-items: center;
-  gap: 1rem;
+  flex-direction: column;
+  justify-content: space-between;
   position: relative;
   overflow: hidden;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 124px;
 }
 
 .kpi-stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 6px 16px -2px rgba(0, 0, 0, 0.07);
   border-color: #cbd5e1;
 }
 
+/* Header Row: Label on Left, Icon on Right */
+.kpi-stat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.kpi-stat-label {
+  font-size: 0.725rem;
+  font-weight: 700;
+  color: var(--dash-text-muted, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0;
+  line-height: 1.25;
+}
+
 .kpi-stat-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.35rem;
+  font-size: 1.15rem;
   flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.kpi-stat-card:hover .kpi-stat-icon {
+  transform: scale(1.06);
 }
 
 .kpi-icon-primary {
@@ -1692,41 +1729,52 @@ p, span, label, input, select, textarea, td, th, .btn, .badge {
   border: 1px solid #e0e7ff;
 }
 
-.kpi-stat-content {
-  flex-grow: 1;
-  min-width: 0;
-}
-
-.kpi-stat-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--dash-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  margin-bottom: 0.25rem;
+.kpi-stat-body {
+  display: flex;
+  flex-direction: column;
 }
 
 .kpi-stat-value {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--dash-text-main);
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--dash-text-main, #0f172a);
   line-height: 1.15;
-  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.02em;
+}
+
+.kpi-stat-unit {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--dash-text-muted, #64748b);
+  letter-spacing: normal;
 }
 
 .kpi-stat-sub {
-  font-size: 0.775rem;
-  color: var(--dash-text-muted);
+  font-size: 0.765rem;
+  color: var(--dash-text-muted, #64748b);
   display: flex;
   align-items: center;
   gap: 0.35rem;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kpi-stat-sub i {
+  font-size: 0.8rem;
+  flex-shrink: 0;
 }
 
 .kpi-progress {
   height: 5px;
   border-radius: 999px;
   background-color: #e2e8f0;
-  margin-top: 0.45rem;
+  margin: 0.35rem 0;
   overflow: hidden;
 }
 
@@ -1734,6 +1782,13 @@ p, span, label, input, select, textarea, td, th, .btn, .badge {
   height: 100%;
   border-radius: 999px;
   transition: width 0.4s ease;
+}
+
+/* Horizontal card support for legacy views */
+.kpi-stat-card-row {
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 1rem !important;
 }
 
 /* Status Filter Pill Tabs */

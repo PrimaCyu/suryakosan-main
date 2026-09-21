@@ -22,12 +22,14 @@
         padding: 6px 10px !important;
     }
     .note-editable {
-        min-height: 420px !important;
+        min-height: 260px !important;
+        max-height: 440px !important;
+        overflow-y: auto !important;
         font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
         font-size: 0.95rem !important;
         line-height: 1.85 !important;
         color: #334155 !important;
-        padding: 20px 24px !important;
+        padding: 16px 20px !important;
     }
     .note-editable h1, .note-editable h2, .note-editable h3 {
         font-weight: 700;
@@ -106,66 +108,7 @@
     <div class="container-fluid">
         @include('backend.dashboard.kosan.kamar.partials.alerts')
 
-        <!-- KPI STATS METRICS ROW -->
-        <div class="kpi-stat-grid mb-4">
-            <!-- 1. Total Artikel -->
-            <div class="kpi-stat-card">
-                <div class="kpi-stat-icon kpi-icon-indigo">
-                    <i class="bi bi-journal-richtext"></i>
-                </div>
-                <div class="kpi-stat-content">
-                    <div class="kpi-stat-label">Total Artikel</div>
-                    <div class="kpi-stat-value">{{ number_format($kpiStats['total_artikels']) }} <span class="fs-7 fw-normal text-muted">Postingan</span></div>
-                    <div class="kpi-stat-sub">
-                        <i class="bi bi-check-circle-fill text-success"></i> Konten terpublikasi aktif
-                    </div>
-                </div>
-            </div>
 
-            <!-- 2. Total Views -->
-            <div class="kpi-stat-card">
-                <div class="kpi-stat-icon kpi-icon-success">
-                    <i class="bi bi-eye-fill"></i>
-                </div>
-                <div class="kpi-stat-content">
-                    <div class="kpi-stat-label">Total Tayangan</div>
-                    <div class="kpi-stat-value text-success">{{ number_format($kpiStats['total_views']) }} <span class="fs-7 fw-normal text-muted">Views</span></div>
-                    <div class="kpi-stat-sub">
-                        <span>Akumulasi seluruh pembaca</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. Rata-rata Views -->
-            <div class="kpi-stat-card">
-                <div class="kpi-stat-icon kpi-icon-primary">
-                    <i class="bi bi-bar-chart-fill"></i>
-                </div>
-                <div class="kpi-stat-content">
-                    <div class="kpi-stat-label">Rata-rata Tayangan</div>
-                    <div class="kpi-stat-value text-primary">{{ number_format($kpiStats['avg_views']) }} <span class="fs-7 fw-normal text-muted">/ artikel</span></div>
-                    <div class="kpi-stat-sub">
-                        <span>Tingkat keterbacaan artikel</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. Artikel Terpopuler -->
-            <div class="kpi-stat-card">
-                <div class="kpi-stat-icon kpi-icon-warning">
-                    <i class="bi bi-fire"></i>
-                </div>
-                <div class="kpi-stat-content">
-                    <div class="kpi-stat-label">Artikel Terpopuler</div>
-                    <div class="kpi-stat-value text-truncate" style="max-width: 200px; font-size: 1.15rem;" title="{{ $kpiStats['top_title'] }}">
-                        {{ $kpiStats['top_title'] }}
-                    </div>
-                    <div class="kpi-stat-sub text-warning fw-semibold">
-                        <i class="bi bi-trophy-fill me-1"></i> {{ number_format($kpiStats['top_views']) }} views
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- MAIN TABLE CARD -->
         <div class="card mb-4 border shadow-sm">
@@ -244,21 +187,16 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <div class="fw-bold text-body-emphasis mb-1" style="font-size: 0.92rem;">
+                                        <div class="fw-bold text-body-emphasis mb-0.5" style="font-size: 0.92rem;">
                                             {{ $item->title }}
                                         </div>
-                                        <div class="d-flex flex-wrap align-items-center gap-2">
-                                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle fs-8">
-                                                /news/detail/{{ $item->slug }}
-                                            </span>
-                                            <span class="badge bg-light text-muted border fs-8">
-                                                <i class="bi bi-clock me-1"></i>{{ $item->reading_time }}
-                                            </span>
+                                        <div class="text-muted fs-8">
+                                            <i class="bi bi-clock me-1"></i>{{ $item->reading_time }}
                                         </div>
                                     </td>
                                     <td class="text-center">
-                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1.5 fw-bold fs-8">
-                                            <i class="bi bi-eye-fill me-1"></i>{{ number_format($item->view) }}
+                                        <span class="text-muted fs-8">
+                                            <i class="bi bi-eye text-muted me-1"></i>{{ number_format($item->view) }}
                                         </span>
                                     </td>
                                     <td>
@@ -267,27 +205,30 @@
                                         </span>
                                     </td>
                                     <td class="text-center">
-                                        <div class="d-flex align-items-center justify-content-center gap-1.5">
+                                        <div class="d-inline-flex align-items-center gap-1.5">
+                                            <button
+                                                type="button"
+                                                class="btn btn-sm btn-outline-primary py-1 px-2.5 rounded-2"
+                                                style="font-size: 0.8rem;"
+                                                onclick="openEditModal({{ $item->id }})"
+                                                title="Edit Artikel"
+                                            >
+                                                <i class="bi bi-pencil me-1"></i>Edit
+                                            </button>
                                             <a
                                                 href="{{ route('news.detail', $item->slug) }}"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                class="btn btn-sm btn-outline-info py-1 px-2 rounded-2"
-                                                title="Lihat di Web Frontend"
+                                                class="btn btn-sm btn-light border py-1 px-2 rounded-2"
+                                                style="font-size: 0.8rem;"
+                                                title="Lihat di Web"
                                             >
-                                                <i class="bi bi-box-arrow-up-right"></i>
+                                                <i class="bi bi-box-arrow-up-right text-secondary"></i>
                                             </a>
                                             <button
                                                 type="button"
-                                                class="btn btn-sm btn-outline-primary py-1 px-2.5 rounded-2"
-                                                onclick="openEditModal({{ $item->id }})"
-                                                title="Edit Artikel"
-                                            >
-                                                <i class="bi bi-pencil-square me-1"></i>Edit
-                                            </button>
-                                            <button
-                                                type="button"
-                                                class="btn btn-sm btn-outline-danger py-1 px-2 rounded-2"
+                                                class="btn btn-sm btn-light border border-danger-subtle text-danger py-1 px-2 rounded-2"
+                                                style="font-size: 0.8rem;"
                                                 onclick="confirmDelete({{ $item->id }}, '{{ addslashes($item->title) }}')"
                                                 title="Hapus Artikel"
                                             >
@@ -331,7 +272,7 @@
 <!-- 1. MODAL TAMBAH ARTIKEL -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalTambahArtikel" tabindex="-1" aria-labelledby="modalTambahArtikelLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <form action="{{ route('admin.artikel.insert') }}" method="POST" enctype="multipart/form-data" id="formTambahArtikel" class="modal-content border-0 shadow-lg" style="border-radius: 14px;">
             @csrf
             <div class="modal-header border-bottom py-3 px-4 bg-body-tertiary">
@@ -383,14 +324,11 @@
                         </div>
                     </div>
 
-                    <!-- Tips Menulis Artikel -->
+                    <!-- Tips Menulis Artikel Singkat -->
                     <div class="col-12">
-                        <div class="alert alert-light border d-flex align-items-start gap-2.5 p-2.5 mb-0 rounded-3 text-secondary fs-8">
-                            <i class="bi bi-lightbulb-fill text-warning fs-6 mt-0.5 shrink-0"></i>
-                            <div>
-                                <strong class="text-dark">Tips Menulis Artikel Rapi & Menarik:</strong>
-                                Gunakan <strong>Heading 2 / 3</strong> untuk judul bab, <strong>Bullet/Numbered List</strong> untuk poin penting, dan tombol <strong>Fullscreen</strong> (<i class="bi bi-arrows-fullscreen"></i>) di pojok kanan toolbar untuk menulis naskah panjang tanpa gangguan.
-                            </div>
+                        <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light border text-secondary fs-8">
+                            <i class="bi bi-lightbulb-fill text-warning fs-7 shrink-0"></i>
+                            <span><strong>Tips:</strong> Gunakan <strong>H2 / H3</strong> untuk sub-bab, <strong>List</strong> untuk poin, dan icon <i class="bi bi-arrows-fullscreen"></i> (Fullscreen) di toolbar untuk mengetik leluasa.</span>
                         </div>
                     </div>
 
@@ -434,7 +372,7 @@
 <!-- 2. SINGLE UNIFIED MODAL EDIT ARTIKEL -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalEditArtikel" tabindex="-1" aria-labelledby="modalEditArtikelLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <form action="" method="POST" enctype="multipart/form-data" id="formEditArtikel" class="modal-content border-0 shadow-lg" style="border-radius: 14px;">
             @csrf
             @method('PUT')
@@ -486,14 +424,11 @@
                         </div>
                     </div>
 
-                    <!-- Tips Menulis Artikel -->
+                    <!-- Tips Menulis Artikel Singkat -->
                     <div class="col-12">
-                        <div class="alert alert-light border d-flex align-items-start gap-2.5 p-2.5 mb-0 rounded-3 text-secondary fs-8">
-                            <i class="bi bi-lightbulb-fill text-warning fs-6 mt-0.5 shrink-0"></i>
-                            <div>
-                                <strong class="text-dark">Tips Menulis Artikel Rapi & Menarik:</strong>
-                                Gunakan <strong>Heading 2 / 3</strong> untuk judul bab, <strong>Bullet/Numbered List</strong> untuk poin penting, dan tombol <strong>Fullscreen</strong> (<i class="bi bi-arrows-fullscreen"></i>) di pojok kanan toolbar untuk menulis naskah panjang tanpa gangguan.
-                            </div>
+                        <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light border text-secondary fs-8">
+                            <i class="bi bi-lightbulb-fill text-warning fs-7 shrink-0"></i>
+                            <span><strong>Tips:</strong> Gunakan <strong>H2 / H3</strong> untuk sub-bab, <strong>List</strong> untuk poin, dan icon <i class="bi bi-arrows-fullscreen"></i> (Fullscreen) di toolbar untuk mengetik leluasa.</span>
                         </div>
                     </div>
 
@@ -619,7 +554,7 @@
     const summernoteConfig = {
         placeholder: 'Tuliskan judul bab, paragraf, poin edukasi, atau panduan lengkap artikel di sini...',
         tabsize: 2,
-        minHeight: 420,
+        minHeight: 260,
         dialogsInBody: true,
         dialogsFade: true,
         toolbar: [
@@ -789,28 +724,40 @@
         modal.show();
     }
 
-    // SweetAlert2 Delete Confirmation
+    // SweetAlert2 Delete Confirmation with Fallback
     function confirmDelete(id, title) {
         const artikel = window.artikelDataMap[id];
         const deleteUrl = artikel ? artikel.delete_url : `{{ url('admin/artikel/delete') }}/${id}`;
 
-        Swal.fire({
-            title: 'Hapus Artikel Blog?',
-            html: `Apakah Anda yakin ingin menghapus artikel <strong>"${title}"</strong>?<br><small class="text-muted">Tindakan ini permanen dan akan menghapus gambar sampul dari server.</small>`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#b91c1c',
-            cancelButtonColor: '#64748b',
-            confirmButtonText: '<i class="bi bi-trash me-1"></i> Ya, Hapus',
-            cancelButtonText: 'Batal',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Hapus Artikel Blog?',
+                html: `Apakah Anda yakin ingin menghapus artikel <strong>"${title}"</strong>?<br><small class="text-muted">Tindakan ini permanen dan akan menghapus gambar sampul dari server.</small>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#b91c1c',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: '<i class="bi bi-trash me-1"></i> Ya, Hapus',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('formDeleteArtikel');
+                    if (form) {
+                        form.action = deleteUrl;
+                        form.submit();
+                    }
+                }
+            });
+        } else {
+            if (confirm(`Apakah Anda yakin ingin menghapus artikel "${title}"?`)) {
                 const form = document.getElementById('formDeleteArtikel');
-                form.action = deleteUrl;
-                form.submit();
+                if (form) {
+                    form.action = deleteUrl;
+                    form.submit();
+                }
             }
-        });
+        }
     }
 
     // Apply Sort Selection
@@ -945,21 +892,16 @@
                                     <td class="text-center fw-semibold text-muted">${index + 1}</td>
                                     <td class="text-center">${imageHtml}</td>
                                     <td>
-                                        <div class="fw-bold text-body-emphasis mb-1" style="font-size: 0.92rem;">
+                                        <div class="fw-bold text-body-emphasis mb-0.5" style="font-size: 0.92rem;">
                                             ${item.title}
                                         </div>
-                                        <div class="d-flex flex-wrap align-items-center gap-2">
-                                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle fs-8">
-                                                /news/detail/${item.slug || '-'}
-                                            </span>
-                                            <span class="badge bg-light text-muted border fs-8">
-                                                <i class="bi bi-clock me-1"></i>${item.reading_time || '1 mnt baca'}
-                                            </span>
+                                        <div class="text-muted fs-8">
+                                            <i class="bi bi-clock me-1"></i>${item.reading_time || '1 mnt baca'}
                                         </div>
                                     </td>
                                     <td class="text-center">
-                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1.5 fw-bold fs-8">
-                                            <i class="bi bi-eye-fill me-1"></i>${Number(item.view || 0).toLocaleString('id-ID')}
+                                        <span class="text-muted fs-8">
+                                            <i class="bi bi-eye text-muted me-1"></i>${Number(item.view || 0).toLocaleString('id-ID')}
                                         </span>
                                     </td>
                                     <td>
@@ -968,27 +910,30 @@
                                         </span>
                                     </td>
                                     <td class="text-center">
-                                        <div class="d-flex align-items-center justify-content-center gap-1.5">
+                                        <div class="d-inline-flex align-items-center gap-1.5">
+                                            <button
+                                                type="button"
+                                                class="btn btn-sm btn-outline-primary py-1 px-2.5 rounded-2"
+                                                style="font-size: 0.8rem;"
+                                                onclick="openEditModal(${item.id})"
+                                                title="Edit Artikel"
+                                            >
+                                                <i class="bi bi-pencil me-1"></i>Edit
+                                            </button>
                                             <a
                                                 href="${item.detail_url}"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                class="btn btn-sm btn-outline-info py-1 px-2 rounded-2"
-                                                title="Lihat di Web Frontend"
+                                                class="btn btn-sm btn-light border py-1 px-2 rounded-2"
+                                                style="font-size: 0.8rem;"
+                                                title="Lihat di Web"
                                             >
-                                                <i class="bi bi-box-arrow-up-right"></i>
+                                                <i class="bi bi-box-arrow-up-right text-secondary"></i>
                                             </a>
                                             <button
                                                 type="button"
-                                                class="btn btn-sm btn-outline-primary py-1 px-2.5 rounded-2"
-                                                onclick="openEditModal(${item.id})"
-                                                title="Edit Artikel"
-                                            >
-                                                <i class="bi bi-pencil-square me-1"></i>Edit
-                                            </button>
-                                            <button
-                                                type="button"
-                                                class="btn btn-sm btn-outline-danger py-1 px-2 rounded-2"
+                                                class="btn btn-sm btn-light border border-danger-subtle text-danger py-1 px-2 rounded-2"
+                                                style="font-size: 0.8rem;"
                                                 onclick="confirmDelete(${item.id}, '${escapedTitle}')"
                                                 title="Hapus Artikel"
                                             >

@@ -1,40 +1,35 @@
 <!doctype html>
-<html lang="id">
+<html lang="id" data-bs-theme="light">
   <!--begin::Head-->
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Sinar Citra Lestari | Admin Dashboard</title>
 
-    <!--begin::Theme Init (prevents flash of incorrect theme on load)-->
     <script>
       (() => {
         'use strict';
-        const STORAGE_KEY = 'lte-theme';
-        let stored = null;
+        // Kunci preferensi lte-theme selalu 'light' agar AdminLTE internal tidak membaca preferensi dark OS
         try {
-          stored = localStorage.getItem(STORAGE_KEY);
+          localStorage.setItem('lte-theme', 'light');
         } catch {}
-        const prefersDark = globalThis.matchMedia('(prefers-color-scheme: dark)').matches;
-        let resolved = 'light';
-        if (stored === 'dark') {
-          resolved = 'dark';
-        } else if (stored === 'light') {
-          resolved = 'light';
-        } else {
-          // 'auto' or not set: follows OS preferences
-          resolved = prefersDark ? 'dark' : 'light';
-        }
-        document.documentElement.setAttribute('data-bs-theme', resolved);
-        document.documentElement.style.colorScheme = resolved;
+        document.documentElement.setAttribute('data-bs-theme', 'light');
+        document.documentElement.style.colorScheme = 'light';
+
+        // Cegah script eksternal atau AdminLTE mengubah data-bs-theme ke dark
+        const observer = new MutationObserver(() => {
+          if (document.documentElement.getAttribute('data-bs-theme') !== 'light') {
+            document.documentElement.setAttribute('data-bs-theme', 'light');
+            document.documentElement.style.colorScheme = 'light';
+          }
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-bs-theme'] });
       })();
     </script>
-    <!--end::Theme Init-->
 
     <link rel="icon" href="{{ asset('logo.png') }}?v={{ @filemtime(public_path('logo.png')) ?: '4' }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-    <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" content="#4f46e5" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#ffffff" />
 
     <!--begin::Google Fonts (Plus Jakarta Sans)-->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -258,66 +253,6 @@
               </a>
             </li>
             <!--end::Fullscreen Toggle-->
-
-            <!--begin::Color Mode Toggle-->
-            <li class="nav-item dropdown">
-              <a
-                class="nav-action-btn"
-                href="#"
-                id="bd-theme"
-                aria-label="Toggle color scheme"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-                title="Ganti Tema (Terang / Gelap)"
-              >
-                <i class="bi bi-sun-fill fs-7" data-lte-theme-icon="light"></i>
-                <i class="bi bi-moon-fill fs-7 d-none" data-lte-theme-icon="dark"></i>
-                <i class="bi bi-circle-half fs-7 d-none" data-lte-theme-icon="auto"></i>
-              </a>
-              <ul
-                class="dropdown-menu dropdown-menu-end shadow-sm border-0"
-                aria-labelledby="bd-theme"
-                style="--bs-dropdown-min-width: 8.5rem; border-radius: 12px;"
-              >
-                <li>
-                  <button
-                    type="button"
-                    class="dropdown-item d-flex align-items-center gap-2 py-2"
-                    data-bs-theme-value="light"
-                    aria-pressed="false"
-                  >
-                    <i class="bi bi-sun-fill text-warning"></i>
-                    Terang (Light)
-                    <i class="bi bi-check-lg ms-auto d-none text-primary"></i>
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    class="dropdown-item d-flex align-items-center gap-2 py-2"
-                    data-bs-theme-value="dark"
-                    aria-pressed="false"
-                  >
-                    <i class="bi bi-moon-fill text-info"></i>
-                    Gelap (Dark)
-                    <i class="bi bi-check-lg ms-auto d-none text-primary"></i>
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    class="dropdown-item d-flex align-items-center gap-2 py-2 active"
-                    data-bs-theme-value="auto"
-                    aria-pressed="true"
-                  >
-                    <i class="bi bi-circle-half text-secondary"></i>
-                    Otomatis (Sistem)
-                    <i class="bi bi-check-lg ms-auto d-none text-primary"></i>
-                  </button>
-                </li>
-              </ul>
-            </li>
-            <!--end::Color Mode Toggle-->
 
             <!--begin::User Menu Dropdown-->
             <li class="nav-item dropdown user-menu ms-1">
@@ -545,6 +480,10 @@
     <!--begin::Required Plugin(AdminLTE)-->
     <script src="{{ asset('assets-dashboard-admin/js/adminlte.js') }}"></script>
 
+    <!--begin::SweetAlert2-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!--end::SweetAlert2-->
+
     <!--begin::OverlayScrollbars Configure-->
     <script>
       const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
@@ -636,76 +575,7 @@
       });
     </script>
 
-    <!-- Theme Switcher Synchronizer (Light, Dark, Auto) -->
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const STORAGE_KEY = 'lte-theme';
-        const themeToggles = document.querySelectorAll('[data-bs-theme-value]');
-        const themeIcons = document.querySelectorAll('[data-lte-theme-icon]');
-
-        const getStoredTheme = () => {
-          try {
-            return localStorage.getItem(STORAGE_KEY) || 'auto';
-          } catch {
-            return 'auto';
-          }
-        };
-
-        const prefersDark = () => globalThis.matchMedia('(prefers-color-scheme: dark)').matches;
-
-        const updateThemeUI = (theme) => {
-          const resolved = (theme === 'auto') ? (prefersDark() ? 'dark' : 'light') : theme;
-          
-          // Apply attribute & style
-          document.documentElement.setAttribute('data-bs-theme', resolved);
-          document.documentElement.style.colorScheme = resolved;
-          window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme, resolved } }));
-
-          // Update checkmarks in dropdown
-          themeToggles.forEach(btn => {
-            const val = btn.getAttribute('data-bs-theme-value');
-            const isActive = (val === theme);
-            btn.classList.toggle('active', isActive);
-            btn.setAttribute('aria-pressed', String(isActive));
-            const check = btn.querySelector('.bi-check-lg');
-            if (check) {
-              check.classList.toggle('d-none', !isActive);
-            }
-          });
-
-          // Update active icon on main trigger button
-          themeIcons.forEach(icon => {
-            const iconTheme = icon.dataset.lteThemeIcon;
-            icon.classList.toggle('d-none', iconTheme !== theme);
-          });
-        };
-
-        // Initialize state on page load
-        const initialTheme = getStoredTheme();
-        updateThemeUI(initialTheme);
-
-        // Click listeners for dropdown items
-        themeToggles.forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const selected = btn.getAttribute('data-bs-theme-value');
-            if (selected) {
-              try {
-                localStorage.setItem(STORAGE_KEY, selected);
-              } catch {}
-              updateThemeUI(selected);
-            }
-          });
-        });
-
-        // Dynamic listener for OS preference changes when 'auto' is active
-        globalThis.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-          if (getStoredTheme() === 'auto') {
-            updateThemeUI('auto');
-          }
-        });
-      });
-
       // Quick Search Palette Modal (Ctrl+K or Cmd+K)
       document.addEventListener('DOMContentLoaded', () => {
         const searchModalEl = document.getElementById('globalSearchModal');

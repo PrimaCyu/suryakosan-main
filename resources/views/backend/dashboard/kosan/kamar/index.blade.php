@@ -29,61 +29,6 @@
 
         @include('backend.dashboard.kosan.kamar.partials.alerts')
 
-        <!-- KPI METRICS RINGKASAN OKUPANSI KAMAR KOSAN -->
-        @if(isset($kpiStats))
-        <div class="kpi-stat-grid mb-4">
-            <!-- 1. Total Unit Kamar -->
-            <div class="kpi-stat-card">
-                <div class="kpi-stat-icon kpi-icon-primary">
-                    <i class="bi bi-door-closed"></i>
-                </div>
-                <div class="kpi-stat-info">
-                    <div class="kpi-stat-value">{{ $kpiStats['total_kamar'] }} <span class="fs-8 fw-normal text-muted">Unit</span></div>
-                    <div class="kpi-stat-label">Total Unit Kamar</div>
-                    <div class="kpi-stat-sub">Kapasitas tercatat di properti ini</div>
-                </div>
-            </div>
-
-            <!-- 2. Kamar Terisi -->
-            <div class="kpi-stat-card">
-                <div class="kpi-stat-icon kpi-icon-success">
-                    <i class="bi bi-person-check-fill"></i>
-                </div>
-                <div class="kpi-stat-info">
-                    <div class="kpi-stat-value text-success">{{ $kpiStats['terisi_kamar'] }} <span class="fs-8 fw-normal text-muted">Unit</span></div>
-                    <div class="kpi-stat-label">Kamar Terisi</div>
-                    <div class="kpi-stat-sub">Penyewa aktif terverifikasi</div>
-                </div>
-            </div>
-
-            <!-- 3. Kamar Kosong / Siap Huni -->
-            <div class="kpi-stat-card">
-                <div class="kpi-stat-icon kpi-icon-danger">
-                    <i class="bi bi-key-fill"></i>
-                </div>
-                <div class="kpi-stat-info">
-                    <div class="kpi-stat-value text-danger">{{ $kpiStats['kosong_kamar'] }} <span class="fs-8 fw-normal text-muted">Unit</span></div>
-                    <div class="kpi-stat-label">Kamar Kosong / Siap Huni</div>
-                    <div class="kpi-stat-sub">Siap disewakan ke penghuni baru</div>
-                </div>
-            </div>
-
-            <!-- 4. Okupansi Rate -->
-            <div class="kpi-stat-card">
-                <div class="kpi-stat-icon kpi-icon-indigo">
-                    <i class="bi bi-pie-chart-fill"></i>
-                </div>
-                <div class="kpi-stat-info">
-                    <div class="kpi-stat-value">{{ $kpiStats['occupancy_rate'] }}%</div>
-                    <div class="kpi-stat-label">Tingkat Okupansi</div>
-                    <div class="kpi-progress">
-                        <div class="kpi-progress-bar bg-success" role="progressbar" style="width: {{ $kpiStats['occupancy_rate'] }}%" aria-valuenow="{{ $kpiStats['occupancy_rate'] }}" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        @endif
-
         <!-- FILTER STATUS KAMAR TABS -->
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
             <div class="status-filter-nav">
@@ -141,7 +86,7 @@
                                 <th class="text-center text-nowrap" style="width: 95px">Status</th>
                                 <th class="text-nowrap" style="min-width: 140px">Penghuni & Tempo</th>
                                 <th class="text-nowrap" style="min-width: 130px">Views & Fasilitas</th>
-                                <th style="width: 215px" class="text-center text-nowrap">Aksi</th>
+                                <th style="width: 140px" class="text-center text-nowrap">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="kamar-tbody">
@@ -241,78 +186,68 @@
                                         @endif
                                     </td>
                                     <td class="text-nowrap">
-                                        <div class="d-flex align-items-center gap-1 text-nowrap">
-                                            <span class="badge badge-subtle-secondary fs-8 py-1" title="Dilihat {{ number_format($item->views ?? 0) }} kali">
-                                                <i class="bi bi-eye me-1"></i>{{ number_format($item->views ?? 0) }}
-                                            </span>
+                                        <div class="fs-8">
+                                            <div class="text-muted d-flex align-items-center gap-1">
+                                                <i class="bi bi-eye"></i> {{ number_format($item->views ?? 0) }} views
+                                            </div>
                                             @if($item->fasilitas)
                                                 @php
                                                     $fasKamarArr = array_filter(array_map('trim', explode(',', $item->fasilitas)));
                                                 @endphp
-                                                @foreach(array_slice($fasKamarArr, 0, 1) as $fk)
-                                                    <span class="badge badge-subtle-info fs-8 py-1">{{ $fk }}</span>
-                                                @endforeach
-                                                @if(count($fasKamarArr) > 1)
-                                                    <span class="badge badge-subtle-secondary fs-8 py-1" title="{{ implode(', ', array_slice($fasKamarArr, 1)) }}">+{{ count($fasKamarArr) - 1 }}</span>
+                                                @if(!empty($fasKamarArr))
+                                                    <div class="text-secondary text-truncate mt-0.5" style="max-width: 150px;" title="{{ implode(', ', $fasKamarArr) }}">
+                                                        {{ implode(', ', array_slice($fasKamarArr, 0, 2)) }}{{ count($fasKamarArr) > 2 ? '...' : '' }}
+                                                    </div>
                                                 @endif
                                             @endif
                                         </div>
                                     </td>
                                     <td class="text-center text-nowrap">
-                                        <div class="table-action-compact justify-content-center">
+                                        <div class="d-inline-flex align-items-center gap-1.5">
                                             <!-- Edit Quick Button -->
                                             <button type="button"
-                                                    class="btn-action-icon act-edit"
+                                                    class="btn btn-sm btn-outline-primary py-1 px-2.5 rounded-2"
+                                                    style="font-size: 0.8rem;"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#modalEditKamar{{ $item->id }}"
                                                     title="Edit Data Kamar">
-                                                <i class="bi bi-pencil-square"></i>
+                                                <i class="bi bi-pencil me-1"></i>Edit
                                             </button>
 
-                                            <!-- Tarif Sewa Quick Button -->
-                                            <button type="button"
-                                                    class="btn-action-icon act-price"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#modalPriceKamar{{ $item->id }}"
-                                                    title="Atur Tarif Sewa">
-                                                <i class="bi bi-cash-stack"></i>
-                                            </button>
-
-                                            <!-- Galeri Foto Quick Button -->
-                                            <button type="button"
-                                                    class="btn-action-icon act-gallery"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#modalImageKamar{{ $item->id }}"
-                                                    title="Kelola Galeri Foto">
-                                                <i class="bi bi-images"></i>
-                                            </button>
-
-                                            <!-- Riwayat Penghuni Quick Button -->
-                                            <button type="button"
-                                                    class="btn-action-icon act-tenant"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#modalTamuKamar{{ $item->id }}"
-                                                    title="Riwayat Penghuni">
-                                                <i class="bi bi-people"></i>
-                                            </button>
-
-                                            <!-- Buka di Web Quick Button -->
-                                            <a href="{{ route('kamar.detail', $item->id) }}"
-                                               target="_blank"
-                                               rel="noopener noreferrer"
-                                               class="btn-action-icon act-web"
-                                               title="Buka Halaman Publik">
-                                                <i class="bi bi-box-arrow-up-right"></i>
-                                            </a>
-
-                                            <!-- Hapus Unit Kamar -->
-                                            <button type="button"
-                                                    class="btn-action-icon act-delete"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#modalDeleteKamar{{ $item->id }}"
-                                                    title="Hapus Unit Kamar">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
+                                            <!-- Dropdown Menu Opsi -->
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-light border py-1 px-2 rounded-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Menu Opsi">
+                                                    <i class="bi bi-three-dots-vertical text-secondary"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 fs-8" style="border-radius: 10px; min-width: 170px;">
+                                                    <li>
+                                                        <button type="button" class="dropdown-item py-1.5 d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalPriceKamar{{ $item->id }}">
+                                                            <i class="bi bi-cash-stack text-secondary"></i> Tarif Sewa
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button type="button" class="dropdown-item py-1.5 d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalImageKamar{{ $item->id }}">
+                                                            <i class="bi bi-images text-secondary"></i> Galeri Foto
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button type="button" class="dropdown-item py-1.5 d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalTamuKamar{{ $item->id }}">
+                                                            <i class="bi bi-people text-secondary"></i> Riwayat Penghuni
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ route('kamar.detail', $item->id) }}" target="_blank" rel="noopener noreferrer" class="dropdown-item py-1.5 d-flex align-items-center gap-2">
+                                                            <i class="bi bi-box-arrow-up-right text-secondary"></i> Lihat di Web
+                                                        </a>
+                                                    </li>
+                                                    <li><hr class="dropdown-divider my-1"></li>
+                                                    <li>
+                                                        <button type="button" class="dropdown-item py-1.5 d-flex align-items-center gap-2 text-danger" data-bs-toggle="modal" data-bs-target="#modalDeleteKamar{{ $item->id }}">
+                                                            <i class="bi bi-trash"></i> Hapus Kamar
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
@@ -659,9 +594,9 @@
                                 if (item.fasilitas) {
                                     const fasArr = item.fasilitas.split(',').map(s => s.trim()).filter(Boolean);
                                     if (fasArr.length > 0) {
-                                        const slice = fasArr.slice(0, 1).map(f => `<span class="badge badge-subtle-info fs-8 py-1">${f}</span>`).join('');
-                                        const more = fasArr.length > 1 ? `<span class="badge badge-subtle-secondary fs-8 py-1">+${fasArr.length - 1}</span>` : '';
-                                        fasHtml = `${slice}${more}`;
+                                        const previewFas = fasArr.slice(0, 2).join(', ');
+                                        const moreFas = fasArr.length > 2 ? '...' : '';
+                                        fasHtml = `<div class="text-secondary text-truncate mt-0.5" style="max-width: 150px;" title="${item.fasilitas}">${previewFas}${moreFas}</div>`;
                                     }
                                 }
 
@@ -682,31 +617,56 @@
                                     <td class="text-center text-nowrap">${statusHtml}</td>
                                     <td>${tenantHtml}</td>
                                     <td class="text-nowrap">
-                                        <div class="d-flex align-items-center gap-1 text-nowrap">
-                                            <span class="badge badge-subtle-secondary fs-8 py-1"><i class="bi bi-eye me-1"></i>${viewsCount}</span>
+                                        <div class="fs-8">
+                                            <div class="text-muted d-flex align-items-center gap-1">
+                                                <i class="bi bi-eye"></i> ${viewsCount} views
+                                            </div>
                                             ${fasHtml}
                                         </div>
                                     </td>
                                     <td class="text-center text-nowrap">
-                                        <div class="table-action-compact justify-content-center">
-                                            <button type="button" class="btn-action-icon act-edit" data-bs-toggle="modal" data-bs-target="#modalEditKamar${item.id}" title="Edit Data Kamar">
-                                                <i class="bi bi-pencil-square"></i>
+                                        <div class="d-inline-flex align-items-center gap-1.5">
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-primary py-1 px-2.5 rounded-2"
+                                                    style="font-size: 0.8rem;"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalEditKamar${item.id}"
+                                                    title="Edit Data Kamar">
+                                                <i class="bi bi-pencil me-1"></i>Edit
                                             </button>
-                                            <button type="button" class="btn-action-icon act-price" data-bs-toggle="modal" data-bs-target="#modalPriceKamar${item.id}" title="Atur Tarif Sewa">
-                                                <i class="bi bi-cash-stack"></i>
-                                            </button>
-                                            <button type="button" class="btn-action-icon act-gallery" data-bs-toggle="modal" data-bs-target="#modalImageKamar${item.id}" title="Kelola Galeri Foto">
-                                                <i class="bi bi-images"></i>
-                                            </button>
-                                            <button type="button" class="btn-action-icon act-tenant" data-bs-toggle="modal" data-bs-target="#modalTamuKamar${item.id}" title="Riwayat Penghuni">
-                                                <i class="bi bi-people"></i>
-                                            </button>
-                                            <a href="/admin/product-kosan/kamar/${item.id}/detail" target="_blank" class="btn-action-icon act-web" title="Buka Halaman Publik">
-                                                <i class="bi bi-box-arrow-up-right"></i>
-                                            </a>
-                                            <button type="button" class="btn-action-icon act-delete" data-bs-toggle="modal" data-bs-target="#modalDeleteKamar${item.id}" title="Hapus Unit Kamar">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-light border py-1 px-2 rounded-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Menu Opsi">
+                                                    <i class="bi bi-three-dots-vertical text-secondary"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 fs-8" style="border-radius: 10px; min-width: 170px;">
+                                                    <li>
+                                                        <button type="button" class="dropdown-item py-1.5 d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalPriceKamar${item.id}">
+                                                            <i class="bi bi-cash-stack text-secondary"></i> Tarif Sewa
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button type="button" class="dropdown-item py-1.5 d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalImageKamar${item.id}">
+                                                            <i class="bi bi-images text-secondary"></i> Galeri Foto
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button type="button" class="dropdown-item py-1.5 d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalTamuKamar${item.id}">
+                                                            <i class="bi bi-people text-secondary"></i> Riwayat Penghuni
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <a href="/kamar/detail/${item.id}" target="_blank" rel="noopener noreferrer" class="dropdown-item py-1.5 d-flex align-items-center gap-2">
+                                                            <i class="bi bi-box-arrow-up-right text-secondary"></i> Lihat di Web
+                                                        </a>
+                                                    </li>
+                                                    <li><hr class="dropdown-divider my-1"></li>
+                                                    <li>
+                                                        <button type="button" class="dropdown-item py-1.5 d-flex align-items-center gap-2 text-danger" data-bs-toggle="modal" data-bs-target="#modalDeleteKamar${item.id}">
+                                                            <i class="bi bi-trash"></i> Hapus Kamar
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </div>
                                     </td>
                                 `;

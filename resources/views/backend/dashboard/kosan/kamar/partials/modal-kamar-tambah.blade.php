@@ -2,27 +2,27 @@
 <div class="modal fade" id="modalTambahKamar" tabindex="-1" aria-labelledby="modalTambahKamarLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header pb-2 border-bottom">
+            <div class="modal-header border-bottom py-3">
                 <div>
                     <h5 class="modal-title fw-bold fs-6" id="modalTambahKamarLabel">
-                        <i class="bi bi-door-open-fill text-primary me-2"></i> Tambah Kamar Baru: {{ $kosan->title }}
+                        <i class="bi bi-door-open text-primary me-2"></i>Tambah Kamar: {{ $kosan->title }}
                     </h5>
-                    <p class="text-muted fs-8 mb-0">Lengkapi data unit kamar, tarif sewa, dan foto utama secara langsung.</p>
+                    <p class="text-muted fs-8 mb-0">Lengkapi informasi tipe unit, tarif sewa, foto, dan fasilitas kamar.</p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
 
             <!-- Tab Switcher: Form Terpadu vs Input Massal -->
-            <div class="px-4 pt-3 bg-body-tertiary border-bottom">
+            <div class="px-4 pt-3 bg-light border-bottom">
                 <ul class="nav nav-pills nav-fill gap-2" id="kamarAddTab" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active py-2 fs-7 fw-semibold" id="tab-single-kamar" data-bs-toggle="pill" data-bs-target="#panel-single-kamar" type="button" role="tab" aria-selected="true">
-                            <i class="bi bi-lightning-charge-fill me-1 text-warning"></i> Form Terpadu (Rekomendasi)
+                            <i class="bi bi-door-open me-1 text-primary"></i> Input Satuan (Lengkap)
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link py-2 fs-7 fw-semibold text-muted" id="tab-bulk-kamar" data-bs-toggle="pill" data-bs-target="#panel-bulk-kamar" type="button" role="tab" aria-selected="false">
-                            <i class="bi bi-collection-fill me-1"></i> Input Cepat Massal (Batch)
+                            <i class="bi bi-collection me-1"></i> Input Massal (Banyak Unit)
                         </button>
                     </li>
                 </ul>
@@ -36,10 +36,9 @@
                         <div class="modal-body p-4" style="max-height: 65vh; overflow-y: auto;">
                             <!-- Bagian 1: Identitas Unit -->
                             <div class="mb-4">
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1 fs-8">1</span>
-                                    <h6 class="fw-bold mb-0 fs-7">Identitas & Nama Kamar</h6>
-                                </div>
+                                <h6 class="fw-bold mb-3 fs-7 text-dark">
+                                    <i class="bi bi-info-circle text-primary me-1.5"></i> Identitas & Nama Kamar
+                                </h6>
                                 <div class="row g-3">
                                     <div class="col-md-7">
                                         <label class="form-label fs-8 fw-semibold mb-1">Nama / Tipe / Nomor Kamar <span class="text-danger">*</span></label>
@@ -61,39 +60,27 @@
 
                             <hr class="my-3 opacity-25">
 
-                            <!-- Bagian 2: Tarif Sewa Langsung (Solusi Alur Fragmented) -->
+                            <!-- Bagian 2: Tarif Sewa Langsung -->
                             <div class="mb-4">
-                                <div class="d-flex align-items-center justify-content-between mb-2">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1 fs-8">2</span>
-                                        <h6 class="fw-bold mb-0 fs-7">Tarif Sewa (Langsung Aktif)</h6>
-                                    </div>
-                                    <span class="text-success fs-8 fw-medium"><i class="bi bi-check2-all me-1"></i>Otomatis masuk sistem</span>
-                                </div>
+                                <h6 class="fw-bold mb-3 fs-7 text-dark">
+                                    <i class="bi bi-cash-stack text-success me-1.5"></i> Tarif Sewa Kamar
+                                </h6>
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <div class="card border border-success-subtle bg-success-subtle bg-opacity-10 p-3 h-100 rounded-3">
-                                            <label class="form-label fs-8 fw-bold mb-1 text-success">
-                                                <i class="bi bi-calendar-month me-1"></i>Tarif Sewa Bulanan (Rp)
-                                            </label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-transparent border-success-subtle text-muted fs-8">Rp</span>
-                                                <input type="number" name="price_bulan" class="form-control border-success-subtle fw-semibold" placeholder="Contoh: 1500000" min="0" step="50000">
-                                            </div>
-                                            <div class="form-text fs-8 text-muted mt-1">Tarif dasar per bulan yang paling umum dicari penyewa.</div>
+                                        <label class="form-label fs-8 fw-semibold mb-1">Tarif Bulanan (Rp) <span class="text-muted fw-normal">(Utama)</span></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light text-muted fs-8">Rp</span>
+                                            <input type="number" name="price_bulan" class="form-control fw-semibold" placeholder="Contoh: 1500000" min="0" step="50000">
                                         </div>
+                                        <div class="form-text fs-8 text-muted">Tarif dasar per bulan yang paling umum dicari.</div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="card border p-3 h-100 rounded-3">
-                                            <label class="form-label fs-8 fw-semibold mb-1">
-                                                <i class="bi bi-calendar-event me-1"></i>Tarif Sewa Tahunan (Rp) <span class="badge badge-subtle-secondary fs-8 ms-1">Opsional</span>
-                                            </label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-transparent text-muted fs-8">Rp</span>
-                                                <input type="number" name="price_tahun" class="form-control" placeholder="Contoh: 16500000" min="0" step="100000">
-                                            </div>
-                                            <div class="form-text fs-8 text-muted mt-1">Dapat dikosongkan jika belum tersedia paket tahunan.</div>
+                                        <label class="form-label fs-8 fw-semibold mb-1">Tarif Tahunan (Rp) <span class="text-muted fw-normal">(Opsional)</span></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light text-muted fs-8">Rp</span>
+                                            <input type="number" name="price_tahun" class="form-control" placeholder="Contoh: 16500000" min="0" step="100000">
                                         </div>
+                                        <div class="form-text fs-8 text-muted">Dapat dikosongkan jika belum ada paket tahunan.</div>
                                     </div>
                                 </div>
                             </div>
@@ -103,19 +90,17 @@
                             <!-- Bagian 3: Foto Kamar (Multi-Image Upload & Preview) -->
                             <div class="mb-4">
                                 <div class="d-flex align-items-center justify-content-between mb-2">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="badge bg-warning-subtle text-warning rounded-pill px-2 py-1 fs-8">3</span>
-                                        <h6 class="fw-bold mb-0 fs-7">Koleksi Foto Kamar</h6>
-                                        <span class="badge bg-primary-subtle text-primary fs-8">Multi-Foto</span>
-                                    </div>
-                                    <span class="text-muted fs-8">Bisa pilih banyak foto (JPG, PNG, WEBP, Maks 5MB)</span>
+                                    <h6 class="fw-bold mb-0 fs-7 text-dark">
+                                        <i class="bi bi-images text-primary me-1.5"></i> Foto Kamar
+                                    </h6>
+                                    <span class="text-muted fs-8">JPG, PNG, WEBP (Bisa pilih banyak)</span>
                                 </div>
                                 <div class="multi-image-dropzone" id="singleRoomDropzone">
                                     <input type="file" name="images[]" id="singleRoomImageInput" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" accept="image/*" multiple>
-                                    <div id="singleRoomPlaceholder">
-                                        <i class="bi bi-images display-6 text-primary mb-2 d-block opacity-75"></i>
-                                        <p class="fs-7 fw-semibold mb-1">Klik atau seret foto-foto unit kamar ke sini</p>
-                                        <p class="text-muted fs-8 mb-0">Pilih 1 atau lebih foto (sudut ruangan, kamar mandi, kasur, dll).</p>
+                                    <div id="singleRoomPlaceholder" class="text-center py-3">
+                                        <i class="bi bi-cloud-arrow-up text-secondary fs-3 mb-1 d-block opacity-75"></i>
+                                        <p class="fs-8 fw-semibold text-dark mb-0">Klik atau seret foto-foto unit kamar ke sini</p>
+                                        <p class="text-muted fs-8 mb-0">Pilih 1 atau lebih foto sudut ruangan, kamar mandi, kasur, dll.</p>
                                     </div>
                                     <div id="singleRoomPreviewWrap" class="d-none mt-2">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -123,7 +108,7 @@
                                                 <i class="bi bi-check2-circle text-success"></i> <span id="singleRoomFileName">0 Foto Dipilih</span>
                                             </span>
                                             <button type="button" class="btn btn-xs btn-outline-danger" id="btnCancelSingleImg">
-                                                <i class="bi bi-x-circle me-1"></i> Reset / Pilih Ulang
+                                                <i class="bi bi-x-circle me-1"></i> Reset Foto
                                             </button>
                                         </div>
                                         <div class="multi-image-grid" id="singleRoomImagesGrid"></div>
@@ -135,11 +120,10 @@
 
                             <!-- Bagian 4: Fasilitas Kamar -->
                             <div class="mb-4">
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <span class="badge bg-info-subtle text-info rounded-pill px-2 py-1 fs-8">4</span>
-                                    <h6 class="fw-bold mb-0 fs-7">Fasilitas Dalam Kamar</h6>
-                                </div>
-                                <div class="p-3 rounded-3 bg-body-tertiary border">
+                                <h6 class="fw-bold mb-3 fs-7 text-dark">
+                                    <i class="bi bi-check2-square text-info me-1.5"></i> Fasilitas Dalam Kamar
+                                </h6>
+                                <div class="p-3 rounded-2 bg-light border">
                                     @php
                                         $listFasilitasKamar = [
                                             'AC',
@@ -161,7 +145,7 @@
                                             <div class="col-md-4 col-6">
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="checkbox" name="fasilitas[]" value="{{ $fasName }}" id="fas_single_{{ $fasKey }}">
-                                                    <label class="form-check-label fs-8 user-select-none" for="fas_single_{{ $fasKey }}">
+                                                    <label class="form-check-label fs-8 user-select-none text-secondary" for="fas_single_{{ $fasKey }}">
                                                         {{ $fasName }}
                                                     </label>
                                                 </div>
@@ -173,27 +157,27 @@
 
                             <!-- Bagian 5: Deskripsi Spesifikasi Kamar -->
                             <div class="mb-2">
-                                <label class="form-label fs-8 fw-semibold mb-1">Deskripsi / Spesifikasi Tambahan</label>
-                                <textarea name="description" class="form-control" rows="3" placeholder="Contoh: Ukuran 3x4 meter, listrik token mandiri 900 watt, view menghadap taman..."></textarea>
+                                <label class="form-label fs-8 fw-semibold mb-1">Deskripsi / Catatan Tambahan <span class="text-muted fw-normal">(Opsional)</span></label>
+                                <textarea name="description" class="form-control" rows="2" placeholder="Contoh: Ukuran 3x4 meter, listrik token mandiri 900 watt, view menghadap taman..."></textarea>
                             </div>
                         </div>
 
-                        <div class="modal-footer bg-body-tertiary">
+                        <div class="modal-footer bg-light border-top py-2">
                             <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
                             <button type="submit" class="btn btn-sm btn-primary">
-                                <i class="bi bi-check2-circle me-1"></i> Simpan Unit Kamar Terpadu
+                                <i class="bi bi-check-lg me-1"></i> Simpan Unit Kamar
                             </button>
                         </div>
                     </form>
                 </div>
 
-                <!-- PANEL 2: LEGACY BULK BATCH KAMAR -->
+                <!-- PANEL 2: BULK BATCH KAMAR -->
                 <div class="tab-pane fade" id="panel-bulk-kamar" role="tabpanel" tabindex="0">
                     <form action="{{ route('admin.product.kosan.kamar.insert', $product_kosan) }}" method="POST" class="modal-content border-0">
                         @csrf
                         <div class="modal-body p-4" style="max-height: 65vh; overflow-y: auto;">
-                            <div class="alert alert-info py-2 px-3 fs-8 mb-3">
-                                <i class="bi bi-info-circle me-1"></i> Gunakan tab ini jika Anda ingin memasukkan banyak unit kamar sekaligus. Foto dan harga dapat diisi setelahnya melalui tombol aksi tabel.
+                            <div class="alert alert-light border py-2 px-3 fs-8 mb-3 text-muted">
+                                <i class="bi bi-info-circle me-1 text-primary"></i> Gunakan tab ini jika Anda ingin mendaftarkan banyak unit kamar sekaligus. Foto dan rincian harga dapat dilengkapi setelahnya.
                             </div>
 
                             <div id="kamarInputContainer">
@@ -214,13 +198,13 @@
                                         </div>
                                         <div class="col-12">
                                             <label class="form-label fs-8 fw-semibold mb-1">Fasilitas Kamar</label>
-                                            <div class="p-2 rounded bg-body-tertiary border">
+                                            <div class="p-2 rounded bg-light border">
                                                 <div class="row g-2">
                                                     @foreach($listFasilitasKamar as $fasKey => $fasName)
                                                         <div class="col-md-4 col-6">
                                                             <div class="form-check">
                                                                 <input class="form-check-input" type="checkbox" name="dataKamar[0][fasilitas][]" value="{{ $fasName }}" id="fasilitas_batch_0_{{ $fasKey }}">
-                                                                <label class="form-check-label fs-8" for="fasilitas_batch_0_{{ $fasKey }}">
+                                                                <label class="form-check-label fs-8 text-secondary" for="fasilitas_batch_0_{{ $fasKey }}">
                                                                     {{ $fasName }}
                                                                 </label>
                                                             </div>
@@ -231,7 +215,7 @@
                                         </div>
                                         <div class="col-12">
                                             <label class="form-label fs-8 fw-semibold mb-1">Deskripsi Singkat</label>
-                                            <textarea name="dataKamar[0][description]" class="form-control" rows="2" placeholder="Deskripsi kamar..."></textarea>
+                                            <textarea name="dataKamar[0][description]" class="form-control" rows="2" placeholder="Deskripsi singkat unit kamar..."></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -242,7 +226,7 @@
                             </button>
                         </div>
 
-                        <div class="modal-footer bg-body-tertiary">
+                        <div class="modal-footer bg-light border-top py-2">
                             <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
                             <button type="submit" class="btn btn-sm btn-primary">
                                 <i class="bi bi-save me-1"></i> Simpan Data Massal

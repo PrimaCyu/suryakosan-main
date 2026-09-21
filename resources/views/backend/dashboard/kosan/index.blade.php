@@ -29,70 +29,7 @@
     <div class="container-fluid">
         @include('backend.dashboard.kosan.kamar.partials.alerts')
 
-        <!-- KPI Metrics Okupansi Seluruh Properti -->
-        @if(isset($kpiStats))
-        <div class="kpi-stat-grid">
-            <!-- 1. Total Properti Kosan -->
-            <div class="kpi-stat-card">
-                <div class="kpi-stat-icon kpi-icon-indigo">
-                    <i class="bi bi-buildings-fill"></i>
-                </div>
-                <div class="kpi-stat-content">
-                    <div class="kpi-stat-label">Total Properti Kos</div>
-                    <div class="kpi-stat-value">{{ number_format($kpiStats['total_kosan']) }} <span class="fs-7 fw-normal text-muted">Cabang</span></div>
-                    <div class="kpi-stat-sub">
-                        <i class="bi bi-geo-alt-fill text-primary"></i> Seluruh unit terdaftar
-                    </div>
-                </div>
-            </div>
 
-            <!-- 2. Total Kapasitas Kamar -->
-            <div class="kpi-stat-card">
-                <div class="kpi-stat-icon kpi-icon-primary">
-                    <i class="bi bi-door-closed-fill"></i>
-                </div>
-                <div class="kpi-stat-content">
-                    <div class="kpi-stat-label">Total Kapasitas</div>
-                    <div class="kpi-stat-value">{{ number_format($kpiStats['total_capacity']) }} <span class="fs-7 fw-normal text-muted">Kamar</span></div>
-                    <div class="kpi-stat-sub">
-                        <i class="bi bi-layer-forward text-info"></i> Kapasitas seluruh cabang
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. Ketersediaan Kamar -->
-            <div class="kpi-stat-card">
-                <div class="kpi-stat-icon kpi-icon-success">
-                    <i class="bi bi-check-circle-fill"></i>
-                </div>
-                <div class="kpi-stat-content">
-                    <div class="kpi-stat-label">Kamar Kosong (Siap Huni)</div>
-                    <div class="kpi-stat-value text-success">{{ number_format($kpiStats['total_available']) }} <span class="fs-7 fw-normal text-muted">Unit</span></div>
-                    <div class="kpi-stat-sub">
-                        <span>{{ number_format($kpiStats['total_occupied']) }} Terisi saat ini</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. Rata-rata Okupansi -->
-            <div class="kpi-stat-card">
-                <div class="kpi-stat-icon {{ $kpiStats['occupancy_rate'] >= 75 ? 'kpi-icon-success' : ($kpiStats['occupancy_rate'] >= 50 ? 'kpi-icon-primary' : 'kpi-icon-warning') }}">
-                    <i class="bi bi-graph-up-arrow"></i>
-                </div>
-                <div class="kpi-stat-content">
-                    <div class="kpi-stat-label">Tingkat Okupansi</div>
-                    <div class="kpi-stat-value">{{ $kpiStats['occupancy_rate'] }}%</div>
-                    <div class="kpi-progress">
-                        <div class="kpi-progress-bar {{ $kpiStats['occupancy_rate'] >= 75 ? 'bg-success' : ($kpiStats['occupancy_rate'] >= 50 ? 'bg-primary' : 'bg-warning') }}"
-                             style="width: {{ min(100, $kpiStats['occupancy_rate']) }}%"></div>
-                    </div>
-                    <div class="kpi-stat-sub mt-1">
-                        <small>{{ $kpiStats['total_occupied'] }} dari {{ $kpiStats['total_capacity'] }} kamar tersewa</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-        @endif
 
         <div class="tab-content" id="kosanTabContent">
             <!-- Partial: Tab Data Kos-kosan -->
@@ -222,29 +159,29 @@
                                 const kamarRoute = `{{ url('admin/product-kosan') }}/${item.id}/kamar/index`;
 
                                 const wilayahBadge = item.wilayah
-                                    ? `<span class="badge badge-subtle-info"><i class="bi bi-geo-alt-fill me-1"></i>${item.wilayah}</span>`
+                                    ? `<div class="text-secondary fs-8"><i class="bi bi-geo-alt text-muted me-1"></i>${item.wilayah}</div>`
                                     : `<span class="text-muted fs-8">-</span>`;
 
                                 const fasilitasText = item.fasilitas
-                                    ? `<span class="badge badge-subtle-secondary fs-8">${item.fasilitas.length > 35 ? item.fasilitas.substring(0, 35) + '...' : item.fasilitas}</span>`
+                                    ? `<div class="text-muted fs-8 text-truncate" style="max-width: 220px;" title="${item.fasilitas}">${item.fasilitas}</div>`
                                     : `<span class="text-muted fs-8">-</span>`;
 
                                 const viewText = item.view
-                                    ? `<span class="badge badge-subtle-primary"><i class="bi bi-eye-fill me-1"></i>${item.view}</span>`
+                                    ? `<span class="text-muted fs-8"><i class="bi bi-eye text-muted me-1"></i>${item.view}</span>`
                                     : `<span class="text-muted fs-8">0</span>`;
 
                                 const kamarTersediaText = item.tersedia !== undefined && item.tersedia !== null
-                                    ? `<span class="badge badge-subtle-success"><i class="bi bi-door-closed me-1"></i>${item.tersedia} Unit</span>`
+                                    ? `<span class="text-muted fs-8">${item.tersedia} Unit</span>`
                                     : `<span class="text-muted fs-8">-</span>`;
 
                                 @if(Auth::user()->isSuperAdmin())
-                                const deleteBtnHtml = `
-                                    <button type="button" class="btn-action-icon act-delete" data-bs-toggle="modal" data-bs-target="#modalDelete${item.id}" title="Hapus Kosan">
+                                const deleteButtonHtml = `
+                                    <button type="button" class="btn btn-sm btn-light border border-danger-subtle py-1 px-2 rounded-2 text-danger" data-bs-toggle="modal" data-bs-target="#modalDelete${item.id}" title="Hapus Kosan">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 `;
                                 @else
-                                const deleteBtnHtml = '';
+                                const deleteButtonHtml = '';
                                 @endif
 
                                 const webUrl = `/kosan/${item.slug || ''}`;
@@ -262,24 +199,28 @@
                                     <td class="text-center">${viewText}</td>
                                     <td class="text-center">${kamarTersediaText}</td>
                                     <td class="text-center text-nowrap">
-                                        <div class="table-action-compact justify-content-center">
+                                        <div class="d-inline-flex align-items-center gap-1.5">
                                             <!-- Kamar Button -->
-                                            <a href="${kamarRoute}" class="btn btn-sm btn-primary" title="Kelola Unit Kamar">
-                                                <i class="bi bi-door-closed me-1"></i>Kamar
+                                            <a href="${kamarRoute}" class="btn btn-sm btn-outline-primary py-1 px-2.5 rounded-2" style="font-size: 0.8rem;" title="Kelola Unit Kamar">
+                                                <i class="bi bi-door-open me-1"></i>Kamar
                                             </a>
+
                                             <!-- Edit Button -->
-                                            <button type="button" class="btn-action-icon act-edit" data-bs-toggle="modal" data-bs-target="#modalEdit${item.id}" title="Edit Info Kosan">
-                                                <i class="bi bi-pencil-square"></i>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2.5 rounded-2" style="font-size: 0.8rem;" data-bs-toggle="modal" data-bs-target="#modalEdit${item.id}" title="Edit Info Kosan">
+                                                <i class="bi bi-pencil me-1"></i>Edit
                                             </button>
-                                            <!-- Galeri Button -->
-                                            <button type="button" class="btn-action-icon act-gallery" data-bs-toggle="modal" data-bs-target="#modalImageKosan${item.id}" title="Kelola Galeri Foto">
+
+                                            <!-- Galeri Foto Button -->
+                                            <button type="button" class="btn btn-sm btn-light border py-1 px-2 rounded-2 text-secondary" data-bs-toggle="modal" data-bs-target="#modalImageKosan${item.id}" title="Kelola Galeri Foto">
                                                 <i class="bi bi-images"></i>
                                             </button>
-                                            <!-- Web Button -->
-                                            <a href="${webUrl}" target="_blank" rel="noopener noreferrer" class="btn-action-icon act-web" title="Buka Halaman Publik">
+
+                                            <!-- Lihat di Web Button -->
+                                            <a href="${webUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-light border py-1 px-2 rounded-2 text-secondary" title="Lihat Halaman Web">
                                                 <i class="bi bi-box-arrow-up-right"></i>
                                             </a>
-                                            ${deleteBtnHtml}
+
+                                            ${deleteButtonHtml}
                                         </div>
                                     </td>
                                 `;

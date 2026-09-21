@@ -30,7 +30,7 @@
                             <th>Fasilitas Unggulan</th>
                             <th class="text-center">Views</th>
                             <th class="text-center">Kamar</th>
-                            <th class="text-center text-nowrap" style="width: 195px">Aksi</th>
+                            <th class="text-center text-nowrap" style="width: 240px">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="kosan-tbody">
@@ -43,33 +43,25 @@
                                 </td>
                                 <td>
                                     @if($item->wilayah)
-                                        <span class="badge badge-subtle-info">
-                                            <i class="bi bi-geo-alt-fill me-1"></i>{{ $item->wilayah }}
-                                        </span>
+                                        <div class="text-secondary fs-8">
+                                            <i class="bi bi-geo-alt text-muted me-1"></i>{{ $item->wilayah }}
+                                        </div>
                                     @else
                                         <span class="text-muted fs-8">-</span>
                                     @endif
                                 </td>
                                 <td>
                                     @if($item->fasilitas)
-                                        @php
-                                            $fasArr = array_filter(array_map('trim', explode(',', $item->fasilitas)));
-                                        @endphp
-                                        <div class="d-flex flex-wrap gap-1">
-                                            @foreach(array_slice($fasArr, 0, 2) as $f)
-                                                <span class="badge badge-subtle-secondary fs-8">{{ $f }}</span>
-                                            @endforeach
-                                            @if(count($fasArr) > 2)
-                                                <span class="badge badge-subtle-secondary fs-8 text-muted">+{{ count($fasArr) - 2 }}</span>
-                                            @endif
+                                        <div class="text-muted fs-8 text-truncate" style="max-width: 220px;" title="{{ $item->fasilitas }}">
+                                            {{ $item->fasilitas }}
                                         </div>
                                     @else
                                         <span class="text-muted fs-8">-</span>
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge badge-subtle-primary">
-                                        <i class="bi bi-eye-fill me-1"></i>{{ number_format($item->view ?? 0) }}
+                                    <span class="text-muted fs-8">
+                                        <i class="bi bi-eye text-muted me-1"></i>{{ number_format($item->view ?? 0) }}
                                     </span>
                                 </td>
                                 <td class="text-center">
@@ -80,48 +72,44 @@
                                         $occRate = $item->occupancy_rate;
                                     @endphp
                                     @if($totalRooms > 0)
-                                        <div class="d-inline-flex flex-column align-items-center">
-                                            <div class="d-flex align-items-center gap-1.5 mb-1">
-                                                <span class="badge {{ $availRooms > 0 ? 'badge-subtle-success' : 'badge-subtle-danger' }}" title="Kamar kosong siap huni">
-                                                    <i class="bi bi-door-open me-1"></i>{{ $availRooms }} Kosong
-                                                </span>
-                                                <span class="text-muted fs-8">/ {{ $totalRooms }} Unit</span>
-                                            </div>
-                                            <div class="progress w-100" style="height: 4px; min-width: 85px;" title="Okupansi {{ $occRate }}%">
-                                                <div class="progress-bar {{ $occRate >= 80 ? 'bg-danger' : ($occRate >= 50 ? 'bg-primary' : 'bg-success') }}" style="width: {{ $occRate }}%"></div>
-                                            </div>
+                                        <div>
+                                            <span class="fw-semibold fs-8 {{ $availRooms > 0 ? 'text-success' : 'text-danger' }}">
+                                                {{ $availRooms }} Kosong
+                                            </span>
+                                            <span class="text-muted fs-8">/ {{ $totalRooms }} Unit</span>
+                                        </div>
+                                        <div class="progress mt-1 mx-auto" style="height: 3px; max-width: 85px;">
+                                            <div class="progress-bar {{ $occRate >= 80 ? 'bg-danger' : ($occRate >= 50 ? 'bg-primary' : 'bg-success') }}" style="width: {{ $occRate }}%"></div>
                                         </div>
                                     @else
-                                        <span class="badge badge-subtle-secondary" title="Belum ada unit kamar didaftarkan">
-                                            <i class="bi bi-door-closed me-1"></i>{{ $item->tersedia ?? 0 }} Unit (Manual)
-                                        </span>
+                                        <span class="text-muted fs-8">{{ $item->tersedia ?? 0 }} Unit</span>
                                     @endif
                                 </td>
                                 <td class="text-center text-nowrap">
-                                    <div class="table-action-compact justify-content-center">
+                                    <div class="d-inline-flex align-items-center gap-1.5">
                                         <!-- Kamar Button (Primary CTA) -->
-                                        <a href="{{ route('admin.product.kosan.kamar.index', $item->id) }}" class="btn btn-sm btn-primary" title="Kelola Unit Kamar">
-                                            <i class="bi bi-door-closed me-1"></i>Kamar
+                                        <a href="{{ route('admin.product.kosan.kamar.index', $item->id) }}" class="btn btn-sm btn-outline-primary py-1 px-2.5 rounded-2" style="font-size: 0.8rem;" title="Kelola Unit Kamar">
+                                            <i class="bi bi-door-open me-1"></i>Kamar
                                         </a>
 
-                                        <!-- Edit Button -->
-                                        <button type="button" class="btn-action-icon act-edit" data-bs-toggle="modal" data-bs-target="#modalEdit{{ $item->id }}" title="Edit Info Kosan">
-                                            <i class="bi bi-pencil-square"></i>
+                                        <!-- Edit Button (Direct CTA) -->
+                                        <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2.5 rounded-2" style="font-size: 0.8rem;" data-bs-toggle="modal" data-bs-target="#modalEdit{{ $item->id }}" title="Edit Info Kosan">
+                                            <i class="bi bi-pencil me-1"></i>Edit
                                         </button>
 
-                                        <!-- Galeri Foto Button -->
-                                        <button type="button" class="btn-action-icon act-gallery" data-bs-toggle="modal" data-bs-target="#modalImageKosan{{ $item->id }}" title="Kelola Galeri Foto">
+                                        <!-- Galeri Foto (Icon button minimalis) -->
+                                        <button type="button" class="btn btn-sm btn-light border py-1 px-2 rounded-2 text-secondary" data-bs-toggle="modal" data-bs-target="#modalImageKosan{{ $item->id }}" title="Kelola Galeri Foto">
                                             <i class="bi bi-images"></i>
                                         </button>
 
-                                        <!-- Buka di Web Frontend -->
-                                        <a href="{{ route('kosan.detail', $item->slug) }}" target="_blank" rel="noopener noreferrer" class="btn-action-icon act-web" title="Buka Halaman Publik">
+                                        <!-- Buka di Web (Icon button minimalis) -->
+                                        <a href="{{ route('kosan.detail', $item->slug) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-light border py-1 px-2 rounded-2 text-secondary" title="Lihat Halaman Web">
                                             <i class="bi bi-box-arrow-up-right"></i>
                                         </a>
 
-                                        <!-- Hapus Kosan (SuperAdmin Only) -->
                                         @if(Auth::user()->isSuperAdmin())
-                                        <button type="button" class="btn-action-icon act-delete" data-bs-toggle="modal" data-bs-target="#modalDelete{{ $item->id }}" title="Hapus Kosan">
+                                        <!-- Hapus Kosan (Icon button merah lembut) -->
+                                        <button type="button" class="btn btn-sm btn-light border border-danger-subtle py-1 px-2 rounded-2 text-danger" data-bs-toggle="modal" data-bs-target="#modalDelete{{ $item->id }}" title="Hapus Kosan">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                         @endif
