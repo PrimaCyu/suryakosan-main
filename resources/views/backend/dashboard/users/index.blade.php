@@ -1,20 +1,25 @@
 @extends('backend.dashboard.main')
 
 @section('content')
-  <!-- Page Header -->
-  <div class="page-header-box mb-4">
-    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-      <div>
-        <h2 class="page-title mb-1">Manajemen Admin & Penugasan Kos</h2>
-        <p class="page-subtitle mb-0">Kelola akun administrator dan tentukan cabang kos yang menjadi tanggung jawab masing-masing admin.</p>
-      </div>
-      <div>
-        <button type="button" class="btn btn-primary fw-semibold" data-bs-toggle="modal" data-bs-target="#modalTambahAdmin">
-          <i class="bi bi-person-plus-fill me-1"></i> Tambah Admin Baru
-        </button>
+<div class="app-content-header">
+  <div class="container-fluid">
+    <div class="page-header-box mb-4">
+      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div>
+          <h2 class="page-title mb-1">
+            <i class="bi bi-person-gear text-secondary me-2"></i>Manajemen Admin & Penugasan Kos
+          </h2>
+          <p class="page-subtitle mb-0">Kelola akun administrator dan tentukan cabang kos yang menjadi tanggung jawab masing-masing admin.</p>
+        </div>
+        <div>
+          <button type="button" class="btn btn-primary fw-semibold" data-bs-toggle="modal" data-bs-target="#modalTambahAdmin">
+            <i class="bi bi-person-plus-fill me-1"></i> Tambah Admin Baru
+          </button>
+        </div>
       </div>
     </div>
   </div>
+</div>
 
 <!-- Main Content -->
 <div class="app-content">
@@ -34,7 +39,7 @@
       </div>
     @endif
 
-    @if($errors->any())
+    @if(isset($errors) && $errors->any())
       <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
         <div class="fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>Terdapat kesalahan:</div>
         <ul class="mb-0 ps-3">
@@ -48,19 +53,22 @@
 
     <!-- Card Table -->
     <div class="card border-0 shadow-sm">
-      <div class="card-header bg-white border-bottom py-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <div class="card-header bg-white border-bottom py-3 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
         <h3 class="section-title mb-0">Daftar Akun Pengelola</h3>
 
         <!-- Form Pencarian -->
-        <form action="{{ route('admin.users.index') }}" method="GET" class="d-flex gap-2" style="max-width: 320px;">
-          <input type="text" name="search" value="{{ request('search') }}" class="form-control form-control-sm" placeholder="Cari nama / email...">
-          <button type="submit" class="btn btn-sm btn-outline-secondary">
-            <i class="bi bi-search"></i>
-          </button>
-          @if(request('search'))
-            <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
-          @endif
-        </form>
+        <div class="search-box-responsive">
+          <form action="{{ route('admin.users.index') }}" method="GET" class="input-group input-group-sm">
+            <span class="input-group-text bg-transparent border-end-0 text-muted">
+              <i class="bi bi-search"></i>
+            </span>
+            <input type="text" name="search" value="{{ request('search') }}" class="form-control border-start-0 ps-0" placeholder="Cari nama / email...">
+            <button type="submit" class="btn btn-outline-secondary">Cari</button>
+            @if(request('search'))
+              <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">Reset</a>
+            @endif
+          </form>
+        </div>
       </div>
 
       <div class="table-responsive">

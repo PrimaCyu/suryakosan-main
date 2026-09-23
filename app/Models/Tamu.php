@@ -19,6 +19,14 @@ class Tamu extends Model
         'total_price',
         'status',
         'access_token',
+        'processed_by',
+        'processed_at',
+        'rejection_reason',
+    ];
+
+    protected $casts = [
+        'processed_at' => 'datetime',
+        'start_date' => 'date',
     ];
 
     protected static function boot()
@@ -34,6 +42,10 @@ class Tamu extends Model
 
     public function productKamarKosan(){
         return $this->belongsTo(ProductKamarKosan::class,'product_kamar_kosan_id');
+    }
+
+    public function processedBy(){
+        return $this->belongsTo(User::class, 'processed_by');
     }
 
     /**

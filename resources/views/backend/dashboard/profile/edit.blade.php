@@ -1,24 +1,29 @@
 @extends('backend.dashboard.main')
 
 @section('content')
-  <!-- Page Header -->
-  <div class="page-header-box mb-4">
-    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-      <div>
-        <h2 class="page-title mb-1">Pengaturan Akun & Keamanan</h2>
-        <p class="page-subtitle mb-0">Kelola informasi profil admin dan perbarui kata sandi akun Anda secara aman.</p>
-      </div>
-      <div>
-        <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
-          <i class="bi bi-arrow-left me-1"></i> Kembali ke Dashboard
-        </a>
+<div class="app-content-header">
+  <div class="container-fluid">
+    <div class="page-header-box mb-4">
+      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div>
+          <h2 class="page-title mb-1">
+            <i class="bi bi-shield-lock text-secondary me-2"></i>Pengaturan Akun & Keamanan
+          </h2>
+          <p class="page-subtitle mb-0">Kelola informasi profil admin dan perbarui kata sandi akun Anda secara aman.</p>
+        </div>
+        <div>
+          <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Kembali ke Dashboard
+          </a>
+        </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Main Content -->
-  <div class="app-content">
-    <div class="container-fluid">
+<!-- Main Content -->
+<div class="app-content">
+  <div class="container-fluid">
 
       @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
@@ -30,7 +35,7 @@
         </div>
       @endif
 
-      @if($errors->any())
+      @if(isset($errors) && $errors->any())
         <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
           <div class="d-flex align-items-center mb-1">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>

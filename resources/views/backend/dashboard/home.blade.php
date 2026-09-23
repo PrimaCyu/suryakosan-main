@@ -48,11 +48,13 @@
     border-radius: var(--dash-radius);
     font-size: 0.8125rem;
     font-weight: 600;
-    padding: 0.42rem 0.85rem;
+    padding: 0.45rem 0.85rem;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.4rem;
     text-decoration: none;
+    white-space: nowrap !important;
     transition: all 0.15s ease;
   }
   .dash-btn-primary:hover {
@@ -67,16 +69,47 @@
     border-radius: var(--dash-radius);
     font-size: 0.8125rem;
     font-weight: 500;
-    padding: 0.42rem 0.85rem;
+    padding: 0.45rem 0.85rem;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.4rem;
     text-decoration: none;
+    white-space: nowrap !important;
     transition: all 0.15s ease;
   }
   .dash-btn-secondary:hover {
     background-color: var(--dash-bg-subtle);
     color: var(--dash-text-main);
+  }
+
+  .dash-header-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--dash-navy);
+  }
+  @media (min-width: 768px) {
+    .dash-header-title {
+      font-size: 1.65rem;
+    }
+  }
+
+  .dash-header-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    width: 100%;
+    margin-top: 0.85rem;
+  }
+  @media (min-width: 768px) {
+    .dash-header-actions {
+      display: flex;
+      align-items: center;
+      width: auto;
+      margin-top: 0;
+      flex-shrink: 0;
+    }
   }
 
   .dash-action-link {
@@ -190,25 +223,29 @@
   <div class="container-fluid">
 
     <!-- 1. HEADER SECTION (Tenang, Bersih & Profesional) -->
-    <div class="dash-card p-4 mb-4">
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-        <div>
-          <div class="d-flex align-items-center gap-2 mb-1">
-            <span class="fs-7 text-muted">{{ \Carbon\Carbon::now()->isoFormat('dddd, D MMMM Y') }}</span>
-            <span class="text-muted">•</span>
-            <span class="fs-7 fw-semibold text-secondary">
-              {{ Auth::user()->isSuperAdmin() ? 'Semua Cabang Properti' : 'Cabang Ditugaskan' }}
+    <div class="dash-card p-3 p-md-4 mb-3 mb-md-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 gap-md-3">
+        <div class="flex-grow-1 w-100">
+          <div class="d-flex align-items-center flex-wrap gap-2 mb-1.5">
+            <span class="fs-8 text-muted d-inline-flex align-items-center">
+              <i class="bi bi-calendar3 text-secondary me-1.5" style="font-size: 0.82rem;"></i>
+              <span class="d-none d-sm-inline">{{ \Carbon\Carbon::now()->locale('id')->isoFormat('dddd, D MMMM Y') }}</span>
+              <span class="d-sm-none">{{ \Carbon\Carbon::now()->locale('id')->isoFormat('D MMM Y') }}</span>
+            </span>
+            <span class="text-muted opacity-40 mx-0.5">•</span>
+            <span class="badge bg-secondary-subtle text-secondary px-2 py-0.5 rounded-pill" style="font-size: 0.72rem; font-weight: 500;">
+              {{ Auth::user()->isSuperAdmin() ? 'Semua Cabang' : 'Cabang Ditugaskan' }}
             </span>
           </div>
-          <h1 class="dash-heading-serif h3 mb-0 text-dark">
+          <h1 class="dash-heading-serif dash-header-title mb-0 text-dark">
             {{ $greeting }}, {{ Auth::user()->name ?? 'Pengelola' }}
           </h1>
-          <p class="fs-7 text-muted mb-0 mt-1">
-            Sinar Citra Lestari • Sistem Pengelolaan Operasional Kos Terpadu
+          <p class="fs-8 text-muted mb-0 mt-1 d-none d-md-block">
+            Sinar Citra Lestari <span class="mx-1 text-muted opacity-50">•</span> Sistem Pengelolaan Operasional Kos Terpadu
           </p>
         </div>
 
-        <div class="d-flex align-items-center gap-2">
+        <div class="dash-header-actions">
           <a href="{{ route('home') }}" target="_blank" class="dash-btn-secondary" title="Buka website pencarian kos">
             <i class="bi bi-box-arrow-up-right"></i>
             <span>Lihat Website</span>
