@@ -116,17 +116,21 @@ class KamarKosanController extends Controller
     {
         $this->checkKosanAccess($product_kosan);
 
-        // Dukung input single room terpadu dari modal terpadu baru ATAU multi-row array legacy
+        // Dukung input single room terpadu dari modal terpadu baru ATAU multi-row array
         if ($request->has('room')) {
             $request->validate([
                 'room'                => 'required|string|max:255',
-                'description'         => 'nullable|string',
-                'cumulative_discount' => 'nullable|numeric|min:0',
-                'price_bulan'         => 'nullable|numeric|min:0',
+                'price_bulan'         => 'required|numeric|min:0',
                 'price_tahun'         => 'nullable|numeric|min:0',
+                'cumulative_discount' => 'nullable|numeric|min:0|max:100',
+                'description'         => 'nullable|string',
                 'image'               => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
                 'images'              => 'nullable|array',
                 'images.*'            => 'image|mimes:jpeg,png,jpg,webp|max:5120',
+            ], [
+                'room.required'        => 'Nama atau nomor kamar wajib diisi.',
+                'price_bulan.required' => 'Tarif sewa bulanan wajib ditentukan saat membuat kamar.',
+                'price_bulan.numeric'  => 'Tarif sewa bulanan harus berupa angka.',
             ]);
 
             $isSuperAdmin = auth()->user()->isSuperAdmin();
@@ -134,26 +138,25 @@ class KamarKosanController extends Controller
             if (is_array($fasilitas)) {
                 $fasilitas = implode(', ', $fasilitas);
             }
+            $discountVal = $isSuperAdmin ? (float)($request->input('cumulative_discount') ?? 0) : 0;
 
-            DB::transaction(function () use ($request, $product_kosan, $fasilitas, $isSuperAdmin) {
+            DB::transaction(function () use ($request, $product_kosan, $fasilitas, $discountVal) {
                 $kamar = ProductKamarKosan::create([
                     'product_kosan_id'    => $product_kosan,
                     'room'                => $request->input('room'),
                     'description'         => $request->input('description'),
                     'fasilitas'           => $fasilitas,
-                    'cumulative_discount' => $isSuperAdmin ? ($request->input('cumulative_discount') ?? 0) : 0,
+                    'cumulative_discount' => $discountVal,
                     'views'               => 0,
                 ]);
 
-                // Auto-create Tarif Bulanan jika diisi
-                if ($request->filled('price_bulan') && (float)$request->input('price_bulan') > 0) {
-                    PriceKamar::create([
-                        'product_kamar_kosan_id' => $kamar->id,
-                        'kategori'               => 'bulan',
-                        'price'                  => (float)$request->input('price_bulan'),
-                        'discount'               => 0,
-                    ]);
-                }
+                // Auto-create Tarif Bulanan (Wajib) & sinkronkan diskon
+                PriceKamar::create([
+                    'product_kamar_kosan_id' => $kamar->id,
+                    'kategori'               => 'bulan',
+                    'price'                  => (float)$request->input('price_bulan'),
+                    'discount'               => $discountVal,
+                ]);
 
                 // Auto-create Tarif Tahunan jika diisi
                 if ($request->filled('price_tahun') && (float)$request->input('price_tahun') > 0) {
@@ -161,7 +164,7 @@ class KamarKosanController extends Controller
                         'product_kamar_kosan_id' => $kamar->id,
                         'kategori'               => 'tahun',
                         'price'                  => (float)$request->input('price_tahun'),
-                        'discount'               => 0,
+                        'discount'               => $discountVal,
                     ]);
                 }
 
@@ -188,9 +191,13 @@ class KamarKosanController extends Controller
             $request->validate([
                 'dataKamar'                       => 'required|array|min:1',
                 'dataKamar.*.room'                => 'required|string|max:255',
+                'dataKamar.*.price_bulan'         => 'required|numeric|min:0',
                 'dataKamar.*.description'         => 'nullable|string',
-                'dataKamar.*.cumulative_discount' => 'nullable|numeric|min:0',
+                'dataKamar.*.cumulative_discount' => 'nullable|numeric|min:0|max:100',
                 'dataKamar.*.views'               => 'nullable|integer|min:0',
+            ], [
+                'dataKamar.*.room.required'        => 'Nama kamar pada setiap baris wajib diisi.',
+                'dataKamar.*.price_bulan.required' => 'Tarif bulanan pada setiap baris wajib diisi.',
             ]);
 
             $isSuperAdmin = auth()->user()->isSuperAdmin();
@@ -202,15 +209,25 @@ class KamarKosanController extends Controller
                     if (is_array($fasilitas)) {
                         $fasilitas = implode(', ', $fasilitas);
                     }
+                    $discVal = $isSuperAdmin ? (float)($item['cumulative_discount'] ?? 0) : 0;
 
-                    ProductKamarKosan::create([
+                    $kamar = ProductKamarKosan::create([
                         'product_kosan_id'    => $product_kosan,
                         'room'                => $item['room'],
                         'description'         => $item['description'] ?? null,
                         'fasilitas'           => $fasilitas,
-                        'cumulative_discount' => $isSuperAdmin ? ($item['cumulative_discount'] ?? 0) : 0,
+                        'cumulative_discount' => $discVal,
                         'views'               => $item['views'] ?? 0,
                     ]);
+
+                    if (isset($item['price_bulan']) && (float)$item['price_bulan'] > 0) {
+                        PriceKamar::create([
+                            'product_kamar_kosan_id' => $kamar->id,
+                            'kategori'               => 'bulan',
+                            'price'                  => (float) $item['price_bulan'],
+                            'discount'               => $discVal,
+                        ]);
+                    }
                 }
             });
         } else {
@@ -224,7 +241,7 @@ class KamarKosanController extends Controller
             \Illuminate\Support\Facades\Cache::forget("kosan_detail_{$kosan->slug}");
         }
 
-        return back()->with('success', 'Data kamar berhasil ditambahkan.');
+        return back()->with('success', 'Data kamar berhasil ditambahkan lengkap beserta tarif sewa.');
     }
 
     public function updateKamar($product_kosan, $product_kamar_kosan, Request $request)
@@ -237,12 +254,18 @@ class KamarKosanController extends Controller
 
         $request->validate([
             'room'                => 'required|string|max:255',
-            'cumulative_discount' => 'nullable|numeric|min:0',
+            'price_bulan'         => 'required|numeric|min:0',
+            'price_tahun'         => 'nullable|numeric|min:0',
+            'cumulative_discount' => 'nullable|numeric|min:0|max:100',
             'description'         => 'nullable|string',
             'views'               => 'nullable|integer|min:0',
             'image'               => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'images'              => 'nullable|array',
             'images.*'            => 'image|mimes:jpeg,png,jpg,webp|max:5120',
+        ], [
+            'room.required'        => 'Nama kamar wajib diisi.',
+            'price_bulan.required' => 'Tarif sewa bulanan wajib ditentukan.',
+            'price_bulan.numeric'  => 'Tarif sewa bulanan harus berupa angka.',
         ]);
 
         $isSuperAdmin = auth()->user()->isSuperAdmin();
@@ -251,14 +274,42 @@ class KamarKosanController extends Controller
             $fasilitas = implode(', ', $fasilitas);
         }
 
-        DB::transaction(function () use ($kamar_kosan, $request, $fasilitas, $isSuperAdmin) {
+        $discountVal = $isSuperAdmin ? (float)$request->input('cumulative_discount', 0) : ($kamar_kosan->cumulative_discount ?? 0);
+
+        DB::transaction(function () use ($kamar_kosan, $request, $fasilitas, $discountVal) {
             $kamar_kosan->update([
                 'room'                => $request->input('room'),
-                'cumulative_discount' => $isSuperAdmin ? $request->input('cumulative_discount', 0) : ($kamar_kosan->cumulative_discount ?? 0),
+                'cumulative_discount' => $discountVal,
                 'description'         => $request->input('description'),
                 'fasilitas'           => $fasilitas,
                 'views'               => $request->input('views', $kamar_kosan->views ?? 0),
             ]);
+
+            // Sync Tarif Bulanan
+            PriceKamar::updateOrCreate(
+                [
+                    'product_kamar_kosan_id' => $kamar_kosan->id,
+                    'kategori'               => 'bulan',
+                ],
+                [
+                    'price'                  => (float) $request->input('price_bulan'),
+                    'discount'               => $discountVal,
+                ]
+            );
+
+            // Sync Tarif Tahunan (jika diisi)
+            if ($request->filled('price_tahun') && (float)$request->input('price_tahun') > 0) {
+                PriceKamar::updateOrCreate(
+                    [
+                        'product_kamar_kosan_id' => $kamar_kosan->id,
+                        'kategori'               => 'tahun',
+                    ],
+                    [
+                        'price'                  => (float) $request->input('price_tahun'),
+                        'discount'               => $discountVal,
+                    ]
+                );
+            }
 
             // Auto-upload Foto Kamar saat update (multi-image atau single image fallback)
             if ($request->hasFile('images')) {
@@ -441,12 +492,20 @@ class KamarKosanController extends Controller
             if ($kategoriNormalized === 'bulanan') $kategoriNormalized = 'bulan';
             if ($kategoriNormalized === 'tahunan') $kategoriNormalized = 'tahun';
 
+            $disc = $isSuperAdmin ? ($item['discount'] ?? 0) : 0;
+
             PriceKamar::create([
                 'product_kamar_kosan_id' => $product_kamar_kosan,
                 'kategori'               => $kategoriNormalized,
                 'price'                  => $item['price'],
-                'discount'               => $isSuperAdmin ? ($item['discount'] ?? 0) : 0
+                'discount'               => $disc
             ]);
+
+            if ($kategoriNormalized === 'bulan' && $isSuperAdmin && $disc > 0) {
+                ProductKamarKosan::where('id', $product_kamar_kosan)->update([
+                    'cumulative_discount' => $disc
+                ]);
+            }
         }
 
         return back()->with('success', 'Harga kamar berhasil ditambahkan.');
@@ -468,12 +527,20 @@ class KamarKosanController extends Controller
         if ($kategoriNormalized === 'bulanan') $kategoriNormalized = 'bulan';
         if ($kategoriNormalized === 'tahunan') $kategoriNormalized = 'tahun';
 
+        $discountVal = $isSuperAdmin ? ($request->discount ?? 0) : ($price_kamar->discount ?? 0);
+
         $price_kamar->update([
             'product_kamar_kosan_id' => $product_kamar_kosan,
             'kategori'               => $kategoriNormalized,
             'price'                  => $request->price,
-            'discount'               => $isSuperAdmin ? ($request->discount ?? 0) : ($price_kamar->discount ?? 0)
+            'discount'               => $discountVal
         ]);
+
+        if ($kategoriNormalized === 'bulan' && $isSuperAdmin) {
+            ProductKamarKosan::where('id', $product_kamar_kosan)->update([
+                'cumulative_discount' => $discountVal
+            ]);
+        }
 
         return back()->with('success', 'Harga kamar berhasil diperbarui.');
     }

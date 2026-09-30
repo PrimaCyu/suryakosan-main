@@ -37,50 +37,72 @@
                             <!-- Bagian 1: Identitas Unit -->
                             <div class="mb-4">
                                 <h6 class="fw-bold mb-3 fs-7 text-dark">
-                                    <i class="bi bi-info-circle text-primary me-1.5"></i> Identitas & Nama Kamar
+                                    <i class="bi bi-door-open text-primary me-1.5"></i> Identitas Kamar
                                 </h6>
                                 <div class="row g-3">
-                                    <div class="col-md-7">
+                                    <div class="col-12">
                                         <label class="form-label fs-8 fw-semibold mb-1">Nama / Tipe / Nomor Kamar <span class="text-danger">*</span></label>
                                         <input type="text" name="room" class="form-control" placeholder="Contoh: Kamar 101 - Lantai 1 (Tipe Deluxe)" required>
-                                        <div class="form-text fs-8 text-muted">Bisa berupa nomor kamar atau nama tipe kamar.</div>
-                                    </div>
-                                    <div class="col-md-5">
-                                        <label class="form-label fs-8 fw-semibold mb-1">Diskon Akumulatif (%)</label>
-                                        @if(Auth::user()->isSuperAdmin())
-                                            <input type="number" step="0.01" min="0" max="100" name="cumulative_discount" class="form-control" placeholder="0">
-                                            <div class="form-text fs-8 text-muted">Potongan harga promo (%)</div>
-                                        @else
-                                            <input type="number" step="0.01" name="cumulative_discount" class="form-control bg-body-secondary" value="0" readonly disabled>
-                                            <div class="form-text fs-8 text-warning"><i class="bi bi-lock-fill me-1"></i>Khusus Super Admin</div>
-                                        @endif
+                                        <div class="form-text fs-8 text-muted">Gunakan nomor kamar yang jelas agar mudah diidentifikasi saat ada booking.</div>
                                     </div>
                                 </div>
                             </div>
 
                             <hr class="my-3 opacity-25">
 
-                            <!-- Bagian 2: Tarif Sewa Langsung -->
+                            <!-- Bagian 2: Tarif Sewa & Diskon Promo (Terpadu) -->
                             <div class="mb-4">
-                                <h6 class="fw-bold mb-3 fs-7 text-dark">
-                                    <i class="bi bi-cash-stack text-success me-1.5"></i> Tarif Sewa Kamar
-                                </h6>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="fw-bold mb-0 fs-7 text-dark">
+                                        <i class="bi bi-cash-stack text-success me-1.5"></i> Tarif Sewa & Promo Diskon
+                                    </h6>
+                                    <span class="badge bg-success-subtle text-success fs-8">Wajib Ada Tarif Dasar</span>
+                                </div>
                                 <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label fs-8 fw-semibold mb-1">Tarif Bulanan (Rp) <span class="text-muted fw-normal">(Utama)</span></label>
+                                    <div class="col-md-7">
+                                        <label class="form-label fs-8 fw-semibold mb-1">Tarif Bulanan (Rp) <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-light text-muted fs-8">Rp</span>
-                                            <input type="number" name="price_bulan" class="form-control fw-semibold" placeholder="Contoh: 1500000" min="0" step="50000">
+                                            <input type="number" name="price_bulan" id="add_price_bulan" class="form-control fw-semibold" placeholder="Contoh: 1500000" min="0" step="10000" required>
                                         </div>
-                                        <div class="form-text fs-8 text-muted">Tarif dasar per bulan yang paling umum dicari.</div>
+                                        <div class="form-text fs-8 text-muted">Tarif pokok per bulan yang akan ditagihkan kepada penyewa.</div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-5">
+                                        <label class="form-label fs-8 fw-semibold mb-1">Diskon Promo Kamar (%)</label>
+                                        @if(Auth::user()->isSuperAdmin())
+                                            <div class="input-group">
+                                                <input type="number" step="0.01" min="0" max="100" name="cumulative_discount" id="add_cumulative_discount" class="form-control" placeholder="0">
+                                                <span class="input-group-text bg-light text-muted fs-8">%</span>
+                                            </div>
+                                            <div class="form-text fs-8 text-muted">Potongan harga promo (0 - 100%).</div>
+                                        @else
+                                            <div class="input-group">
+                                                <input type="number" step="0.01" name="cumulative_discount" id="add_cumulative_discount" class="form-control bg-body-secondary" value="0" readonly disabled>
+                                                <span class="input-group-text bg-light text-muted fs-8">%</span>
+                                            </div>
+                                            <div class="form-text fs-8 text-warning"><i class="bi bi-lock-fill me-1"></i>Khusus Super Admin</div>
+                                        @endif
+                                    </div>
+
+                                    <!-- Live Calculation Preview Box -->
+                                    <div class="col-12">
+                                        <div id="addPricePreviewBox" class="p-2.5 rounded-3 bg-light border d-flex justify-content-between align-items-center">
+                                            <div class="fs-8 text-muted">
+                                                <i class="bi bi-receipt text-primary me-1"></i> Estimasi Harga Net Per Bulan:
+                                            </div>
+                                            <div class="fs-7 fw-bold text-success" id="addPriceNetDisplay">
+                                                Rp 0 <span class="fs-8 fw-normal text-muted">/ bulan</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
                                         <label class="form-label fs-8 fw-semibold mb-1">Tarif Tahunan (Rp) <span class="text-muted fw-normal">(Opsional)</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-light text-muted fs-8">Rp</span>
                                             <input type="number" name="price_tahun" class="form-control" placeholder="Contoh: 16500000" min="0" step="100000">
                                         </div>
-                                        <div class="form-text fs-8 text-muted">Dapat dikosongkan jika belum ada paket tahunan.</div>
+                                        <div class="form-text fs-8 text-muted">Kosongkan jika belum tersedia paket sewa 1 tahun.</div>
                                     </div>
                                 </div>
                             </div>
@@ -177,23 +199,30 @@
                         @csrf
                         <div class="modal-body p-4" style="max-height: 65vh; overflow-y: auto;">
                             <div class="alert alert-light border py-2 px-3 fs-8 mb-3 text-muted">
-                                <i class="bi bi-info-circle me-1 text-primary"></i> Gunakan tab ini jika Anda ingin mendaftarkan banyak unit kamar sekaligus. Foto dan rincian harga dapat dilengkapi setelahnya.
+                                <i class="bi bi-info-circle me-1 text-primary"></i> Gunakan tab ini untuk mendaftarkan banyak unit kamar sekaligus. Setiap kamar akan langsung dibuatkan tarif bulanan aktif.
                             </div>
 
                             <div id="kamarInputContainer">
                                 <div class="kamar-row card border rounded p-3 mb-3" id="kamar-row-0">
                                     <div class="row g-3 align-items-center">
-                                        <div class="col-md-6">
+                                        <div class="col-md-5">
                                             <label class="form-label fs-8 fw-semibold mb-1">Nama / Tipe Kamar <span class="text-danger">*</span></label>
-                                            <input type="text" name="dataKamar[0][room]" class="form-control" placeholder="Contoh: Kamar Deluxe A" required>
+                                            <input type="text" name="dataKamar[0][room]" class="form-control" placeholder="Contoh: Kamar 101" required>
                                         </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label fs-8 fw-semibold mb-1">Diskon Akumulatif (%)</label>
+                                        <div class="col-md-4">
+                                            <label class="form-label fs-8 fw-semibold mb-1">Tarif Bulanan (Rp) <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light text-muted fs-8">Rp</span>
+                                                <input type="number" name="dataKamar[0][price_bulan]" class="form-control fw-semibold" placeholder="1500000" min="0" step="10000" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label fs-8 fw-semibold mb-1">Diskon Promo (%)</label>
                                             @if(Auth::user()->isSuperAdmin())
-                                                <input type="number" step="0.01" name="dataKamar[0][cumulative_discount]" class="form-control" placeholder="0">
+                                                <input type="number" step="0.01" min="0" max="100" name="dataKamar[0][cumulative_discount]" class="form-control" placeholder="0">
                                             @else
                                                 <input type="number" step="0.01" name="dataKamar[0][cumulative_discount]" class="form-control bg-body-secondary" value="0" readonly disabled>
-                                                <small class="text-muted d-block mt-1 fs-8"><i class="bi bi-lock-fill text-warning me-1"></i>Khusus Super Admin</small>
+                                                <small class="text-muted d-block mt-1 fs-8"><i class="bi bi-lock-fill text-warning me-1"></i>Super Admin</small>
                                             @endif
                                         </div>
                                         <div class="col-12">

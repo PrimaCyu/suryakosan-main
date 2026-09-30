@@ -109,6 +109,9 @@ class ProcessBookingDate
 
                 if ($isSingleInput) {
                     $discVal = $pInfo['discount'];
+                    if ($discVal <= 0 && $cat === 'bulan') {
+                        $discVal = (float) ($kamar->cumulative_discount ?? 0);
+                    }
                     if ($discVal > 0) {
                         if ($discVal <= 100) {
                             $totalDiscountAmount = ($subtotal * $discVal) / 100;

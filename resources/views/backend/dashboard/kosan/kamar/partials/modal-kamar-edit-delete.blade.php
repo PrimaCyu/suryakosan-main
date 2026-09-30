@@ -12,24 +12,74 @@
             </div>
             <div class="modal-body p-4">
                 <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label">Tipe / Nama Kamar <span class="text-danger">*</span></label>
+                    <div class="col-md-8">
+                        <label class="form-label fs-8 fw-semibold mb-1">Tipe / Nama Kamar <span class="text-danger">*</span></label>
                         <input type="text" name="room" class="form-control" value="{{ $item->room }}" required>
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label">Diskon Akumulatif (%)</label>
-                        @if(Auth::user()->isSuperAdmin())
-                            <input type="number" step="0.01" name="cumulative_discount" class="form-control" value="{{ $item->cumulative_discount }}">
-                        @else
-                            <input type="number" step="0.01" class="form-control bg-light" value="{{ $item->cumulative_discount }}" readonly disabled>
-                            <small class="text-muted d-block mt-1"><i class="bi bi-lock-fill text-warning me-1"></i>Hanya diatur langsung oleh Super Admin</small>
-                        @endif
+                        <label class="form-label fs-8 fw-semibold mb-1"><i class="bi bi-eye me-1 text-muted"></i> Views Count</label>
+                        <input type="number" min="0" name="views" class="form-control" value="{{ $item->views ?? 0 }}">
                     </div>
 
-                    <div class="col-md-4">
-                        <label class="form-label"><i class="bi bi-eye me-1"></i> Views Count</label>
-                        <input type="number" min="0" name="views" class="form-control" value="{{ $item->views ?? 0 }}">
+                    <!-- Tarif Sewa & Promo Diskon Langsung -->
+                    <div class="col-12">
+                        <div class="p-3 rounded-3 bg-light border">
+                            <h6 class="fw-bold mb-2.5 fs-7 text-dark">
+                                <i class="bi bi-cash-stack text-success me-1.5"></i> Tarif Sewa & Promo Diskon
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-7">
+                                    <label class="form-label fs-8 fw-semibold mb-1">Tarif Bulanan (Rp) <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white text-muted fs-8">Rp</span>
+                                        <input type="number" name="price_bulan" id="edit_price_bulan_{{ $item->id }}" class="form-control fw-semibold edit-price-bulan" data-kamar-id="{{ $item->id }}" value="{{ $item->monthly_price ? $item->monthly_price->price : '' }}" placeholder="Contoh: 1500000" min="0" step="10000" required>
+                                    </div>
+                                    <div class="form-text fs-8 text-muted">Tarif pokok sewa per bulan.</div>
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label fs-8 fw-semibold mb-1">Diskon Promo Kamar (%)</label>
+                                    @if(Auth::user()->isSuperAdmin())
+                                        <div class="input-group">
+                                            <input type="number" step="0.01" min="0" max="100" name="cumulative_discount" id="edit_cumulative_discount_{{ $item->id }}" class="form-control edit-cumulative-discount" data-kamar-id="{{ $item->id }}" value="{{ $item->cumulative_discount ?? 0 }}" placeholder="0">
+                                            <span class="input-group-text bg-white text-muted fs-8">%</span>
+                                        </div>
+                                        <div class="form-text fs-8 text-muted">Potongan promo (0 - 100%).</div>
+                                    @else
+                                        <div class="input-group">
+                                            <input type="number" step="0.01" name="cumulative_discount" id="edit_cumulative_discount_{{ $item->id }}" class="form-control bg-body-secondary edit-cumulative-discount" data-kamar-id="{{ $item->id }}" value="{{ $item->cumulative_discount ?? 0 }}" readonly disabled>
+                                            <span class="input-group-text bg-white text-muted fs-8">%</span>
+                                        </div>
+                                        <small class="text-muted d-block mt-1 fs-8"><i class="bi bi-lock-fill text-warning me-1"></i>Super Admin</small>
+                                    @endif
+                                </div>
+
+                                <div class="col-12">
+                                    <div id="editPricePreviewBox{{ $item->id }}" class="p-2 rounded-2 bg-white border d-flex justify-content-between align-items-center">
+                                        <div class="fs-8 text-muted">
+                                            <i class="bi bi-receipt text-primary me-1"></i> Estimasi Harga Net:
+                                        </div>
+                                        <div class="fs-7 fw-bold text-success" id="editPriceNetDisplay{{ $item->id }}">
+                                            @php
+                                                $rawP = (float)($item->monthly_price->price ?? 0);
+                                                $discP = (float)($item->cumulative_discount ?? 0);
+                                                $netP = $discP > 0 ? ($discP <= 100 ? $rawP * (1 - $discP/100) : max(0, $rawP - $discP)) : $rawP;
+                                            @endphp
+                                            Rp {{ number_format($netP, 0, ',', '.') }} <span class="fs-8 fw-normal text-muted">/ bulan</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label fs-8 fw-semibold mb-1">Tarif Tahunan (Rp) <span class="text-muted fw-normal">(Opsional)</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white text-muted fs-8">Rp</span>
+                                        <input type="number" name="price_tahun" class="form-control" value="{{ $item->yearly_price ? $item->yearly_price->price : '' }}" placeholder="Contoh: 16500000" min="0" step="100000">
+                                    </div>
+                                    <div class="form-text fs-8 text-muted">Dapat dikosongkan jika tidak ada paket tahunan.</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="col-12">

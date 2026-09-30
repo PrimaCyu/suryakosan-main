@@ -114,15 +114,30 @@
                                     </td>
                                     <td class="text-nowrap">
                                         @if($item->monthly_price)
-                                            <div class="fw-bold text-success fs-7">
-                                                Rp {{ number_format($item->monthly_price->price, 0, ',', '.') }}<span class="fs-8 fw-normal text-muted">/bln</span>
-                                            </div>
+                                            @php
+                                                $rawMonthly = (float) $item->monthly_price->price;
+                                                $disc = (float) ($item->cumulative_discount ?: $item->monthly_price->discount);
+                                                $hasDiscount = $disc > 0;
+                                                $finalMonthly = $hasDiscount ? ($disc <= 100 ? $rawMonthly * (1 - $disc/100) : max(0, $rawMonthly - $disc)) : $rawMonthly;
+                                            @endphp
+                                            @if($hasDiscount)
+                                                <div class="fw-bold text-success fs-7">
+                                                    Rp {{ number_format($finalMonthly, 0, ',', '.') }}<span class="fs-8 fw-normal text-muted">/bln</span>
+                                                </div>
+                                                <div class="fs-8 text-muted text-decoration-line-through">
+                                                    Rp {{ number_format($rawMonthly, 0, ',', '.') }}
+                                                </div>
+                                            @else
+                                                <div class="fw-bold text-dark fs-7">
+                                                    Rp {{ number_format($rawMonthly, 0, ',', '.') }}<span class="fs-8 fw-normal text-muted">/bln</span>
+                                                </div>
+                                            @endif
                                         @else
                                             <span class="badge badge-subtle-secondary fs-8">Belum diatur</span>
                                         @endif
 
                                         @if($item->yearly_price)
-                                            <div class="fs-8 text-muted mt-0">
+                                            <div class="fs-8 text-muted mt-0.5">
                                                 Rp {{ number_format($item->yearly_price->price, 0, ',', '.') }}/thn
                                             </div>
                                         @endif
@@ -367,6 +382,76 @@
             });
         });
 
+        function updateAddPricePreview() {
+            const rawVal = parseFloat(document.getElementById('add_price_bulan')?.value) || 0;
+            const discVal = parseFloat(document.getElementById('add_cumulative_discount')?.value) || 0;
+            const netDisplay = document.getElementById('addPriceNetDisplay');
+            if (!netDisplay) return;
+
+            if (rawVal <= 0) {
+                netDisplay.innerHTML = 'Rp 0 <span class="fs-8 fw-normal text-muted">/ bulan</span>';
+                return;
+            }
+
+            let finalVal = rawVal;
+            if (discVal > 0) {
+                if (discVal <= 100) {
+                    finalVal = rawVal * (1 - (discVal / 100));
+                } else {
+                    finalVal = Math.max(0, rawVal - discVal);
+                }
+            }
+
+            const fmtNet = new Intl.NumberFormat('id-ID').format(Math.round(finalVal));
+            if (discVal > 0) {
+                const hemat = Math.round(rawVal - finalVal);
+                netDisplay.innerHTML = `Rp ${fmtNet} <span class="fs-8 fw-normal text-muted">/ bulan</span> <span class="badge bg-success-subtle text-success ms-1.5 fs-8">Hemat Rp ${new Intl.NumberFormat('id-ID').format(hemat)}</span>`;
+            } else {
+                netDisplay.innerHTML = `Rp ${fmtNet} <span class="fs-8 fw-normal text-muted">/ bulan</span>`;
+            }
+        }
+
+        document.addEventListener('input', function(e) {
+            if (e.target.id === 'add_price_bulan' || e.target.id === 'add_cumulative_discount') {
+                updateAddPricePreview();
+                return;
+            }
+
+            if (e.target.classList.contains('edit-price-bulan') || e.target.classList.contains('edit-cumulative-discount')) {
+                const kamarId = e.target.getAttribute('data-kamar-id');
+                if (!kamarId) return;
+                const priceEl = document.getElementById(`edit_price_bulan_${kamarId}`);
+                const discEl = document.getElementById(`edit_cumulative_discount_${kamarId}`);
+                const displayEl = document.getElementById(`editPriceNetDisplay${kamarId}`);
+                if (!priceEl || !displayEl) return;
+
+                const rawVal = parseFloat(priceEl.value) || 0;
+                const discVal = parseFloat(discEl ? discEl.value : 0) || 0;
+
+                if (rawVal <= 0) {
+                    displayEl.innerHTML = 'Rp 0 <span class="fs-8 fw-normal text-muted">/ bulan</span>';
+                    return;
+                }
+
+                let finalVal = rawVal;
+                if (discVal > 0) {
+                    if (discVal <= 100) {
+                        finalVal = rawVal * (1 - (discVal / 100));
+                    } else {
+                        finalVal = Math.max(0, rawVal - discVal);
+                    }
+                }
+
+                const fmtNet = new Intl.NumberFormat('id-ID').format(Math.round(finalVal));
+                if (discVal > 0) {
+                    const hemat = Math.round(rawVal - finalVal);
+                    displayEl.innerHTML = `Rp ${fmtNet} <span class="fs-8 fw-normal text-muted">/ bulan</span> <span class="badge bg-success-subtle text-success ms-1.5 fs-8">Hemat Rp ${new Intl.NumberFormat('id-ID').format(hemat)}</span>`;
+                } else {
+                    displayEl.innerHTML = `Rp ${fmtNet} <span class="fs-8 fw-normal text-muted">/ bulan</span>`;
+                }
+            }
+        });
+
         document.addEventListener('click', function(e) {
             const btnAddKmrRow = e.target.closest('.btn-add-kamar-row');
             if (btnAddKmrRow) {
@@ -378,17 +463,24 @@
                     div.className = 'kamar-row card border rounded p-3 mb-3';
                     div.id = `kamar-row-${index}`;
                     const discKamarField = isSuperAdminUser
-                        ? `<input type="number" step="0.01" name="dataKamar[${index}][cumulative_discount]" class="form-control" placeholder="0">`
+                        ? `<input type="number" step="0.01" min="0" max="100" name="dataKamar[${index}][cumulative_discount]" class="form-control" placeholder="0">`
                         : `<input type="number" step="0.01" name="dataKamar[${index}][cumulative_discount]" class="form-control bg-light" value="0" readonly disabled title="Hanya diatur langsung oleh Super Admin"><small class="text-muted d-block mt-1" style="font-size: 0.72rem;"><i class="bi bi-lock-fill text-warning me-1"></i>Khusus Super Admin</small>`;
 
                     div.innerHTML = `
                         <div class="row g-3 align-items-center">
-                            <div class="col-md-6">
-                                <label class="form-label fs-8 fw-semibold mb-1">Nama / Tipe Kamar <span class="text-danger">*</span></label>
-                                <input type="text" name="dataKamar[${index}][room]" class="form-control" placeholder="Contoh: Kamar Deluxe B" required>
-                            </div>
                             <div class="col-md-5">
-                                <label class="form-label fs-8 fw-semibold mb-1">Diskon Akumulatif (%)</label>
+                                <label class="form-label fs-8 fw-semibold mb-1">Nama / Tipe Kamar <span class="text-danger">*</span></label>
+                                <input type="text" name="dataKamar[${index}][room]" class="form-control" placeholder="Contoh: Kamar 102" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fs-8 fw-semibold mb-1">Tarif Bulanan (Rp) <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted fs-8">Rp</span>
+                                    <input type="number" name="dataKamar[${index}][price_bulan]" class="form-control fw-semibold" placeholder="1500000" min="0" step="10000" required>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fs-8 fw-semibold mb-1">Diskon (%)</label>
                                 ${discKamarField}
                             </div>
                             <div class="col-md-1 text-end align-self-end">
@@ -470,10 +562,12 @@
             const rows = container.querySelectorAll('.kamar-row');
             rows.forEach((row, i) => {
                 const room = row.querySelector('input[name*="[room]"]');
+                const price = row.querySelector('input[name*="[price_bulan]"]');
                 const disc = row.querySelector('input[name*="[cumulative_discount]"]');
                 const desc = row.querySelector('textarea[name*="[description]"]');
 
                 if (room) room.name = `dataKamar[${i}][room]`;
+                if (price) price.name = `dataKamar[${i}][price_bulan]`;
                 if (disc) disc.name = `dataKamar[${i}][cumulative_discount]`;
                 if (desc) desc.name = `dataKamar[${i}][description]`;
 
@@ -551,10 +645,20 @@
                                     const mPrice = item.price_kamar.find(p => p.kategori === 'bulan');
                                     const yPrice = item.price_kamar.find(p => p.kategori === 'tahun');
                                     if (mPrice) {
-                                        priceHtml = `<div class="fw-bold text-success fs-7">Rp ${Number(mPrice.price).toLocaleString('id-ID')}<span class="fs-8 fw-normal text-muted">/bln</span></div>`;
+                                        const rawP = Number(mPrice.price);
+                                        const disc = Number(item.cumulative_discount || mPrice.discount || 0);
+                                        if (disc > 0) {
+                                            const netP = disc <= 100 ? rawP * (1 - disc / 100) : Math.max(0, rawP - disc);
+                                            priceHtml = `
+                                                <div class="fw-bold text-success fs-7">Rp ${Math.round(netP).toLocaleString('id-ID')}<span class="fs-8 fw-normal text-muted">/bln</span></div>
+                                                <div class="fs-8 text-muted text-decoration-line-through">Rp ${rawP.toLocaleString('id-ID')}</div>
+                                            `;
+                                        } else {
+                                            priceHtml = `<div class="fw-bold text-dark fs-7">Rp ${rawP.toLocaleString('id-ID')}<span class="fs-8 fw-normal text-muted">/bln</span></div>`;
+                                        }
                                     }
                                     if (yPrice) {
-                                        priceHtml += `<div class="fs-8 text-muted mt-1">Rp ${Number(yPrice.price).toLocaleString('id-ID')}/thn</div>`;
+                                        priceHtml += `<div class="fs-8 text-muted mt-0.5">Rp ${Number(yPrice.price).toLocaleString('id-ID')}/thn</div>`;
                                     }
                                 }
 
