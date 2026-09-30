@@ -5,8 +5,8 @@
 
             <!-- LOGO -->
             <a
-                href="{{ route('login') }}"
-                aria-label="Login Sinar Citra Lestari"
+                href="{{ route('home') }}"
+                aria-label="Beranda Sinar Citra Lestari"
                 class="group flex items-center gap-3 transition-all duration-300 hover:-translate-y-1"
             >
                 <div class="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center rounded-2xl bg-white p-1.5 shadow-[0_5px_15px_rgba(0,0,0,0.18)] transition-all duration-300 group-hover:scale-105">
@@ -135,11 +135,20 @@
 
         </div>
 
-        <!-- COPYRIGHT -->
-        <div class="mt-6 pt-4 border-t border-[#F3A833]/15 text-center">
-            <p class="text-[10px] sm:text-xs text-[#F8EFE6]/50">
+        <!-- COPYRIGHT & PORTAL ADMIN -->
+        <div class="mt-6 pt-4 border-t border-[#F3A833]/15 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+            <p class="text-[10px] sm:text-xs text-[#F8EFE6]/50 mb-0">
                 &copy; {{ date('Y') }} Sinar Citra Lestari. Seluruh hak cipta dilindungi.
             </p>
+
+            <a
+                href="{{ route('login') }}"
+                class="text-[10px] sm:text-[11px] font-semibold text-[#F8EFE6]/40 hover:text-[#F3A833] transition-colors flex items-center gap-1.5"
+                title="Portal Login Pengelola / Admin Kosan"
+            >
+                <i class="fa-solid fa-shield-halved text-[9px]"></i>
+                <span>Portal Pengelola</span>
+            </a>
         </div>
 
     </div>

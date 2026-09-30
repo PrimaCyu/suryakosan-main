@@ -772,7 +772,10 @@
           totalBasePrice += categorySubtotal;
 
           if (isSingleInput) {
-            const discVal = pInfo.discount;
+            let discVal = pInfo.discount;
+            if (discVal <= 0 && cat === 'bulan') {
+              discVal = cumulativeDiscountVal;
+            }
 
             if (discVal > 0) {
               if (discVal <= 100) {
