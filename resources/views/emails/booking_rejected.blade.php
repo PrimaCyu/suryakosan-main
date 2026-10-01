@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tanda Terima Booking Kos</title>
+    <title>Pemberitahuan Status Booking Kos</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -22,7 +22,7 @@
             border: 1px solid #E9DDD2;
         }
         .email-header {
-            background: linear-gradient(135deg, #3B2314 0%, #54331d 100%);
+            background: linear-gradient(135deg, #991B1B 0%, #7F1D1D 100%);
             border-bottom: 3px solid #F3A833;
             color: #ffffff;
             padding: 28px 24px;
@@ -37,7 +37,7 @@
         .email-header p {
             margin: 6px 0 0 0;
             font-size: 13px;
-            color: #F3A833;
+            color: #FECACA;
             font-weight: 600;
         }
         .email-body {
@@ -46,7 +46,7 @@
         .greeting {
             font-size: 16px;
             font-weight: 700;
-            color: #3B2314;
+            color: #7F1D1D;
             margin-bottom: 12px;
         }
         .message {
@@ -57,9 +57,9 @@
         }
         .status-pill {
             display: inline-block;
-            background-color: #FEF3C7;
-            color: #92400E;
-            border: 1px solid #FCD34D;
+            background-color: #FEE2E2;
+            color: #991B1B;
+            border: 1px solid #FCA5A5;
             padding: 6px 14px;
             border-radius: 9999px;
             font-size: 12px;
@@ -68,19 +68,42 @@
             letter-spacing: 0.5px;
             margin-bottom: 20px;
         }
+        .reason-box {
+            background-color: #FEF2F2;
+            border: 1px solid #FECACA;
+            border-left: 4px solid #DC2626;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+        .reason-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: #991B1B;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .reason-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #7F1D1D;
+            font-weight: 600;
+            margin: 0;
+        }
         .summary-card {
             background-color: #FFF8F1;
             border: 1px solid #E9DDD2;
             border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 20px;
+            padding: 16px 18px;
+            margin-bottom: 22px;
         }
         .summary-card h3 {
-            margin: 0 0 12px 0;
-            font-size: 14px;
+            margin: 0 0 10px 0;
+            font-size: 13px;
             color: #3B2314;
             border-bottom: 1px solid #E9DDD2;
-            padding-bottom: 8px;
+            padding-bottom: 6px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -88,34 +111,34 @@
         .info-row {
             display: table;
             width: 100%;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-size: 13px;
         }
         .info-cell-label {
             display: table-cell;
             color: #7B6759;
-            padding-bottom: 6px;
+            padding-bottom: 4px;
         }
         .info-cell-value {
             display: table-cell;
             font-weight: 700;
             text-align: right;
             color: #3B2314;
-            padding-bottom: 6px;
+            padding-bottom: 4px;
         }
-        .notice-box {
+        .solution-box {
             background-color: #F8FAFC;
-            border-left: 4px solid #F3A833;
+            border-left: 4px solid #00A896;
             padding: 14px 16px;
             border-radius: 6px;
             font-size: 13px;
-            line-height: 1.5;
-            color: #475569;
+            line-height: 1.6;
+            color: #334155;
             margin-bottom: 24px;
         }
-        .btn-action {
+        .btn-wa {
             display: inline-block;
-            background-color: #E60049;
+            background-color: #25D366;
             color: #ffffff !important;
             text-decoration: none;
             padding: 12px 24px;
@@ -138,23 +161,29 @@
 
     <div class="email-container">
         <div class="email-header">
-            <h1>Tanda Terima Permohonan Booking</h1>
+            <h1>Pemberitahuan Status Booking</h1>
             <p>{{ config('app.name', 'Sinar Citra Lestari') }}</p>
         </div>
 
         <div class="email-body">
-            <div class="greeting">Halo, {{ $tamu->name }}! 👋</div>
+            <div class="greeting">Halo, {{ $tamu->name }}</div>
 
             <div>
-                <span class="status-pill">⏳ Menunggu Verifikasi Pembayaran</span>
+                <span class="status-pill">❌ Status: Permohonan Tidak Disetujui</span>
             </div>
 
             <p class="message">
-                Terima kasih telah mengajukan pemesanan kamar kos melalui website kami. Reservasi Anda telah tercatat di sistem kami dengan kode booking: <strong style="color: #E60049;">#BOOK-{{ str_pad($tamu->id, 5, '0', STR_PAD_LEFT) }}</strong>.
+                Terima kasih atas minat Anda untuk menyewa kamar di kos kami. Melalui email ini, kami ingin memberitahukan bahwa permohonan reservasi Anda dengan kode booking: <strong style="color: #991B1B;">#BOOK-{{ str_pad($tamu->id, 5, '0', STR_PAD_LEFT) }}</strong> belum dapat kami setujui.
             </p>
 
+            <!-- KOTAK ALASAN PENOLAKAN -->
+            <div class="reason-box">
+                <div class="reason-title">Alasan Penolakan dari Admin:</div>
+                <p class="reason-text">"{{ $reason }}"</p>
+            </div>
+
             <div class="summary-card">
-                <h3>Rincian Reservasi</h3>
+                <h3>Rincian Pengajuan</h3>
                 <div class="info-row">
                     <span class="info-cell-label">Nama Kos:</span>
                     <span class="info-cell-value">{{ $tamu->productKamarKosan->productKosan->title ?? '-' }}</span>
@@ -164,43 +193,43 @@
                     <span class="info-cell-value">{{ $tamu->productKamarKosan->room ?? '-' }}</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-cell-label">Tanggal Mulai Masuk (Check-In):</span>
-                    <span class="info-cell-value">{{ \Carbon\Carbon::parse($tamu->start_date)->translatedFormat('d F Y') }} ({{ $tamu->start_time }})</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-cell-label">Tanggal Selesai Sewa:</span>
-                    <span class="info-cell-value">{{ \Carbon\Carbon::parse($tamu->end_date)->translatedFormat('d F Y') }}</span>
+                    <span class="info-cell-label">Rencana Check-In:</span>
+                    <span class="info-cell-value">{{ \Carbon\Carbon::parse($tamu->start_date)->translatedFormat('d F Y') }}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-cell-label">Metode Pembayaran:</span>
                     <span class="info-cell-value">{{ strtoupper($tamu->payment_method) }}</span>
                 </div>
-                <div class="info-row" style="border-top: 1px solid #E9DDD2; padding-top: 8px; margin-top: 4px;">
-                    <span class="info-cell-label" style="font-weight: 800; color: #3B2314;">Total Biaya Sewa:</span>
-                    <span class="info-cell-value" style="font-size: 16px; color: #E60049;">Rp {{ number_format($tamu->total_price, 0, ',', '.') }}</span>
+                <div class="info-row">
+                    <span class="info-cell-label">Nominal:</span>
+                    <span class="info-cell-value">Rp {{ number_format($tamu->total_price, 0, ',', '.') }}</span>
                 </div>
             </div>
 
-            <div class="notice-box">
-                ℹ️ <strong>Langkah Berikutnya:</strong><br>
-                Tim pengelola kami sedang memverifikasi bukti pembayaran yang Anda kirimkan. Proses verifikasi membutuhkan waktu maksimal <strong>1x24 jam</strong>.<br><br>
-                Begitu pembayaran Anda disetujui, kami akan mengirimkan <strong>Email Konfirmasi Resmi</strong> yang disertai <strong>Lampiran File PDF (Kwitansi Pelunasan & Bukti Reservasi Sah)</strong>.
+            <div class="solution-box">
+                💡 <strong>Informasi Pengembalian Dana (Refund) & Konfirmasi:</strong><br>
+                Jika Anda telah melakukan transfer dana atau ingin mengunggah bukti pembayaran yang valid, silakan hubungi tim pengelola kami melalui WhatsApp dengan melampirkan kode booking di atas agar tim kami dapat segera membantu proses <strong>pengembalian dana (refund) 100%</strong> atau pemesanan ulang unit yang tersedia.
             </div>
 
-            <div style="text-align: center; margin-top: 10px; margin-bottom: 25px;">
-                <a href="{{ route('booking.success', $tamu->access_token) }}" target="_blank" class="btn-action">
-                    Cek Status Reservasi Anda
+            @php
+                $waMsg = "Halo Admin Sinar Citra Lestari, saya " . $tamu->name . " (Kode Booking #" . str_pad($tamu->id, 5, '0', STR_PAD_LEFT) . " di " . ($tamu->productKamarKosan->productKosan->title ?? 'Kos') . ") yang pengajuannya ditolak dengan alasan: '" . $reason . "'. Mohon bantuan untuk tindak lanjut / proses pengembalian dana (refund).";
+                $waLink = "https://wa.me/" . $waNumber . "?text=" . urlencode($waMsg);
+            @endphp
+
+            <div style="text-align: center; margin-top: 15px; margin-bottom: 25px;">
+                <a href="{{ $waLink }}" target="_blank" class="btn-wa">
+                    💬 Hubungi Admin via WhatsApp untuk Refund / Bantuan
                 </a>
             </div>
 
             <p class="message" style="margin-bottom: 0; font-size: 13px; color: #8F7765;">
-                Jika Anda memiliki pertanyaan lebih lanjut, silakan hubungi tim pengelola kami dengan menyebutkan kode booking Anda.
+                Kami memohon maaf atas ketidaknyamanan ini dan berharap dapat melayani Anda di kesempatan berikutnya.
             </p>
         </div>
 
         <div class="footer">
             &copy; {{ date('Y') }} {{ config('app.name', 'Sinar Citra Lestari') }}. Seluruh hak cipta dilindungi.<br>
-            Email ini dikirim otomatis sebagai konfirmasi permohonan reservasi awal.
+            Email ini dikirim otomatis oleh sistem informasi reservasi kos.
         </div>
     </div>
 

@@ -9,18 +9,22 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class BookingConfirmationMail extends Mailable
+class BookingRejectedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $tamu;
+    public $reason;
+    public $waNumber;
 
     /**
-     * Create a new message instance (Tanda terima awal, menunggu verifikasi admin).
+     * Create a new message instance (Pemberitahuan Penolakan Booking, tanpa PDF).
      */
-    public function __construct(Tamu $tamu)
+    public function __construct(Tamu $tamu, ?string $reason = null, ?string $waNumber = null)
     {
         $this->tamu = $tamu;
+        $this->reason = $reason ?? 'Pembayaran tidak memenuhi ketentuan yang berlaku atau unit kamar telah terisi.';
+        $this->waNumber = $waNumber ?? '6281234567890';
     }
 
     /**
@@ -29,7 +33,7 @@ class BookingConfirmationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '[Menunggu Verifikasi] Booking Kos #' . str_pad($this->tamu->id, 5, '0', STR_PAD_LEFT) . ' - Sinar Citra Lestari',
+            subject: 'Pemberitahuan Status Booking Kos #' . str_pad($this->tamu->id, 5, '0', STR_PAD_LEFT) . ' - Sinar Citra Lestari',
         );
     }
 
@@ -39,15 +43,17 @@ class BookingConfirmationMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.booking_confirmation',
+            view: 'emails.booking_rejected',
             with: [
                 'tamu' => $this->tamu,
+                'reason' => $this->reason,
+                'waNumber' => $this->waNumber,
             ],
         );
     }
 
     /**
-     * Lampiran: Kosong pada tahap awal (PDF hanya dikirim saat disetujui).
+     * Tanpa lampiran PDF saat ditolak.
      *
      * @return array<int, \Illuminate\Mail\Mailables\Attachment>
      */

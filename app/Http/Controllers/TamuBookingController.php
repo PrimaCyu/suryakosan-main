@@ -23,8 +23,6 @@ class TamuBookingController extends Controller
 
     public function booking($product_kamar_kosan, Request $request)
     {
-        $kamar = ProductKamarKosan::with(['priceKamar', 'productKosan'])->findOrFail($product_kamar_kosan);
-
         $request->validate([
             'name'              => 'required|string|max:255',
             'telp'              => 'required|string|max:25',
@@ -40,46 +38,56 @@ class TamuBookingController extends Controller
             'tahun'             => 'nullable|integer|min:0',
         ]);
 
-        // 1. Validasi ketersediaan jadwal kamar
-        $bookingDate = $this->processBookingDates->calculateBookingRange($kamar->id, $request);
-        if (isset($bookingDate['status']) && $bookingDate['status'] === false) {
-            return back()->withInput()->with('failed', $bookingDate['message']);
+        try {
+            $tamu = DB::transaction(function () use ($product_kamar_kosan, $request) {
+                // Kunci baris data kamar untuk mencegah race condition / double booking konkuren
+                $kamar = ProductKamarKosan::with(['priceKamar', 'productKosan'])
+                    ->where('id', $product_kamar_kosan)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                // 1. Validasi ketersediaan jadwal kamar secara atomic di dalam lock
+                $bookingDate = $this->processBookingDates->calculateBookingRange($kamar->id, $request);
+                if (isset($bookingDate['status']) && $bookingDate['status'] === false) {
+                    throw new \DomainException($bookingDate['message']);
+                }
+
+                // 2. Kalkulasi total harga resmi dari sisi backend (Anti Price Tampering)
+                $serverCalculatedPrice = $this->processBookingDates->calculateBookingPrice($kamar, $request);
+
+                $data = [
+                    'product_kamar_kosan_id' => $kamar->id,
+                    'name'                   => strip_tags($request->name),
+                    'telp'                   => strip_tags($request->telp),
+                    'email'                  => filter_var($request->email, FILTER_SANITIZE_EMAIL),
+                    'start_time'             => $request->start_time,
+                    'start_date'             => $bookingDate['start'],
+                    'end_date'               => $bookingDate['end'],
+                    'payment_method'         => strtolower($request->payment_method),
+                    'total_price'            => $serverCalculatedPrice,
+                    'status'                 => 'pending',
+                ];
+
+                if ($request->hasFile('proof_of_transfer') && $request->file('proof_of_transfer')->isValid()) {
+                    $path = $request->file('proof_of_transfer')->store('tamu/proof-of-transfer', 'public');
+                    $data['proof_of_transfer'] = $path;
+                }
+
+                return Tamu::create($data);
+            });
+        } catch (\DomainException $e) {
+            return back()->withInput()->with('failed', $e->getMessage());
+        } catch (\Exception $e) {
+            Log::error('Error saat proses transaksi booking: ' . $e->getMessage());
+            return back()->withInput()->with('failed', 'Terjadi kendala saat memproses booking Anda. Silakan coba beberapa saat lagi.');
         }
 
-        // 2. Kalkulasi total harga resmi dari sisi backend (Anti Price Tampering)
-        $serverCalculatedPrice = $this->processBookingDates->calculateBookingPrice($kamar, $request);
-
-        $tamu = DB::transaction(function () use ($kamar, $bookingDate, $request, $serverCalculatedPrice) {
-            $data = [
-                'product_kamar_kosan_id' => $kamar->id,
-                'name'                   => strip_tags($request->name),
-                'telp'                   => strip_tags($request->telp),
-                'email'                  => filter_var($request->email, FILTER_SANITIZE_EMAIL),
-                'start_time'             => $request->start_time,
-                'start_date'             => $bookingDate['start'],
-                'end_date'               => $bookingDate['end'],
-                'payment_method'         => strtolower($request->payment_method),
-                'total_price'            => $serverCalculatedPrice,
-                'status'                 => 'pending',
-            ];
-
-            if ($request->hasFile('proof_of_transfer') && $request->file('proof_of_transfer')->isValid()) {
-                $path = $request->file('proof_of_transfer')->store('tamu/proof-of-transfer', 'public');
-                $data['proof_of_transfer'] = $path;
-            }
-
-            return Tamu::create($data);
-        });
-
-        // 3. Generate PDF dan kirim email konfirmasi
+        // 3. Kirim email tanda terima permohonan booking (tanpa lampiran PDF; PDF resmi dikirim saat disetujui)
         try {
             $tamu->load(['productKamarKosan.productKosan']);
-            $pdf = Pdf::loadView('pdf.booking_invoice', compact('tamu'));
-            $pdfOutput = $pdf->output();
-
-            Mail::to($tamu->email)->send(new BookingConfirmationMail($tamu, $pdfOutput));
+            Mail::to($tamu->email)->send(new BookingConfirmationMail($tamu));
         } catch (\Exception $e) {
-            Log::error('Gagal mengirim email konfirmasi booking / generate PDF: ' . $e->getMessage());
+            Log::error('Gagal mengirim email konfirmasi booking awal: ' . $e->getMessage());
         }
 
         return redirect()->route('booking.success', $tamu->access_token)->with('success', 'Booking Berhasil! Simpan bukti reservasi ini.');

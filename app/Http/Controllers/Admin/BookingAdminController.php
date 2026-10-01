@@ -3,8 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\BookingApprovedMail;
+use App\Mail\BookingRejectedMail;
+use App\Models\SosialMedia;
 use App\Models\Tamu;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class BookingAdminController extends Controller
 {
@@ -90,7 +96,29 @@ class BookingAdminController extends Controller
             $dataTamu->productKamarKosan->productKosan->syncAvailableCount();
         }
 
-        return back()->with('success', 'Permintaan booking atas nama ' . $dataTamu->name . ' telah disetujui (Approved) oleh ' . $user->name . '. Audit trail tercatat.');
+        // Kirim email konfirmasi persetujuan (Approved) beserta lampiran file PDF kwitansi lunas
+        try {
+            if (!empty($dataTamu->email)) {
+                $dataTamu->load(['productKamarKosan.productKosan']);
+                $pdf = Pdf::loadView('pdf.booking_invoice', ['tamu' => $dataTamu]);
+                $pdfOutput = $pdf->output();
+
+                $waSosmed = SosialMedia::where('title', 'like', '%whatsapp%')->orWhere('url', 'like', '%wa.me%')->first();
+                $waNumber = '6281234567890';
+                if ($waSosmed) {
+                    preg_match('/[0-9]{9,15}/', $waSosmed->url, $m);
+                    if (!empty($m[0])) {
+                        $waNumber = $m[0];
+                    }
+                }
+
+                Mail::to($dataTamu->email)->send(new BookingApprovedMail($dataTamu, $pdfOutput, $waNumber));
+            }
+        } catch (\Exception $e) {
+            Log::error('Gagal mengirim email approved booking ke ' . $dataTamu->email . ': ' . $e->getMessage());
+        }
+
+        return back()->with('success', 'Permintaan booking atas nama ' . $dataTamu->name . ' telah disetujui (Approved) oleh ' . $user->name . '. Email konfirmasi resmi & kwitansi PDF telah dikirim ke penyewa.');
     }
 
     public function rejectBooking(Request $request, $tamu)
@@ -129,6 +157,25 @@ class BookingAdminController extends Controller
             $dataTamu->productKamarKosan->productKosan->syncAvailableCount();
         }
 
-        return back()->with('success', 'Permintaan booking atas nama ' . $dataTamu->name . ' telah ditolak (Rejected) oleh ' . $user->name . '. Alasan penolakan telah tercatat di jejak audit.');
+        // Kirim email pemberitahuan penolakan (Rejected) tanpa lampiran PDF, disertai alasan & link bantuan WA
+        try {
+            if (!empty($dataTamu->email)) {
+                $dataTamu->load(['productKamarKosan.productKosan']);
+                $waSosmed = SosialMedia::where('title', 'like', '%whatsapp%')->orWhere('url', 'like', '%wa.me%')->first();
+                $waNumber = '6281234567890';
+                if ($waSosmed) {
+                    preg_match('/[0-9]{9,15}/', $waSosmed->url, $m);
+                    if (!empty($m[0])) {
+                        $waNumber = $m[0];
+                    }
+                }
+
+                Mail::to($dataTamu->email)->send(new BookingRejectedMail($dataTamu, $reason, $waNumber));
+            }
+        } catch (\Exception $e) {
+            Log::error('Gagal mengirim email rejected booking ke ' . $dataTamu->email . ': ' . $e->getMessage());
+        }
+
+        return back()->with('success', 'Permintaan booking atas nama ' . $dataTamu->name . ' telah ditolak (Rejected) oleh ' . $user->name . '. Email pemberitahuan alasan penolakan telah dikirim ke penyewa.');
     }
 }

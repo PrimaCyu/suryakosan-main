@@ -388,7 +388,11 @@ class KamarKosanController extends Controller
             'title' => 'required|string|max:255',
         ]);
 
-        $fasilitasKamar = FasilitasKamar::findOrFail($fasilitas_kamar);
+        $fasilitasKamar = FasilitasKamar::where('id', $fasilitas_kamar)
+            ->where('product_kamar_kosan_id', $product_kamar_kosan)
+            ->whereHas('productKamarKosan', fn($q) => $q->where('product_kosan_id', $product_kosan))
+            ->firstOrFail();
+
         $fasilitasKamar->update([
             'product_kamar_kosan_id' => $fasilitasKamar->product_kamar_kosan_id,
             'title'                  => $request->title
@@ -400,7 +404,11 @@ class KamarKosanController extends Controller
     public function deleteFasilitas($product_kosan, $product_kamar_kosan, $fasilitas_kamar)
     {
         $this->checkKosanAccess($product_kosan);
-        $fasilitasKamar = FasilitasKamar::findOrFail($fasilitas_kamar);
+        $fasilitasKamar = FasilitasKamar::where('id', $fasilitas_kamar)
+            ->where('product_kamar_kosan_id', $product_kamar_kosan)
+            ->whereHas('productKamarKosan', fn($q) => $q->where('product_kosan_id', $product_kosan))
+            ->firstOrFail();
+
         $fasilitasKamar->delete();
         return back()->with('success', 'fasilitas delete success');
     }
@@ -465,7 +473,11 @@ class KamarKosanController extends Controller
     public function deleteKamarImage($product_kosan, $product_kamar_kosan, $product_kamar_image_kosan)
     {
         $this->checkKosanAccess($product_kosan);
-        $image_kamar = ProductKamarImageKosan::findOrFail($product_kamar_image_kosan);
+        $image_kamar = ProductKamarImageKosan::where('id', $product_kamar_image_kosan)
+            ->where('product_kamar_kosan_id', $product_kamar_kosan)
+            ->whereHas('productKamarKosan', fn($q) => $q->where('product_kosan_id', $product_kosan))
+            ->firstOrFail();
+
         if ($image_kamar->image && Storage::disk('public')->exists($image_kamar->image)) {
             Storage::disk('public')->delete($image_kamar->image);
         }
@@ -521,7 +533,10 @@ class KamarKosanController extends Controller
         ]);
 
         $isSuperAdmin = auth()->user()->isSuperAdmin();
-        $price_kamar = PriceKamar::findOrFail($price_kamar);
+        $price_kamar = PriceKamar::where('id', $price_kamar)
+            ->where('product_kamar_kosan_id', $product_kamar_kosan)
+            ->whereHas('productKamarKosan', fn($q) => $q->where('product_kosan_id', $product_kosan))
+            ->firstOrFail();
 
         $kategoriNormalized = strtolower(trim($request->kategori));
         if ($kategoriNormalized === 'bulanan') $kategoriNormalized = 'bulan';
@@ -548,7 +563,11 @@ class KamarKosanController extends Controller
     public function deletePriceKamar($product_kosan, $product_kamar_kosan, $price_kamar)
     {
         $this->checkKosanAccess($product_kosan);
-        $price_kamar = PriceKamar::findOrFail($price_kamar);
+        $price_kamar = PriceKamar::where('id', $price_kamar)
+            ->where('product_kamar_kosan_id', $product_kamar_kosan)
+            ->whereHas('productKamarKosan', fn($q) => $q->where('product_kosan_id', $product_kosan))
+            ->firstOrFail();
+
         $price_kamar->delete();
         return back()->with('success', 'price kamar delete success');
     }
@@ -568,7 +587,10 @@ class KamarKosanController extends Controller
     public function renewTamu($product_kosan, $product_kamar_kosan, $tamu, Request $request)
     {
         $this->checkKosanAccess($product_kosan);
-        $dataTamu = Tamu::findOrFail($tamu);
+        $dataTamu = Tamu::where('id', $tamu)
+            ->where('product_kamar_kosan_id', $product_kamar_kosan)
+            ->whereHas('productKamarKosan', fn($q) => $q->where('product_kosan_id', $product_kosan))
+            ->firstOrFail();
 
         $request->validate([
             'name'              => 'required|string|max:255',
@@ -621,7 +643,11 @@ class KamarKosanController extends Controller
     public function deleteTamu($product_kosan, $product_kamar_kosan, $tamu)
     {
         $this->checkKosanAccess($product_kosan);
-        $dataTamu = Tamu::findOrFail($tamu);
+        $dataTamu = Tamu::where('id', $tamu)
+            ->where('product_kamar_kosan_id', $product_kamar_kosan)
+            ->whereHas('productKamarKosan', fn($q) => $q->where('product_kosan_id', $product_kosan))
+            ->firstOrFail();
+
         if ($dataTamu->proof_of_transfer && Storage::disk('public')->exists($dataTamu->proof_of_transfer)) {
             Storage::disk('public')->delete($dataTamu->proof_of_transfer);
         }

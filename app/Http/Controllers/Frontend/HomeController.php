@@ -149,12 +149,6 @@ class HomeController extends Controller
         ])->findOrFail($product_kamar_kosan);
         $kamar->increment('views');
 
-        // Invalidate semua cache terkait agar views terupdate
-        Cache::forget('home_kamar_list');
-        if ($kamar->productKosan) {
-            Cache::forget("kosan_detail_{$kamar->productKosan->slug}");
-        }
-
         return view('frontend.kosan.kamar.detail-kamar', compact('kamar'));
     }
 

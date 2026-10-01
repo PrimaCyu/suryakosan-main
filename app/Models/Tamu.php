@@ -26,7 +26,8 @@ class Tamu extends Model
 
     protected $casts = [
         'processed_at' => 'datetime',
-        'start_date' => 'date',
+        'start_date'   => 'date',
+        'end_date'     => 'datetime',
     ];
 
     protected static function boot()

@@ -317,7 +317,7 @@
   <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-7 space-y-10">
 
     <!-- 3. BREADCRUMB & TOP ACTION TOOLBAR -->
-    <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs -mb-2">
+    <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs mb-2 sm:mb-3">
       <nav class="flex items-center gap-2 text-[#7B6759] font-medium overflow-x-auto no-scrollbar py-1">
         <a href="{{ route('home') }}" class="hover:text-[#E60049] transition-colors whitespace-nowrap">Beranda</a>
         <i class="fa-solid fa-chevron-right text-[9px] text-[#A69383]"></i>
@@ -371,7 +371,7 @@
         <!-- Photo Utama (Hero Item) -->
         <div class="lg:col-span-7">
           <div
-            class="relative h-[280px] sm:h-[400px] lg:h-[474px] rounded-[2rem] overflow-hidden cursor-pointer bg-[#EADFD4] group shadow-lg"
+            class="relative h-[260px] sm:h-[360px] lg:h-[420px] rounded-[2rem] overflow-hidden cursor-pointer bg-[#EADFD4] group shadow-lg"
             onclick="openGallery(0)"
           >
             <img
@@ -402,7 +402,7 @@
           @for($i = 1; $i <= 4; $i++)
             @if(isset($images[$i]))
               <div
-                class="relative h-[135px] sm:h-[195px] lg:h-[231px] overflow-hidden rounded-[1.5rem] bg-[#EADFD4] cursor-pointer group shadow-sm"
+                class="relative h-[125px] sm:h-[174px] lg:h-[204px] overflow-hidden rounded-[1.5rem] bg-[#EADFD4] cursor-pointer group shadow-sm"
                 onclick="openGallery({{ $i }})"
               >
                 <img
@@ -424,7 +424,7 @@
                 @endif
               </div>
             @else
-              <div class="h-[135px] sm:h-[195px] lg:h-[231px] rounded-[1.5rem] bg-[#F2E9E1] flex flex-col items-center justify-center text-[#B6A393] gap-1">
+              <div class="h-[125px] sm:h-[174px] lg:h-[204px] rounded-[1.5rem] bg-[#F2E9E1] flex flex-col items-center justify-center text-[#B6A393] gap-1">
                 <i class="fa-regular fa-image text-xl"></i>
                 <span class="text-[10px] font-bold">Foto Tambahan</span>
               </div>
@@ -511,10 +511,6 @@
                 Kamar ({{ $kosan->productKamarKosan->count() }})
               </button>
 
-              <button type="button" onclick="scrollToSection('peraturan', this)" class="tab-button px-3 sm:px-3.5 py-2.5 rounded-xl text-[#F8EBDD] hover:bg-white/10 text-[10px] sm:text-xs font-extrabold whitespace-nowrap transition-all">
-                Tata Tertib
-              </button>
-
               <button type="button" onclick="scrollToSection('faq', this)" class="tab-button px-3 sm:px-3.5 py-2.5 rounded-xl text-[#F8EBDD] hover:bg-white/10 text-[10px] sm:text-xs font-extrabold whitespace-nowrap transition-all">
                 FAQ
               </button>
@@ -539,7 +535,7 @@
         <div class="lg:col-span-8">
           <div class="relative bg-white p-6 sm:p-8 rounded-[2rem] border border-[#E9DDD2] shadow-sm overflow-hidden">
             <div class="absolute top-0 right-0 w-24 h-24 rounded-bl-[3rem] bg-[#F3A833]/15"></div>
-            <div class="relative text-xs sm:text-sm text-[#604D3F] leading-[1.9]">
+            <div class="relative text-xs sm:text-sm text-[#604D3F] leading-[1.9] [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2 [&_li]:mb-1.5 [&_strong]:font-bold [&_strong]:text-[#3B2314] [&_h1]:text-xl [&_h2]:text-lg [&_h3]:text-base [&_h1]:font-black [&_h2]:font-black [&_h3]:font-bold [&_h1]:text-[#3B2314] [&_h2]:text-[#3B2314] [&_h3]:text-[#3B2314]">
               @if(!empty(trim(strip_tags($kosan->description ?? ''))))
                 {!! $kosan->description !!}
               @else
@@ -928,81 +924,10 @@
       </div>
     </section>
 
-    <!-- 8.1 PERATURAN & TATA TERTIB KOS -->
-    <section id="peraturan" class="reveal space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-        <div>
-          <span class="text-[10px] font-extrabold uppercase tracking-[.2em] text-[#E60049]">05 — Tata Tertib</span>
-          <h3 class="text-2xl sm:text-3xl font-black text-[#3B2314] mt-1">Peraturan & Ketentuan Huni</h3>
-          <p class="text-xs sm:text-sm text-[#7B6759] mt-1">Dirancang untuk menciptakan kenyamanan, privasi, dan ketenangan seluruh penghuni kos.</p>
-        </div>
-        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-bold">
-          <i class="fa-solid fa-shield-halved text-emerald-600"></i>
-          <span>Lingkungan Nyaman & Tertib</span>
-        </span>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- Rule 1: Jam Bertamu -->
-        <div class="bg-white p-5 rounded-2xl border border-[#E9DDD2] shadow-sm hover:shadow-md transition-shadow">
-          <div class="w-10 h-10 rounded-xl bg-[#E60049]/10 text-[#E60049] flex items-center justify-center text-lg mb-3">
-            <i class="fa-regular fa-clock"></i>
-          </div>
-          <h4 class="text-sm font-black text-[#3B2314]">Jam Bertamu & Istirahat</h4>
-          <p class="text-xs text-[#7B6759] mt-1 leading-relaxed">Tamu diperkenankan berkunjung maksimal hingga pkl 22.00 WITA untuk menjaga ketenangan jam istirahat penghuni lain.</p>
-        </div>
-
-        <!-- Rule 2: Ketertiban & Larangan Merokok -->
-        <div class="bg-white p-5 rounded-2xl border border-[#E9DDD2] shadow-sm hover:shadow-md transition-shadow">
-          <div class="w-10 h-10 rounded-xl bg-[#F3A833]/15 text-[#D97706] flex items-center justify-center text-lg mb-3">
-            <i class="fa-solid fa-ban-smoking"></i>
-          </div>
-          <h4 class="text-sm font-black text-[#3B2314]">Bebas Asap di Ruang AC</h4>
-          <p class="text-xs text-[#7B6759] mt-1 leading-relaxed">Dilarang merokok di dalam kamar ber-AC. Merokok hanya diperbolehkan di area luar/balkon terbuka yang disediakan.</p>
-        </div>
-
-        <!-- Rule 3: Parkir Rapi -->
-        <div class="bg-white p-5 rounded-2xl border border-[#E9DDD2] shadow-sm hover:shadow-md transition-shadow">
-          <div class="w-10 h-10 rounded-xl bg-[#00A896]/10 text-[#00A896] flex items-center justify-center text-lg mb-3">
-            <i class="fa-solid fa-square-parking"></i>
-          </div>
-          <h4 class="text-sm font-black text-[#3B2314]">Area Parkir Tertib</h4>
-          <p class="text-xs text-[#7B6759] mt-1 leading-relaxed">Parkir kendaraan motor/mobil di area yang telah ditentukan secara rapi dan pastikan selalu dikunci stang ganda.</p>
-        </div>
-
-        <!-- Rule 4: Kebersihan Bersama -->
-        <div class="bg-white p-5 rounded-2xl border border-[#E9DDD2] shadow-sm hover:shadow-md transition-shadow">
-          <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg mb-3">
-            <i class="fa-solid fa-broom"></i>
-          </div>
-          <h4 class="text-sm font-black text-[#3B2314]">Kebersihan Area Bersama</h4>
-          <p class="text-xs text-[#7B6759] mt-1 leading-relaxed">Wajib mencuci peralatan masak setelah menggunakan dapur bersama serta membuang sampah pada tempat yang disediakan.</p>
-        </div>
-
-        <!-- Rule 5: Penggunaan Listrik -->
-        <div class="bg-white p-5 rounded-2xl border border-[#E9DDD2] shadow-sm hover:shadow-md transition-shadow">
-          <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg mb-3">
-            <i class="fa-solid fa-bolt"></i>
-          </div>
-          <h4 class="text-sm font-black text-[#3B2314]">Penggunaan Daya Listrik</h4>
-          <p class="text-xs text-[#7B6759] mt-1 leading-relaxed">Pemakaian alat elektronik berdaya tinggi (seperti dispenser pribadi, air fryer) harap dikonfirmasikan ke pengelola kos.</p>
-        </div>
-
-        <!-- Rule 6: Kebijakan Hewan Peliharaan -->
-        <div class="bg-white p-5 rounded-2xl border border-[#E9DDD2] shadow-sm hover:shadow-md transition-shadow">
-          <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg mb-3">
-            <i class="fa-solid fa-paw"></i>
-          </div>
-          <h4 class="text-sm font-black text-[#3B2314]">Hewan Peliharaan</h4>
-          <p class="text-xs text-[#7B6759] mt-1 leading-relaxed">Kebijakan membawa hewan peliharaan memerlukan izin pengelola untuk memastikan tidak mengganggu kenyamanan tetangga.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- 8.2 FAQ / PERTANYAAN UMUM -->
+    <!-- 8.1 FAQ / PERTANYAAN UMUM -->
     <section id="faq" class="reveal space-y-6">
       <div>
-        <span class="text-[10px] font-extrabold uppercase tracking-[.2em] text-[#00A896]">06 — Bantuan & FAQ</span>
+        <span class="text-[10px] font-extrabold uppercase tracking-[.2em] text-[#00A896]">05 — Bantuan & FAQ</span>
         <h3 class="text-2xl sm:text-3xl font-black text-[#3B2314] mt-1">Pertanyaan yang Sering Diajukan</h3>
         <p class="text-xs sm:text-sm text-[#7B6759] mt-1">Informasi ringkas seputar proses booking, pembayaran, dan survei lokasi kos.</p>
       </div>
@@ -1433,11 +1358,21 @@
 
       const kosLat = {{ $baseCoords['lat'] }};
       const kosLng = {{ $baseCoords['lng'] }};
+      const isTouchOrMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || window.innerWidth < 768;
 
       const vicinityMap = L.map('vicinity-map', {
         center: [kosLat, kosLng],
         zoom: 15,
-        scrollWheelZoom: false
+        scrollWheelZoom: false,
+        dragging: !isTouchOrMobile, // Mencegah scroll trap saat jari menyentuh peta di HP
+        tap: !isTouchOrMobile
+      });
+
+      // Izinkan geser saat pengguna sengaja menyentuh peta
+      mapElem.addEventListener('click', function () {
+        if (!vicinityMap.dragging.enabled()) {
+          vicinityMap.dragging.enable();
+        }
       });
 
       // High-resolution tile layers (Zero Watermark, 100% Free & Fast)
