@@ -8,7 +8,6 @@
   <link rel="icon" href="{{ asset('scl.png') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/airbnb.css">
 
   <style>
     :root {
@@ -62,47 +61,183 @@
       transform: translateY(-2px);
     }
 
+    /* FLATPICKR LUXURY THEME (RESPONSIVE & ZERO CLIPPING) */
     .flatpickr-calendar {
-      border-radius: 1.25rem !important;
-      box-shadow: 0 20px 45px rgba(59,35,20,.16) !important;
+      background: #FFFFFF !important;
+      border-radius: 1.5rem !important;
+      box-shadow: 0 24px 60px rgba(59,35,20,0.18) !important;
       border: 1px solid var(--line) !important;
-      padding: .75rem !important;
       font-family: inherit !important;
-      max-width: calc(100vw - 2rem) !important;
+      width: 320px !important;
+      padding: 12px !important;
+      box-sizing: border-box !important;
       z-index: 99999 !important;
     }
 
-    .flatpickr-day.selected,
-    .flatpickr-day.startRange,
-    .flatpickr-day.endRange,
-    .flatpickr-day.selected:hover,
-    .flatpickr-day.startRange:hover,
-    .flatpickr-day.endRange:hover {
-      background: var(--red) !important;
-      border-color: var(--red) !important;
-      font-weight: 700 !important;
-      border-radius: .75rem !important;
+    .flatpickr-calendar::before,
+    .flatpickr-calendar::after {
+      border-bottom-color: #FFFFFF !important;
     }
 
+    .flatpickr-months {
+      position: relative !important;
+      align-items: center !important;
+      padding: 4px 0 10px 0 !important;
+      border-bottom: 1px solid #F3ECE6 !important;
+    }
+
+    .flatpickr-months .flatpickr-month {
+      color: #3B2314 !important;
+      height: 38px !important;
+    }
+
+    .flatpickr-current-month {
+      font-size: 105% !important;
+      font-weight: 800 !important;
+      padding-top: 2px !important;
+    }
+
+    .flatpickr-current-month .cur-month {
+      font-weight: 800 !important;
+      color: #3B2314 !important;
+    }
+
+    .flatpickr-current-month input.cur-year {
+      font-weight: 800 !important;
+      color: #3B2314 !important;
+    }
+
+    /* Month Navigation Prev / Next Buttons */
+    .flatpickr-months .flatpickr-prev-month,
+    .flatpickr-months .flatpickr-next-month {
+      position: absolute !important;
+      top: 6px !important;
+      width: 32px !important;
+      height: 32px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border-radius: 10px !important;
+      background: #FFF8F1 !important;
+      border: 1px solid #E9DDD2 !important;
+      color: #3B2314 !important;
+      transition: all 0.2s ease !important;
+      cursor: pointer !important;
+      z-index: 10 !important;
+    }
+
+    .flatpickr-months .flatpickr-prev-month {
+      left: 6px !important;
+    }
+
+    .flatpickr-months .flatpickr-next-month {
+      right: 6px !important;
+    }
+
+    .flatpickr-months .flatpickr-prev-month:hover,
+    .flatpickr-months .flatpickr-next-month:hover {
+      background: #E60049 !important;
+      color: #FFFFFF !important;
+      border-color: #E60049 !important;
+    }
+
+    .flatpickr-months .flatpickr-prev-month svg,
+    .flatpickr-months .flatpickr-next-month svg {
+      width: 14px !important;
+      height: 14px !important;
+      fill: currentColor !important;
+      stroke: currentColor !important;
+      stroke-width: 1px !important;
+    }
+
+    /* Weekday Headers */
+    .flatpickr-weekdays {
+      margin-top: 6px !important;
+      height: 30px !important;
+    }
+
+    span.flatpickr-weekday {
+      color: #8E7B6D !important;
+      font-weight: 800 !important;
+      font-size: 11px !important;
+      letter-spacing: 0.05em !important;
+    }
+
+    /* Days Grid Layout (7 columns, guaranteed fit with zero cut off) */
+    .flatpickr-innerContainer {
+      width: 100% !important;
+      justify-content: center !important;
+      overflow: visible !important;
+    }
+
+    .flatpickr-rContainer {
+      width: 100% !important;
+    }
+
+    .flatpickr-days {
+      width: 100% !important;
+    }
+
+    .dayContainer {
+      width: 100% !important;
+      min-width: 100% !important;
+      max-width: 100% !important;
+      display: grid !important;
+      grid-template-columns: repeat(7, 1fr) !important;
+      gap: 3px !important;
+      padding: 4px 0 !important;
+    }
+
+    .flatpickr-day {
+      width: auto !important;
+      max-width: none !important;
+      height: 38px !important;
+      line-height: 36px !important;
+      margin: 0 !important;
+      border-radius: 10px !important;
+      font-weight: 700 !important;
+      font-size: 13px !important;
+      color: #3B2314 !important;
+      border: 1px solid transparent !important;
+      transition: all 0.15s ease !important;
+    }
+
+    .flatpickr-day:hover {
+      background: #FFF0F3 !important;
+      border-color: #E60049 !important;
+      color: #E60049 !important;
+    }
+
+    .flatpickr-day.selected,
+    .flatpickr-day.selected:hover {
+      background: #E60049 !important;
+      border-color: #E60049 !important;
+      color: #FFFFFF !important;
+      font-weight: 800 !important;
+      box-shadow: 0 4px 14px rgba(230,0,73,0.35) !important;
+    }
+
+    .flatpickr-day.today {
+      border-color: #F3A833 !important;
+      background: #FFF8F1 !important;
+      color: #3B2314 !important;
+      font-weight: 800 !important;
+    }
+
+    /* Disabled Dates (Past or Booked) */
     .flatpickr-day.flatpickr-disabled,
     .flatpickr-day.flatpickr-disabled:hover {
-      color: #A99B90 !important;
-      background: #F6F0EA !important;
+      color: #C0B4AB !important;
+      background: #F9F6F3 !important;
       cursor: not-allowed !important;
-      position: relative !important;
-      border-radius: .5rem !important;
+      border-color: transparent !important;
+      opacity: 0.65 !important;
+      text-decoration: line-through !important;
     }
 
-    .flatpickr-day.flatpickr-disabled::after {
-      content: "";
-      position: absolute;
-      bottom: 5px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 18px;
-      height: 3px;
-      background: var(--yellow);
-      border-radius: 9999px;
+    .flatpickr-day.prevMonthDay,
+    .flatpickr-day.nextMonthDay {
+      color: #D3C7BD !important;
     }
 
     .shine {
@@ -187,6 +322,38 @@
 
     @php
       $namaKosan = $kamar->productKosan->title ?? 'Sinar Citra Lestari';
+
+      $bookedRanges = [];
+      $latestBookedEnd = null;
+      if ($kamar && $kamar->tamu) {
+          foreach ($kamar->tamu as $t) {
+              if (in_array(strtolower($t->status), ['approved', 'pending']) && $t->start_date && $t->end_date) {
+                  $sDate = \Carbon\Carbon::parse($t->start_date)->format('Y-m-d');
+                  $eDate = \Carbon\Carbon::parse($t->end_date)->format('Y-m-d');
+                  $bookedRanges[] = [
+                      'from' => $sDate,
+                      'to' => $eDate,
+                  ];
+                  if (!$latestBookedEnd || $eDate > $latestBookedEnd) {
+                      $latestBookedEnd = $eDate;
+                  }
+              }
+          }
+      }
+
+      $todayStr = now()->format('Y-m-d');
+      $isTodayBooked = false;
+      foreach ($bookedRanges as $r) {
+          if ($todayStr >= $r['from'] && $todayStr <= $r['to']) {
+              $isTodayBooked = true;
+              break;
+          }
+      }
+
+      $firstAvailableDate = $todayStr;
+      if ($isTodayBooked && $latestBookedEnd) {
+          $firstAvailableDate = \Carbon\Carbon::parse($latestBookedEnd)->addDay()->format('Y-m-d');
+      }
     @endphp
 
     <!-- BREADCRUMB -->
@@ -352,15 +519,61 @@
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label class="block font-bold text-[#5D483A] mb-2">Tanggal Mulai Masuk <span class="text-[#E60049]">*</span></label>
+                  <div class="flex items-center justify-between mb-2">
+                    <label class="block font-bold text-[#5D483A]">Tanggal Mulai Masuk <span class="text-[#E60049]">*</span></label>
+                    @if($isTodayBooked && $latestBookedEnd)
+                      <span class="text-[10px] font-extrabold text-[#E60049] bg-rose-50 border border-rose-200/80 px-2 py-0.5 rounded-md">
+                        Ter-booking s/d {{ \Carbon\Carbon::parse($latestBookedEnd)->locale('id')->isoFormat('D MMM Y') }}
+                      </span>
+                    @endif
+                  </div>
+
+                  @if($isTodayBooked && $latestBookedEnd)
+                    <div class="mb-3 p-3.5 rounded-2xl bg-[#FFF8F1] border-2 border-[#F3A833] shadow-sm flex items-start gap-3 text-xs text-[#3B2314] leading-relaxed">
+                      <span class="w-8 h-8 rounded-xl bg-[#F3A833]/20 text-[#D97706] flex items-center justify-center shrink-0 text-sm mt-0.5">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                      </span>
+                      <div class="flex-1">
+                        <span class="font-black text-[#3B2314] block">Kamar sedang terisi saat ini.</span>
+                        <p class="text-[11px] text-[#7B6759] mt-0.5">
+                          Tersedia mulai: <strong class="text-[#E60049]">{{ \Carbon\Carbon::parse($firstAvailableDate)->locale('id')->isoFormat('D MMMM Y') }}</strong>
+                        </p>
+                        <button
+                          type="button"
+                          onclick="selectQuickDate('{{ $firstAvailableDate }}')"
+                          style="background-color: #E60049; color: #FFFFFF;"
+                          class="mt-2 inline-flex items-center gap-1.5 px-3.5 py-2 hover:bg-[#C90040] text-white rounded-xl font-black text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+                        >
+                          <i class="fa-solid fa-calendar-check text-[#F3A833]"></i>
+                          <span>Pilih Cepat ({{ \Carbon\Carbon::parse($firstAvailableDate)->locale('id')->isoFormat('D MMMM Y') }})</span>
+                        </button>
+                      </div>
+                    </div>
+                  @endif
+
                   <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#E60049]">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#E60049] z-10">
                       <i class="fa-solid fa-calendar-day"></i>
                     </div>
-                    <input type="text" id="input-tanggal" name="start_date" required placeholder="Pilih tanggal mulai..."
-                      class="input-scl w-full pl-11 pr-4 py-3.5 bg-white border border-[#E9DDD2] rounded-2xl font-medium text-[#3B2314] cursor-pointer">
+                    <input type="text" id="input-tanggal" name="start_date" required placeholder="Pilih tanggal mulai masuk..."
+                      class="input-scl w-full pl-11 pr-10 py-3.5 bg-white border border-[#E9DDD2] rounded-2xl font-bold text-[#3B2314] cursor-pointer">
+                    <button type="button" onclick="if(fpInstance) fpInstance.toggle()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#8E7B6D] hover:text-[#E60049] transition-colors cursor-pointer z-10" title="Buka/Tutup Kalender">
+                      <i class="fa-solid fa-chevron-down text-xs"></i>
+                    </button>
                   </div>
-                  <p class="mt-2 text-[10px] text-[#9A887A]">Tanggal bergaris menandakan sudah ter-booking.</p>
+
+                  <!-- Legend Status Kalender -->
+                  <div class="mt-2.5 flex items-center gap-3 text-[10px] text-[#7B6759]">
+                    <span class="flex items-center gap-1.5 font-bold">
+                      <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                      <span>Bisa Dipilih</span>
+                    </span>
+                    <span class="flex items-center gap-1.5 font-bold text-rose-700">
+                      <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+                      <span>Terisi / Booked</span>
+                    </span>
+                    <span class="text-[#9A887A] ml-auto">Bisa digeser ↔</span>
+                  </div>
                 </div>
 
                 <div>
@@ -659,43 +872,64 @@
 
     const kamarPriceData = @json($kamar->priceKamar);
     const cumulativeDiscountVal = parseFloat("{{ $kamar->cumulative_discount ?? 0 }}") || 0;
+    const bookedRanges = @json($bookedRanges);
+    const firstAvailableDateStr = "{{ $firstAvailableDate }}";
+
+    function selectQuickDate(dateStr) {
+      if (fpInstance) {
+        fpInstance.setDate(dateStr, true);
+        fpInstance.jumpToDate(dateStr);
+      }
+    }
 
     document.addEventListener("DOMContentLoaded", function() {
-      function fetchBookedDates() {
-        fetch("{{ route('check.date.kamar', $kamar->id) }}")
-          .then(response => {
-            if (!response.ok) throw new Error("Gagal mengambil data booking");
-            return response.json();
-          })
-          .then(data => {
-            const disabledRanges = data.map(tamu => ({
-              from: tamu.start_date,
-              to: tamu.end_date
-            }));
-
-            if (fpInstance) {
-              fpInstance.set('disable', disabledRanges);
-            }
-          })
-          .catch(err => console.error("Error Fetch Date:", err));
-      }
-
+      // Initialize Flatpickr with preloaded booked ranges and swipe gestures
       fpInstance = flatpickr("#input-tanggal", {
         dateFormat: "Y-m-d",
         altInput: true,
         altFormat: "j F Y",
         minDate: "today",
         locale: "id",
-        disable: [],
+        disable: bookedRanges,
+        defaultDate: null,
         appendTo: document.body,
-        position: "auto center",
-        onOpen: function() {
-          fetchBookedDates();
+        position: "auto left",
+        onReady: function(selectedDates, dateStr, instance) {
+          if (firstAvailableDateStr) {
+            instance.jumpToDate(firstAvailableDateStr);
+          }
+          attachFlatpickrSwipe(instance);
+        },
+        onOpen: function(selectedDates, dateStr, instance) {
+          if (!instance.selectedDates.length && firstAvailableDateStr) {
+            instance.jumpToDate(firstAvailableDateStr);
+          }
         }
       });
 
-      fetchBookedDates();
-      setInterval(fetchBookedDates, 10000);
+      // Enable touch swipe / drag gestures between months on mobile & tablet
+      function attachFlatpickrSwipe(instance) {
+        if (!instance || !instance.calendarContainer) return;
+        const container = instance.calendarContainer;
+        let startX = 0;
+        let endX = 0;
+
+        container.addEventListener('touchstart', function(e) {
+          startX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        container.addEventListener('touchend', function(e) {
+          endX = e.changedTouches[0].screenX;
+          const deltaX = endX - startX;
+          if (Math.abs(deltaX) > 35) {
+            if (deltaX < 0) {
+              instance.changeMonth(1); // Swipe left -> Next month
+            } else {
+              instance.changeMonth(-1); // Swipe right -> Previous month
+            }
+          }
+        }, { passive: true });
+      }
 
       const durationInputs = ['durasi-jam', 'durasi-hari', 'durasi-minggu', 'durasi-bulan', 'durasi-tahun'];
 

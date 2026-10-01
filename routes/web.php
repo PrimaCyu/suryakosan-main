@@ -30,6 +30,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 */
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/kosan', [HomeController::class, 'kosanIndex'])->name('kosan.index');
+Route::get('/kosan/detail', fn() => redirect()->route('kosan.index'));
 Route::get('/kosan/detail/{slug}', [HomeController::class, 'kosanDetail'])->name('kosan.detail');
 Route::get('/kamar/detail/{product_kamar_kosan?}', [HomeController::class, 'kamarDetail'])->name('kamar.detail');
 Route::get('/news', [HomeController::class, 'newsIndex'])->name('news.index');

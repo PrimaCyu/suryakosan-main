@@ -184,22 +184,34 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label for="select_wilayah_edit_{{ $item->id }}" class="form-label">
+                                    <label for="select_wilayah_edit_{{ $item->id }}" class="form-label fw-semibold">
                                         Wilayah (Bali) <span class="text-danger">*</span>
                                     </label>
-                                    <select name="wilayah" id="select_wilayah_edit_{{ $item->id }}" class="form-select select-wilayah-edit" data-current-value="{{ $item->wilayah }}" required>
-                                        <option value="{{ $item->wilayah }}" selected>{{ $item->wilayah ?? '-- Pilih Wilayah --' }}</option>
+                                    <select name="wilayah" id="select_wilayah_edit_{{ $item->id }}" class="form-select select-wilayah-edit" required>
+                                        <option value="" disabled>-- Pilih Kab / Kota (Bali) --</option>
+                                        @php
+                                            $baliRegencies = ['Denpasar', 'Badung', 'Gianyar', 'Tabanan', 'Buleleng', 'Karangasem', 'Klungkung', 'Bangli', 'Jembrana'];
+                                        @endphp
+                                        @foreach($baliRegencies as $reg)
+                                            <option value="{{ $reg }}" {{ (old('wilayah', $item->wilayah) == $reg) ? 'selected' : '' }}>{{ $reg }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
 
-                                <div class="col-md-6">
-                                    <label for="edit_alamat_{{ $item->id }}" class="form-label">Alamat Lengkap</label>
-                                    <input type="text" name="alamat" id="edit_alamat_{{ $item->id }}" class="form-control" value="{{ old('alamat', $item->alamat) }}" placeholder="Jl. Contoh No. 123...">
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label for="edit_google_maps_{{ $item->id }}" class="form-label">Google Maps URL / Embed</label>
-                                    <input type="text" name="google_maps" id="edit_google_maps_{{ $item->id }}" class="form-control" value="{{ old('google_maps', $item->google_maps) }}" placeholder="https://maps.app.goo.gl/...">
+                                <div class="col-12">
+                                    <label for="edit_gmaps_{{ $item->id }}" class="form-label">
+                                        Link Lokasi Google Maps / Embed <span class="badge bg-secondary-subtle text-secondary fs-8 ms-1">Opsional</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent text-muted"><i class="bi bi-geo-alt-fill text-danger"></i></span>
+                                        <input type="text"
+                                               name="gmaps"
+                                               id="edit_gmaps_{{ $item->id }}"
+                                               class="form-control"
+                                               value="{{ old('gmaps', $item->gmaps) }}"
+                                               placeholder="https://maps.app.goo.gl/... atau <iframe src=...>">
+                                    </div>
+                                    <div class="form-text fs-8 text-muted">Salin tautan bagikan Google Maps atau kode sematan embed (iframe) untuk menampilkan peta lokasi presisi.</div>
                                 </div>
 
                                 <div class="col-md-6">

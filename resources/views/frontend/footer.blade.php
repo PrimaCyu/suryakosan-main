@@ -135,20 +135,11 @@
 
         </div>
 
-        <!-- COPYRIGHT & PORTAL ADMIN -->
+        
         <div class="mt-6 pt-4 border-t border-[#F3A833]/15 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
             <p class="text-[10px] sm:text-xs text-[#F8EFE6]/50 mb-0">
                 &copy; {{ date('Y') }} Sinar Citra Lestari. Seluruh hak cipta dilindungi.
             </p>
-
-            <a
-                href="{{ route('login') }}"
-                class="text-[10px] sm:text-[11px] font-semibold text-[#F8EFE6]/40 hover:text-[#F3A833] transition-colors flex items-center gap-1.5"
-                title="Portal Login Pengelola / Admin Kosan"
-            >
-                <i class="fa-solid fa-shield-halved text-[9px]"></i>
-                <span>Portal Pengelola</span>
-            </a>
         </div>
 
     </div>

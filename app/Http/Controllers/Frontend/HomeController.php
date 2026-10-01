@@ -23,7 +23,7 @@ class HomeController extends Controller
     public function index()
     {
         $kamarList = Cache::remember('home_kamar_list', 3600, function () {
-            return ProductKamarKosan::with(['productKosan.productImageKosan', 'productKamarImageKosan', 'priceKamar'])
+            return ProductKamarKosan::with(['productKosan.productImageKosan', 'productKamarImageKosan', 'priceKamar', 'tamu'])
                         ->orderByDesc('views')
                         ->orderByDesc('created_at')
                         ->get();
@@ -53,7 +53,11 @@ class HomeController extends Controller
             $query->where(function($q) use ($search) {
                 $q->whereRaw('LOWER(title) LIKE ?', ["%{$search}%"])
                   ->orWhereRaw('LOWER(wilayah) LIKE ?', ["%{$search}%"])
-                  ->orWhereRaw('LOWER(fasilitas) LIKE ?', ["%{$search}%"]);
+                  ->orWhereRaw('LOWER(fasilitas) LIKE ?', ["%{$search}%"])
+                  ->orWhereHas('productKamarKosan', function($sub) use ($search) {
+                      $sub->whereRaw('LOWER(room) LIKE ?', ["%{$search}%"])
+                          ->orWhereRaw('LOWER(fasilitas) LIKE ?', ["%{$search}%"]);
+                  });
             });
         }
 
@@ -83,6 +87,7 @@ class HomeController extends Controller
             if (isset($rangeMap[$request->price_range])) {
                 [$min, $max] = $rangeMap[$request->price_range];
                 $query->whereHas('productKamarKosan.priceKamar', function ($q) use ($min, $max) {
+                    $q->whereRaw('LOWER(kategori) = ?', ['bulan']);
                     if (!is_null($min)) {
                         $q->where('price', '>=', $min);
                     }
@@ -99,13 +104,28 @@ class HomeController extends Controller
 
     public function kosanDetail($slug)
     {
-        $kosan = Cache::remember("kosan_detail_{$slug}", 3600, function () use ($slug) {
-            return ProductKosan::with(['productImageKosan', 'productKamarKosan.productKamarImageKosan', 'productKamarKosan.priceKamar'])
-                        ->where('slug', $slug)
-                        ->firstOrFail();
-        });
+        $kosan = ProductKosan::with([
+            'productImageKosan',
+            'productKamarKosan.productKamarImageKosan',
+            'productKamarKosan.priceKamar',
+            'productKamarKosan.tamu' => function ($t) {
+                $t->where('status', 'approved')
+                  ->whereDate('end_date', '>=', now()->toDateString());
+            }
+        ])
+        ->where('slug', $slug)
+        ->firstOrFail();
 
-        return view('frontend.kosan.detail-kos', compact('kosan'));
+        // Increment view count realistically
+        $kosan->increment('view');
+
+        // Related Kosan in same or other regions for exploration/cross-selling
+        $relatedKosans = ProductKosan::with(['productImageKosan', 'productKamarKosan.priceKamar'])
+            ->where('id', '!=', $kosan->id)
+            ->take(3)
+            ->get();
+
+        return view('frontend.kosan.detail-kos', compact('kosan', 'relatedKosans'));
     }
 
     public function kamarDetail($product_kamar_kosan = null)
@@ -114,7 +134,19 @@ class HomeController extends Controller
             return redirect()->route('kosan.index');
         }
 
-        $kamar = ProductKamarKosan::with(['productKosan', 'productKamarImageKosan', 'priceKamar'])->findOrFail($product_kamar_kosan);
+        $kamar = ProductKamarKosan::with([
+            'productKosan.productImageKosan',
+            'productKosan.productKamarKosan' => function ($q) use ($product_kamar_kosan) {
+                $q->where('id', '!=', $product_kamar_kosan)
+                  ->with(['productKamarImageKosan', 'priceKamar']);
+            },
+            'productKamarImageKosan',
+            'priceKamar',
+            'tamu' => function ($t) {
+                $t->where('status', 'approved')
+                  ->whereDate('end_date', '>=', now()->toDateString());
+            }
+        ])->findOrFail($product_kamar_kosan);
         $kamar->increment('views');
 
         // Invalidate semua cache terkait agar views terupdate

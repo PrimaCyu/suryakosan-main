@@ -172,7 +172,7 @@ class KosanController extends Controller
             'wilayah'     => $request->wilayah ?? 'Bali',
             'tersedia'    => $request->tersedia ?? 0,
             'view'        => $request->view ?? 0,
-            'gmaps'       => $request->gmaps
+            'gmaps'       => $request->gmaps ?? $request->google_maps
         ];
 
         $kosan = ProductKosan::create($data);
@@ -205,6 +205,7 @@ class KosanController extends Controller
     {
         $this->checkKosanAccess($product_kosan);
         $productKosan = ProductKosan::findOrFail($product_kosan);
+        $oldSlug = $productKosan->slug;
 
         $request->validate([
             'title'       => 'required|string|max:255',
@@ -214,6 +215,7 @@ class KosanController extends Controller
             'tersedia'    => 'nullable|numeric',
             'view'        => 'nullable|numeric',
             'gmaps'       => 'nullable|string',
+            'google_maps' => 'nullable|string',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'images'      => 'nullable|array',
             'images.*'    => 'image|mimes:jpeg,png,jpg,webp|max:5120',
@@ -234,7 +236,7 @@ class KosanController extends Controller
             'wilayah'     => $request->wilayah ?? 'Bali',
             'tersedia'    => $request->tersedia ?? 0,
             'view'        => $request->view ?? 0,
-            'gmaps'       => $request->gmaps
+            'gmaps'       => $request->gmaps ?? $request->google_maps
         ];
 
         $productKosan->update($data);
@@ -262,6 +264,7 @@ class KosanController extends Controller
         }
 
         Cache::forget('home_kamar_list');
+        Cache::forget("kosan_detail_{$oldSlug}");
         Cache::forget("kosan_detail_{$productKosan->slug}");
 
         return back()->with('success', 'Properti Kos-kosan berhasil diperbarui');

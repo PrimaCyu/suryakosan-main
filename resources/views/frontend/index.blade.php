@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sinar Citra Lestari - Platform Pencarian & Sewa Kos Modern</title>
+    <meta name="description" content="Platform pencarian dan sewa kos modern Sinar Citra Lestari di Bali. Dapatkan unit kamar kos siap huni, fasilitas lengkap, lokasi strategis, dan reservasi instan resmi.">
+    <meta name="keywords" content="sewa kos bali, kosan modern gianyar, kos tabanan, kost fasilitas lengkap, kosan murah nyaman, kamar kos siap huni">
+    
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url('/') }}">
+    <meta property="og:title" content="Sinar Citra Lestari - Platform Pencarian & Sewa Kos Modern">
+    <meta property="og:description" content="Hunian kos modern, nyaman & bebas ribet. Fasilitas lengkap siap huni dengan reservasi instan bergaransi e-Ticket resmi.">
+    <meta property="og:image" content="{{ asset('scl.png') }}">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -83,9 +93,9 @@
 
     <!-- FLASH MESSAGE MODAL -->
     @if (session('success'))
-        <div id="flash-success-modal" class="fixed inset-0 bg-[#3B2314]/70 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
+        <div id="flash-success-modal" onclick="if(event.target===this) closeSuccessModal()" class="fixed inset-0 bg-[#3B2314]/70 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
             <div class="bg-[#FFFCF8] w-full max-w-md rounded-[2.5rem] p-6 sm:p-8 shadow-2xl relative space-y-5 border border-[#F3A833]/30 animate-in fade-in zoom-in duration-200">
-                <button type="button" onclick="closeSuccessModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-[#3B2314]/5 flex items-center justify-center text-[#6B4630] hover:bg-[#E60049] hover:text-white transition-all">
+                <button type="button" onclick="closeSuccessModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-[#3B2314]/5 flex items-center justify-center text-[#6B4630] hover:bg-[#E60049] hover:text-white transition-all" aria-label="Tutup modal">
                     <i class="fa-solid fa-xmark text-sm"></i>
                 </button>
 
@@ -115,9 +125,9 @@
     @endif
 
     @if (session('failed'))
-        <div id="flash-failed-modal" class="fixed inset-0 bg-[#3B2314]/70 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
+        <div id="flash-failed-modal" onclick="if(event.target===this) closeFailedModal()" class="fixed inset-0 bg-[#3B2314]/70 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
             <div class="bg-[#FFFCF8] w-full max-w-md rounded-[2.5rem] p-6 sm:p-8 shadow-2xl relative space-y-5 border border-[#E60049]/20 animate-in fade-in zoom-in duration-200">
-                <button type="button" onclick="closeFailedModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-[#3B2314]/5 flex items-center justify-center text-[#6B4630] hover:bg-[#E60049] hover:text-white transition-all">
+                <button type="button" onclick="closeFailedModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-[#3B2314]/5 flex items-center justify-center text-[#6B4630] hover:bg-[#E60049] hover:text-white transition-all" aria-label="Tutup modal">
                     <i class="fa-solid fa-xmark text-sm"></i>
                 </button>
 
@@ -201,13 +211,17 @@
                                 
                                 <!-- WILAYAH DROPDOWN -->
                                 @php
-                                    $wilayahList = $kamarList->pluck('productKosan.wilayah')->filter()->unique()->values();
+                                    $wilayahList = $kamarList->pluck('productKosan.wilayah')
+                                        ->merge(isset($kosanList) ? $kosanList->pluck('wilayah') : [])
+                                        ->filter()
+                                        ->unique()
+                                        ->values();
                                 @endphp
                                 <div class="sm:col-span-4 relative flex items-center bg-[#FFF8F1] rounded-2xl px-3 py-2.5 border border-[#E9DDD2] hover:border-[#F3A833] transition-colors">
                                     <i class="fa-solid fa-location-dot text-[#E60049] text-sm shrink-0 mr-2.5"></i>
                                     <div class="flex-1 min-w-0">
-                                        <span class="block text-[9px] uppercase font-black text-[#8E7B6D] tracking-wider">Wilayah</span>
-                                        <select name="wilayah" class="w-full bg-transparent text-xs font-bold text-[#3B2314] focus:outline-none cursor-pointer">
+                                        <label for="search-wilayah" class="block text-[9px] uppercase font-black text-[#8E7B6D] tracking-wider cursor-pointer">Wilayah</label>
+                                        <select id="search-wilayah" name="wilayah" class="w-full bg-transparent text-xs font-bold text-[#3B2314] focus:outline-none cursor-pointer">
                                             <option value="semua">Semua Wilayah</option>
                                             @foreach($wilayahList as $w)
                                                 <option value="{{ $w }}">{{ $w }}</option>
@@ -220,8 +234,8 @@
                                 <div class="sm:col-span-4 relative flex items-center bg-[#FFF8F1] rounded-2xl px-3 py-2.5 border border-[#E9DDD2] hover:border-[#F3A833] transition-colors">
                                     <i class="fa-solid fa-wallet text-[#F3A833] text-sm shrink-0 mr-2.5"></i>
                                     <div class="flex-1 min-w-0">
-                                        <span class="block text-[9px] uppercase font-black text-[#8E7B6D] tracking-wider">Rentang Budget</span>
-                                        <select name="price_range" class="w-full bg-transparent text-xs font-bold text-[#3B2314] focus:outline-none cursor-pointer">
+                                        <label for="search-price-range" class="block text-[9px] uppercase font-black text-[#8E7B6D] tracking-wider cursor-pointer">Rentang Budget</label>
+                                        <select id="search-price-range" name="price_range" class="w-full bg-transparent text-xs font-bold text-[#3B2314] focus:outline-none cursor-pointer">
                                             <option value="">Semua Budget</option>
                                             <option value="under-500">&lt; Rp 500rb / bln</option>
                                             <option value="500-1000">Rp 500rb - 1 Juta</option>
@@ -237,7 +251,7 @@
                                     <div class="flex-1 relative flex items-center bg-[#FFF8F1] rounded-2xl px-3 py-2.5 border border-[#E9DDD2] hover:border-[#F3A833] transition-colors">
                                         <i class="fa-solid fa-magnifying-glass text-[#00A896] text-sm shrink-0 mr-2"></i>
                                         <div class="flex-1 min-w-0">
-                                            <span class="block text-[9px] uppercase font-black text-[#8E7B6D] tracking-wider">Kata Kunci</span>
+                                            <label for="hero-search-input" class="block text-[9px] uppercase font-black text-[#8E7B6D] tracking-wider cursor-pointer">Kata Kunci</label>
                                             <input
                                                 type="text"
                                                 id="hero-search-input"
@@ -252,6 +266,7 @@
                                         type="submit"
                                         class="shine px-5 py-4 bg-[#E60049] hover:bg-[#C90040] text-white rounded-2xl font-black text-xs transition-all shadow-md active:scale-95 shrink-0 flex items-center gap-2"
                                         title="Cari Kos"
+                                        aria-label="Cari Kos"
                                     >
                                         <span>Cari</span>
                                         <i class="fa-solid fa-arrow-right text-[10px]"></i>
@@ -401,7 +416,7 @@
                         @endphp
                         <div class="bg-white rounded-[2rem] border border-[#E9DDD2] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group flex flex-col sm:flex-row">
                             <div class="sm:w-5/12 relative h-56 sm:h-auto overflow-hidden bg-[#EDE4DC] shrink-0">
-                                <img src="{{ $kosImgUrl }}" alt="{{ $kos->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <img src="{{ $kosImgUrl }}" alt="{{ $kos->title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 <span class="absolute top-3 left-3 px-3 py-1 bg-[#3B2314]/90 text-white rounded-full text-[10px] font-black">
                                     {{ $kos->wilayah ?? 'Bali' }}
                                 </span>
@@ -422,7 +437,7 @@
                                     <span class="text-[11px] text-[#8E7B6D] font-bold">
                                         <i class="fa-solid fa-location-dot text-[#E60049] mr-1"></i> {{ $kos->wilayah }}
                                     </span>
-                                    <a href="{{ route('kosan.detail', $kos->slug) }}" class="px-4 py-2 bg-[#3B2314] hover:bg-[#E60049] text-white text-xs font-black rounded-xl transition-all active:scale-95 flex items-center gap-1.5">
+                                    <a href="{{ route('kosan.detail', $kos->slug) }}" class="px-4 py-2 bg-[#3B2314] hover:bg-[#E60049] text-white text-xs font-black rounded-xl transition-all active:scale-95 flex items-center gap-1.5" aria-label="Lihat kos {{ $kos->title }}">
                                         <span>Lihat Kos</span>
                                         <i class="fa-solid fa-arrow-right text-[10px]"></i>
                                     </a>
@@ -461,24 +476,25 @@
                 </div>
 
                 @php
-                    $iconMap = [
-                        'AC' => 'fa-snowflake',
-                        'Kamar Mandi Dalam' => 'fa-bath',
-                        'Water Heater' => 'fa-temperature-arrow-up',
-                        'Kasur Springbed' => 'fa-bed',
-                        'Kasur' => 'fa-bed',
-                        'Lemari Pakaian' => 'fa-door-closed',
-                        'Lemari' => 'fa-door-closed',
-                        'Meja & Kursi Belajar' => 'fa-chair',
-                        'Meja' => 'fa-table',
-                        'TV / Smart TV' => 'fa-tv',
-                        'Wastafel' => 'fa-sink',
-                        'Wi-Fi / Internet' => 'fa-wifi',
-                        'Parkir Mobil' => 'fa-car',
-                        'Parkir Motor' => 'fa-motorcycle',
-                        'Dapur Bersama' => 'fa-kitchen-set',
-                        'CCTV 24 Jam' => 'fa-video',
-                    ];
+                    $getFasilitasIcon = function($fas) {
+                        $f = strtolower(trim($fas));
+                        if (str_contains($f, 'ac')) return 'fa-snowflake';
+                        if (str_contains($f, 'mandi') || str_contains($f, 'toilet') || str_contains($f, 'km ') || $f === 'km') return 'fa-bath';
+                        if (str_contains($f, 'heater') || str_contains($f, 'hangat')) return 'fa-temperature-arrow-up';
+                        if (str_contains($f, 'kasur') || str_contains($f, 'springbed') || str_contains($f, 'bed')) return 'fa-bed';
+                        if (str_contains($f, 'lemari') || str_contains($f, 'wardrobe')) return 'fa-door-closed';
+                        if (str_contains($f, 'meja') || str_contains($f, 'kursi') || str_contains($f, 'kerja')) return 'fa-chair';
+                        if (str_contains($f, 'tv')) return 'fa-tv';
+                        if (str_contains($f, 'wifi') || str_contains($f, 'wi-fi') || str_contains($f, 'internet')) return 'fa-wifi';
+                        if (str_contains($f, 'mobil')) return 'fa-car';
+                        if (str_contains($f, 'motor') || str_contains($f, 'parkir')) return 'fa-motorcycle';
+                        if (str_contains($f, 'dapur') || str_contains($f, 'kitchen') || str_contains($f, 'masak')) return 'fa-kitchen-set';
+                        if (str_contains($f, 'cctv') || str_contains($f, 'keamanan')) return 'fa-video';
+                        if (str_contains($f, 'cuci') || str_contains($f, 'laundry')) return 'fa-soap';
+                        if (str_contains($f, 'balkon')) return 'fa-mountain-sun';
+                        if (str_contains($f, 'wastafel') || str_contains($f, 'sink')) return 'fa-sink';
+                        return 'fa-check';
+                    };
                 @endphp
 
                 @if($kamarList->count() > 0)
@@ -495,15 +511,24 @@
                                 }
 
                                 $fasKamarArr = array_filter(array_map('trim', explode(',', $kamar->fasilitas ?? '')));
-                                $fasKosanArr = array_filter(array_map('trim', explode(',', $kamar->productKosan->fasilitas ?? '')));
+                                $fasKosanArr = array_filter(array_map('trim', explode(',', $kamar->productKosan?->fasilitas ?? '')));
                                 $fasilitasArr = array_unique(array_merge($fasKamarArr, $fasKosanArr));
 
                                 $monthlyPriceObj = $kamar->priceKamar->first(function($price) {
                                     return strtolower($price->kategori) === 'bulan';
                                 });
-                                $monthlyPrice = $monthlyPriceObj ? $monthlyPriceObj->price : null;
+                                $monthlyPrice = $monthlyPriceObj ? (float)$monthlyPriceObj->price : null;
+                                $discPercent = $monthlyPriceObj && $monthlyPriceObj->discount > 0
+                                    ? (float)$monthlyPriceObj->discount
+                                    : (float)($kamar->cumulative_discount ?? 0);
+                                $finalMonthlyPrice = $monthlyPrice;
+                                if ($monthlyPrice && $discPercent > 0) {
+                                    $finalMonthlyPrice = max(0, round($monthlyPrice - ($monthlyPrice * ($discPercent / 100))));
+                                }
+
                                 $wilayahNama = $kamar->productKosan->wilayah ?? '-';
                                 $kosanJudul = $kamar->productKosan->title ?? 'Kost Properti';
+                                $roomStatus = $kamar->room_status ?? 'kosong';
                             @endphp
 
                             <div class="kos-card bg-white rounded-[2rem] shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col overflow-hidden group border border-[#E9DDD2] text-[#3B2314]" data-wilayah="{{ Str::slug($wilayahNama) }}">
@@ -511,9 +536,19 @@
                                 <div class="relative overflow-hidden h-52 bg-[#EDE4DC]">
                                     <img src="{{ $imgUrl }}" alt="{{ $kamar->room }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
 
-                                    <div class="absolute top-3 left-3 bg-[#3B2314]/90 text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider flex items-center gap-1.5">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-[#00A896]"></span> Siap Huni
-                                    </div>
+                                    @if($roomStatus === 'terisi')
+                                        <div class="absolute top-3 left-3 bg-[#3B2314]/90 text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider flex items-center gap-1.5 shadow-md">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-[#E60049]"></span> Terisi
+                                        </div>
+                                    @elseif($roomStatus === 'pending')
+                                        <div class="absolute top-3 left-3 bg-[#3B2314]/90 text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider flex items-center gap-1.5 shadow-md">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-[#F3A833] animate-pulse"></span> Booking Pending
+                                        </div>
+                                    @else
+                                        <div class="absolute top-3 left-3 bg-[#3B2314]/90 text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider flex items-center gap-1.5 shadow-md">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-[#00A896]"></span> Siap Huni
+                                        </div>
+                                    @endif
 
                                     <div class="absolute top-3 right-3 bg-white/90 text-[#3B2314] text-[10px] font-extrabold px-2.5 py-1.5 rounded-full shadow-sm flex items-center gap-1">
                                         <i class="fa-solid fa-eye text-[#E60049]"></i> {{ number_format($kamar->views ?? 0) }}
@@ -538,7 +573,7 @@
 
                                         <div class="flex flex-wrap items-center gap-1.5 my-3.5 min-h-[28px]">
                                             @forelse(array_slice($fasilitasArr, 0, 3) as $fas)
-                                                @php $iconClass = $iconMap[$fas] ?? 'fa-check'; @endphp
+                                                @php $iconClass = $getFasilitasIcon($fas); @endphp
                                                 <span class="bg-[#FFF8F1] text-[#7B6759] border border-[#E9DDD2] px-2.5 py-1 rounded-lg flex items-center gap-1 text-[10px] font-bold">
                                                     <i class="fa-solid {{ $iconClass }} text-[#00A896]"></i> {{ $fas }}
                                                 </span>
@@ -558,9 +593,23 @@
                                         <div class="flex items-baseline justify-between pt-3 border-t border-[#E9DDD2]">
                                             <span class="text-[10px] uppercase font-bold text-[#8E7B6D]">Tarif Sewa</span>
                                             @if($monthlyPrice)
+                                                <div class="text-right">
+                                                    @if($discPercent > 0)
+                                                        <div class="flex items-center justify-end gap-1.5 mb-0.5">
+                                                            <span class="text-[10px] text-[#8E7B6D] line-through">Rp {{ number_format($monthlyPrice, 0, ',', '.') }}</span>
+                                                            <span class="text-[9px] font-black bg-[#E60049]/10 text-[#E60049] px-1.5 py-0.5 rounded-md">-{{ round($discPercent) }}%</span>
+                                                        </div>
+                                                    @endif
+                                                    <div>
+                                                        <span class="text-lg font-black text-[#E60049]">Rp {{ number_format($finalMonthlyPrice, 0, ',', '.') }}</span>
+                                                        <span class="text-[10px] text-[#7B6759] font-medium">/bln</span>
+                                                    </div>
+                                                </div>
+                                            @elseif($kamar->priceKamar->isNotEmpty())
+                                                @php $altPrice = $kamar->priceKamar->first(); @endphp
                                                 <div>
-                                                    <span class="text-lg font-black text-[#E60049]">Rp {{ number_format($monthlyPrice, 0, ',', '.') }}</span>
-                                                    <span class="text-[10px] text-[#7B6759] font-medium">/bln</span>
+                                                    <span class="text-lg font-black text-[#E60049]">Rp {{ number_format($altPrice->price, 0, ',', '.') }}</span>
+                                                    <span class="text-[10px] text-[#7B6759] font-medium">/{{ strtolower($altPrice->kategori) }}</span>
                                                 </div>
                                             @else
                                                 <span class="text-xs font-extrabold text-[#7B6759]">Hubungi Admin</span>
@@ -577,10 +626,11 @@
                                             </a>
                                             <a
                                                 href="{{ route('form.booking.kamar', $kamar->id) }}"
-                                                class="shine px-3 py-2.5 bg-[#E60049] hover:bg-[#C90040] text-white text-xs font-black rounded-xl text-center transition-all shadow-md active:scale-95 flex items-center justify-center gap-1"
+                                                class="shine px-3 py-2.5 {{ $roomStatus === 'terisi' ? 'bg-[#3B2314] hover:bg-[#24150D]' : 'bg-[#E60049] hover:bg-[#C90040]' }} text-white text-xs font-black rounded-xl text-center transition-all shadow-md active:scale-95 flex items-center justify-center gap-1"
+                                                title="{{ $roomStatus === 'terisi' ? 'Kamar terisi saat ini, booking sekarang untuk periode mendatang' : 'Pesan kamar ini sekarang' }}"
                                             >
                                                 <i class="fa-solid fa-bolt text-[#F3A833] text-[10px]"></i>
-                                                <span>Pesan</span>
+                                                <span>{{ $roomStatus === 'terisi' ? 'Booking Nanti' : 'Pesan' }}</span>
                                             </a>
                                         </div>
                                     </div>
@@ -588,6 +638,13 @@
                                 </div>
                             </div>
                         @endforeach
+
+                        <!-- Empty state when filtered by Wilayah tab -->
+                        <div id="no-kamar-filter" class="hidden col-span-1 sm:col-span-2 lg:col-span-3 bg-white/5 rounded-3xl p-10 text-center border border-white/10 text-white/70">
+                            <i class="fa-solid fa-location-dot text-2xl text-[#F3A833] mb-2 block"></i>
+                            <p class="text-xs font-bold text-white">Tidak ada kamar pada wilayah ini saat ini.</p>
+                            <p class="text-[11px] text-white/60 mt-1">Silakan pilih "Semua Wilayah" atau hubungi kami untuk ketersediaan unit terbaru.</p>
+                        </div>
                     </div>
                 @else
                     <div class="bg-white/5 rounded-3xl p-12 text-center max-w-lg mx-auto border border-white/10 text-white/70">
@@ -660,10 +717,10 @@
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <button type="button" class="manual-testimoni-scroll prev w-10 h-10 rounded-xl bg-white text-[#3B2314] hover:bg-[#E60049] hover:text-white transition-all shadow-sm border border-[#E9DDD2] flex items-center justify-center active:scale-95">
+                        <button type="button" class="manual-testimoni-scroll prev w-10 h-10 rounded-xl bg-white text-[#3B2314] hover:bg-[#E60049] hover:text-white transition-all shadow-sm border border-[#E9DDD2] flex items-center justify-center active:scale-95" aria-label="Testimoni sebelumnya">
                             <i class="fa-solid fa-chevron-left text-xs"></i>
                         </button>
-                        <button type="button" class="manual-testimoni-scroll next w-10 h-10 rounded-xl bg-white text-[#3B2314] hover:bg-[#E60049] hover:text-white transition-all shadow-sm border border-[#E9DDD2] flex items-center justify-center active:scale-95">
+                        <button type="button" class="manual-testimoni-scroll next w-10 h-10 rounded-xl bg-white text-[#3B2314] hover:bg-[#E60049] hover:text-white transition-all shadow-sm border border-[#E9DDD2] flex items-center justify-center active:scale-95" aria-label="Testimoni berikutnya">
                             <i class="fa-solid fa-chevron-right text-xs"></i>
                         </button>
                     </div>
@@ -766,7 +823,7 @@
                                 <p class="text-white/70 text-xs mt-2 max-w-xl line-clamp-2 leading-relaxed">
                                     {{ Str::limit(strip_tags($art->deskripsi ?? 'Baca selengkapnya artikel menarik seputar hunian.'), 120) }}
                                 </p>
-                                <a href="{{ route('news.detail', $art->slug) }}" class="mt-4 inline-flex items-center gap-1.5 text-xs font-black text-[#F3A833] hover:text-white transition-colors">
+                                <a href="{{ route('news.detail', $art->slug) }}" class="mt-4 inline-flex items-center gap-1.5 text-xs font-black text-[#F3A833] hover:text-white transition-colors" aria-label="Baca selengkapnya artikel {{ $art->title }}">
                                     <span>Baca Selengkapnya</span>
                                     <i class="fa-solid fa-arrow-right text-[10px]"></i>
                                 </a>
@@ -789,7 +846,7 @@
                                 <p class="text-[#7B6759] text-xs mt-2 line-clamp-2 leading-relaxed">
                                     {{ Str::limit(strip_tags($art->deskripsi ?? 'Baca selengkapnya artikel menarik seputar hunian.'), 90) }}
                                 </p>
-                                <a href="{{ route('news.detail', $art->slug) }}" class="mt-3 text-xs font-black text-[#00A896] hover:text-[#E60049] transition-colors inline-flex items-center gap-1">
+                                <a href="{{ route('news.detail', $art->slug) }}" class="mt-3 text-xs font-black text-[#00A896] hover:text-[#E60049] transition-colors inline-flex items-center gap-1" aria-label="Baca artikel {{ $art->title }}">
                                     <span>Baca</span>
                                     <i class="fa-solid fa-arrow-right text-[9px]"></i>
                                 </a>
@@ -827,8 +884,21 @@
 
                     <div class="flex flex-col sm:flex-row gap-3 shrink-0">
                         @php
+                            $adminWa = '6282146138847';
+                            if (isset($globalSosmed)) {
+                                $waItem = $globalSosmed->first(function ($s) {
+                                    $t = strtolower($s->title ?? $s->name ?? $s->platform ?? '');
+                                    return str_contains($t, 'whatsapp') || $t === 'wa' || str_contains($t, 'wa ');
+                                });
+                                if ($waItem && !empty($waItem->url ?? $waItem->link ?? '')) {
+                                    $digits = preg_replace('/[^0-9]/', '', $waItem->url ?? $waItem->link ?? '');
+                                    if (!empty($digits)) {
+                                        $adminWa = $digits;
+                                    }
+                                }
+                            }
                             $waText = "Halo Admin Sinar Citra Lestari, saya tertarik untuk mencari kamar kos dan ingin konsultasi/survei lokasi. Mohon informasinya.";
-                            $waUrl = "https://wa.me/6281234567890?text=" . rawurlencode($waText);
+                            $waUrl = "https://wa.me/" . $adminWa . "?text=" . rawurlencode($waText);
                         @endphp
                         <a
                             href="{{ $waUrl }}"
@@ -887,6 +957,7 @@
         // Filter Wilayah Tabs for Kamar
         const filterBtns = document.querySelectorAll('.filter-btn');
         const kosCards = document.querySelectorAll('.kos-card');
+        const noFilterAlert = document.getElementById('no-kamar-filter');
 
         filterBtns.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -899,6 +970,7 @@
                 btn.classList.add('bg-[#F3A833]', 'text-[#3B2314]', 'shadow-md');
 
                 const filter = btn.getAttribute('data-filter');
+                let visibleCount = 0;
 
                 kosCards.forEach(card => {
                     const show = filter === 'semua' || card.getAttribute('data-wilayah') === filter;
@@ -908,10 +980,19 @@
                             card.style.opacity = '1';
                             card.style.transform = 'translateY(0)';
                         });
+                        visibleCount++;
                     } else {
                         card.style.display = 'none';
                     }
                 });
+
+                if (noFilterAlert) {
+                    if (visibleCount === 0) {
+                        noFilterAlert.classList.remove('hidden');
+                    } else {
+                        noFilterAlert.classList.add('hidden');
+                    }
+                }
             });
         });
 
@@ -948,6 +1029,14 @@
             const modal = document.getElementById('flash-failed-modal');
             if (modal) modal.remove();
         }
+
+        // Keyboard Escape listener for modals
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeSuccessModal();
+                closeFailedModal();
+            }
+        });
     </script>
 
 </body>
