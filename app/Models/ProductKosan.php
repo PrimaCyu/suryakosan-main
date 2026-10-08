@@ -54,10 +54,12 @@ class ProductKosan extends Model
             return (int) ($this->tersedia ?? 0);
         }
 
+        $today = now()->toDateString();
         $occupiedRooms = $this->productKamarKosan()
-            ->whereHas('tamu', function ($q) {
+            ->whereHas('tamu', function ($q) use ($today) {
                 $q->where('status', 'approved')
-                  ->whereDate('end_date', '>=', now()->toDateString());
+                  ->whereDate('start_date', '<=', $today)
+                  ->whereDate('end_date', '>=', $today);
             })
             ->count();
 
@@ -78,23 +80,30 @@ class ProductKosan extends Model
     }
 
     /**
-     * Accessor untuk jumlah kamar terisi aktif.
+     * Accessor untuk jumlah kamar terisi aktif saat ini.
      */
     public function getOccupiedRoomsCountAttribute(): int
     {
+        $today = now()->toDateString();
         if ($this->relationLoaded('productKamarKosan')) {
-            return $this->productKamarKosan->filter(function ($kamar) {
+            return $this->productKamarKosan->filter(function ($kamar) use ($today) {
                 if ($kamar->relationLoaded('tamu')) {
-                    return $kamar->tamu->where('status', 'approved')->where('end_date', '>=', now()->toDateString())->count() > 0;
+                    return $kamar->tamu->where('status', 'approved')
+                        ->filter(fn($t) => \Carbon\Carbon::parse($t->start_date)->toDateString() <= $today && \Carbon\Carbon::parse($t->end_date)->toDateString() >= $today)
+                        ->count() > 0;
                 }
-                return $kamar->tamu()->where('status', 'approved')->whereDate('end_date', '>=', now()->toDateString())->exists();
+                return $kamar->tamu()->where('status', 'approved')
+                    ->whereDate('start_date', '<=', $today)
+                    ->whereDate('end_date', '>=', $today)
+                    ->exists();
             })->count();
         }
 
         return $this->productKamarKosan()
-            ->whereHas('tamu', function ($q) {
+            ->whereHas('tamu', function ($q) use ($today) {
                 $q->where('status', 'approved')
-                  ->whereDate('end_date', '>=', now()->toDateString());
+                  ->whereDate('start_date', '<=', $today)
+                  ->whereDate('end_date', '>=', $today);
             })
             ->count();
     }

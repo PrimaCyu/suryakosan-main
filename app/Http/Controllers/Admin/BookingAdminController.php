@@ -9,6 +9,7 @@ use App\Models\SosialMedia;
 use App\Models\Tamu;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -129,6 +130,9 @@ class BookingAdminController extends Controller
             $dataTamu->productKamarKosan->productKosan->syncAvailableCount();
         }
 
+        Cache::forget('home_kamar_list');
+        Cache::forget('home_kosan_list');
+
         // Kirim email konfirmasi persetujuan (Approved) beserta lampiran file PDF kwitansi lunas
         try {
             if (!empty($dataTamu->email)) {
@@ -189,6 +193,9 @@ class BookingAdminController extends Controller
         if ($dataTamu->productKamarKosan && $dataTamu->productKamarKosan->productKosan) {
             $dataTamu->productKamarKosan->productKosan->syncAvailableCount();
         }
+
+        Cache::forget('home_kamar_list');
+        Cache::forget('home_kosan_list');
 
         // Kirim email pemberitahuan penolakan (Rejected) tanpa lampiran PDF, disertai alasan & link bantuan WA
         try {

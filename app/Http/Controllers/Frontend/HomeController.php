@@ -172,6 +172,7 @@ class HomeController extends Controller
 
         $tamu = $kamar->tamu()
                         ->whereIn('status', ['approved', 'pending'])
+                        ->whereDate('end_date', '>=', now()->toDateString())
                         ->select('start_date', 'end_date')
                         ->get();
 

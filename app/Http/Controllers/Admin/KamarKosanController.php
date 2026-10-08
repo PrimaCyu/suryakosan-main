@@ -507,12 +507,16 @@ class KamarKosanController extends Controller
 
             $disc = $isSuperAdmin ? ($item['discount'] ?? 0) : 0;
 
-            PriceKamar::create([
-                'product_kamar_kosan_id' => $product_kamar_kosan,
-                'kategori'               => $kategoriNormalized,
-                'price'                  => $item['price'],
-                'discount'               => $disc
-            ]);
+            PriceKamar::updateOrCreate(
+                [
+                    'product_kamar_kosan_id' => $product_kamar_kosan,
+                    'kategori'               => $kategoriNormalized,
+                ],
+                [
+                    'price'                  => $item['price'],
+                    'discount'               => $disc
+                ]
+            );
 
             if ($kategoriNormalized === 'bulan' && $isSuperAdmin && $disc > 0) {
                 ProductKamarKosan::where('id', $product_kamar_kosan)->update([
@@ -594,13 +598,22 @@ class KamarKosanController extends Controller
             ->firstOrFail();
 
         $request->validate([
-            'name'              => 'required|string|max:255',
-            'telp'              => 'required|string|max:25',
-            'email'             => 'required|email|max:255',
-            'start_date'        => 'required|date',
+            'name'              => 'nullable|string|max:255',
+            'telp'              => 'nullable|string|max:25',
+            'email'             => 'nullable|email|max:255',
+            'start_date'        => 'nullable|date',
             'payment_method'    => 'nullable|string',
             'proof_of_transfer' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'tahun'             => 'nullable|integer|min:0',
+            'bulan'             => 'nullable|integer|min:0',
         ]);
+
+        // Tetapkan start_date default: lanjutkan dari end_date sewa sebelumnya
+        if (!$request->filled('start_date')) {
+            $prevEnd = $dataTamu->end_date ? \Carbon\Carbon::parse($dataTamu->end_date) : now();
+            $effectiveStart = $prevEnd->isPast() ? now()->toDateString() : $prevEnd->toDateString();
+            $request->merge(['start_date' => $effectiveStart]);
+        }
 
         $bookingDate = $this->processBookingDates->calculateBookingRange($product_kamar_kosan, $request, $dataTamu->id);
         if (isset($bookingDate['status']) && $bookingDate['status'] === false) {
@@ -612,10 +625,10 @@ class KamarKosanController extends Controller
 
         $data = [
             'product_kamar_kosan_id' => $dataTamu->product_kamar_kosan_id,
-            'name'                   => strip_tags($request->name),
-            'telp'                   => strip_tags($request->telp),
-            'email'                  => filter_var($request->email, FILTER_SANITIZE_EMAIL),
-            'start_time'             => $request->start_time ?: $dataTamu->start_time,
+            'name'                   => strip_tags($request->input('name') ?: $dataTamu->name),
+            'telp'                   => strip_tags($request->input('telp') ?: $dataTamu->telp),
+            'email'                  => filter_var($request->input('email') ?: $dataTamu->email, FILTER_SANITIZE_EMAIL),
+            'start_time'             => $request->start_time ?: ($dataTamu->start_time ?: '12:00'),
             'start_date'             => $bookingDate['start'],
             'end_date'               => $bookingDate['end'],
             'payment_method'         => $request->payment_method ?: ($dataTamu->payment_method ?: 'cash'),

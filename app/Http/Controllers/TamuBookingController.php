@@ -85,7 +85,10 @@ class TamuBookingController extends Controller
             return back()->withInput()->with('failed', 'Terjadi kendala saat memproses booking Anda. Silakan coba beberapa saat lagi.');
         }
 
-        // 3. Kirim email tanda terima permohonan booking (tanpa lampiran PDF; PDF resmi dikirim saat disetujui)
+        // 3. Bersihkan cache ketersediaan beranda
+        \Illuminate\Support\Facades\Cache::forget('home_kamar_list');
+
+        // 4. Kirim email tanda terima permohonan booking (tanpa lampiran PDF; PDF resmi dikirim saat disetujui)
         try {
             $tamu->load(['productKamarKosan.productKosan']);
             Mail::to($tamu->email)->send(new BookingConfirmationMail($tamu));

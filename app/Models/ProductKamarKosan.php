@@ -38,16 +38,19 @@ class ProductKamarKosan extends Model
     }
 
     /**
-     * Penyewa aktif (status approved dan masa sewa masih berlaku).
+     * Penyewa aktif yang sedang menempati kamar hari ini (status approved & dalam rentang sewa).
      */
     public function getActiveTenantAttribute()
     {
+        $today = now()->toDateString();
         if ($this->relationLoaded('tamu')) {
             return $this->tamu
                 ->where('status', 'approved')
-                ->filter(function ($t) {
+                ->filter(function ($t) use ($today) {
                     try {
-                        return \Carbon\Carbon::parse($t->end_date)->endOfDay()->gte(now());
+                        $start = \Carbon\Carbon::parse($t->start_date)->toDateString();
+                        $end = \Carbon\Carbon::parse($t->end_date)->toDateString();
+                        return $start <= $today && $end >= $today;
                     } catch (\Exception $e) {
                         return false;
                     }
@@ -58,8 +61,32 @@ class ProductKamarKosan extends Model
 
         return $this->tamu()
             ->where('status', 'approved')
-            ->whereDate('end_date', '>=', now()->toDateString())
+            ->whereDate('start_date', '<=', $today)
+            ->whereDate('end_date', '>=', $today)
             ->orderByDesc('end_date')
+            ->first();
+    }
+
+    /**
+     * Booking approved untuk jadwal masa depan (belum masuk periode sewa).
+     */
+    public function getUpcomingTenantAttribute()
+    {
+        $today = now()->toDateString();
+        if ($this->relationLoaded('tamu')) {
+            return $this->tamu
+                ->where('status', 'approved')
+                ->filter(function ($t) use ($today) {
+                    return \Carbon\Carbon::parse($t->start_date)->toDateString() > $today;
+                })
+                ->sortBy('start_date')
+                ->first();
+        }
+
+        return $this->tamu()
+            ->where('status', 'approved')
+            ->whereDate('start_date', '>', $today)
+            ->orderBy('start_date', 'asc')
             ->first();
     }
 
