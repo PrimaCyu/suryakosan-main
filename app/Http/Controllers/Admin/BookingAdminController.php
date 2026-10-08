@@ -85,12 +85,45 @@ class BookingAdminController extends Controller
             }
         }
 
-        $dataTamu->update([
-            'status' => 'approved',
-            'processed_by' => $user->id,
-            'processed_at' => now(),
-            'rejection_reason' => null,
-        ]);
+        // Cek apakah jadwal bertabrakan dengan booking lain yang sudah APPROVED pada kamar ini
+        $overlappingApproved = Tamu::where('product_kamar_kosan_id', $dataTamu->product_kamar_kosan_id)
+            ->where('status', 'approved')
+            ->where('id', '!=', $dataTamu->id)
+            ->where(function ($query) use ($dataTamu) {
+                $query->where('start_date', '<', $dataTamu->end_date)
+                      ->where('end_date', '>', $dataTamu->start_date);
+            })
+            ->first();
+
+        if ($overlappingApproved) {
+            $existingStart = \Carbon\Carbon::parse($overlappingApproved->start_date)->format('d M Y');
+            $existingEnd = \Carbon\Carbon::parse($overlappingApproved->end_date)->format('d M Y');
+            return back()->with('failed', "Tidak dapat menyetujui: Kamar sudah terisi oleh penyewa '{$overlappingApproved->name}' pada periode {$existingStart} s/d {$existingEnd}.");
+        }
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($dataTamu, $user) {
+            $dataTamu->update([
+                'status' => 'approved',
+                'processed_by' => $user->id,
+                'processed_at' => now(),
+                'rejection_reason' => null,
+            ]);
+
+            // Otomatis batalkan booking pending lain yang bertabrakan jadwalnya
+            Tamu::where('product_kamar_kosan_id', $dataTamu->product_kamar_kosan_id)
+                ->where('status', 'pending')
+                ->where('id', '!=', $dataTamu->id)
+                ->where(function ($query) use ($dataTamu) {
+                    $query->where('start_date', '<', $dataTamu->end_date)
+                          ->where('end_date', '>', $dataTamu->start_date);
+                })
+                ->update([
+                    'status' => 'reject',
+                    'processed_by' => $user->id,
+                    'processed_at' => now(),
+                    'rejection_reason' => 'Kamar telah disetujui untuk pemohon booking lain pada periode tanggal yang sama.',
+                ]);
+        });
 
         if ($dataTamu->productKamarKosan && $dataTamu->productKamarKosan->productKosan) {
             $dataTamu->productKamarKosan->productKosan->syncAvailableCount();
@@ -177,5 +210,33 @@ class BookingAdminController extends Controller
         }
 
         return back()->with('success', 'Permintaan booking atas nama ' . $dataTamu->name . ' telah ditolak (Rejected) oleh ' . $user->name . '. Email pemberitahuan alasan penolakan telah dikirim ke penyewa.');
+    }
+
+    public function viewProof($tamu)
+    {
+        $id = $tamu instanceof Tamu ? $tamu->id : $tamu;
+        $dataTamu = Tamu::with('productKamarKosan.productKosan')->findOrFail($id);
+        $user = auth()->user();
+
+        if (!$user->isSuperAdmin()) {
+            $assignedIds = $user->kosans()->pluck('product_kosans.id')->toArray();
+            if (!in_array($dataTamu->productKamarKosan->product_kosan_id, $assignedIds)) {
+                abort(403, 'Akses ditolak.');
+            }
+        }
+
+        if (empty($dataTamu->proof_of_transfer)) {
+            abort(404, 'Bukti pembayaran tidak ditemukan.');
+        }
+
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($dataTamu->proof_of_transfer)) {
+            return \Illuminate\Support\Facades\Storage::disk('public')->response($dataTamu->proof_of_transfer);
+        }
+
+        if (\Illuminate\Support\Facades\Storage::disk('local')->exists($dataTamu->proof_of_transfer)) {
+            return \Illuminate\Support\Facades\Storage::disk('local')->response($dataTamu->proof_of_transfer);
+        }
+
+        abort(404, 'File bukti transfer tidak ditemukan di storage.');
     }
 }

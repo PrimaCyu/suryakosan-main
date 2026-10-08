@@ -537,7 +537,7 @@
             <div class="absolute top-0 right-0 w-24 h-24 rounded-bl-[3rem] bg-[#F3A833]/15"></div>
             <div class="relative text-xs sm:text-sm text-[#604D3F] leading-[1.9] [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2 [&_li]:mb-1.5 [&_strong]:font-bold [&_strong]:text-[#3B2314] [&_h1]:text-xl [&_h2]:text-lg [&_h3]:text-base [&_h1]:font-black [&_h2]:font-black [&_h3]:font-bold [&_h1]:text-[#3B2314] [&_h2]:text-[#3B2314] [&_h3]:text-[#3B2314]">
               @if(!empty(trim(strip_tags($kosan->description ?? ''))))
-                {!! $kosan->description !!}
+                {!! \App\Models\Artikel::sanitizeHtml($kosan->description) !!}
               @else
                 <p class="text-[#9A8675] italic">Deskripsi kosan belum ditambahkan oleh pemilik.</p>
               @endif

@@ -55,7 +55,7 @@
                                     </td>
                                     <td class="text-center">
                                         @if($tamu->proof_of_transfer)
-                                            <a href="{{ asset('storage/' . $tamu->proof_of_transfer) }}" target="_blank" class="btn btn-sm btn-outline-info py-1 px-2">
+                                            <a href="{{ route('admin.booking.proof', $tamu->id) }}" target="_blank" class="btn btn-sm btn-outline-info py-1 px-2">
                                                 <i class="bi bi-eye"></i> Bukti
                                             </a>
                                         @else

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Artikel;
 use App\Models\FasilitasKamar;
 use App\Models\PriceKamar;
 use App\Models\ProductKamarImageKosan;
@@ -144,7 +145,7 @@ class KamarKosanController extends Controller
                 $kamar = ProductKamarKosan::create([
                     'product_kosan_id'    => $product_kosan,
                     'room'                => $request->input('room'),
-                    'description'         => $request->input('description'),
+                    'description'         => Artikel::sanitizeHtml($request->input('description')),
                     'fasilitas'           => $fasilitas,
                     'cumulative_discount' => $discountVal,
                     'views'               => 0,
@@ -280,7 +281,7 @@ class KamarKosanController extends Controller
             $kamar_kosan->update([
                 'room'                => $request->input('room'),
                 'cumulative_discount' => $discountVal,
-                'description'         => $request->input('description'),
+                'description'         => Artikel::sanitizeHtml($request->input('description')),
                 'fasilitas'           => $fasilitas,
                 'views'               => $request->input('views', $kamar_kosan->views ?? 0),
             ]);
@@ -648,8 +649,13 @@ class KamarKosanController extends Controller
             ->whereHas('productKamarKosan', fn($q) => $q->where('product_kosan_id', $product_kosan))
             ->firstOrFail();
 
-        if ($dataTamu->proof_of_transfer && Storage::disk('public')->exists($dataTamu->proof_of_transfer)) {
-            Storage::disk('public')->delete($dataTamu->proof_of_transfer);
+        if ($dataTamu->proof_of_transfer) {
+            if (Storage::disk('public')->exists($dataTamu->proof_of_transfer)) {
+                Storage::disk('public')->delete($dataTamu->proof_of_transfer);
+            }
+            if (Storage::disk('local')->exists($dataTamu->proof_of_transfer)) {
+                Storage::disk('local')->delete($dataTamu->proof_of_transfer);
+            }
         }
         $dataTamu->delete();
 

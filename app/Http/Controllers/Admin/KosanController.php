@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Artikel;
 use App\Models\ProductImageKosan;
 use App\Models\ProductKosan;
 use Illuminate\Http\Request;
@@ -167,7 +168,7 @@ class KosanController extends Controller
         $data = [
             'title'       => $request->title,
             'slug'        => $this->generateUniqueSlug($request->title),
-            'description' => $description,
+            'description' => Artikel::sanitizeHtml($description),
             'fasilitas'   => $fasilitas ?? '',
             'wilayah'     => $request->wilayah ?? 'Bali',
             'tersedia'    => $request->tersedia ?? 0,
@@ -231,7 +232,7 @@ class KosanController extends Controller
         $data = [
             'title'       => $request->title,
             'slug'        => $this->generateUniqueSlug($request->title, $productKosan->id),
-            'description' => $description,
+            'description' => Artikel::sanitizeHtml($description),
             'fasilitas'   => $fasilitas ?? '',
             'wilayah'     => $request->wilayah ?? 'Bali',
             'tersedia'    => $request->tersedia ?? 0,
@@ -367,5 +368,17 @@ class KosanController extends Controller
         }
 
         return back()->with('success', 'delete success');
+    }
+
+    public function indexImage($product_kosan)
+    {
+        $kosan = ProductKosan::with('productImageKosan')->findOrFail($product_kosan);
+        $this->checkKosanAccess($kosan->id);
+
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json($kosan->productImageKosan);
+        }
+
+        return redirect()->route('admin.product.kosan.index')->with('info', "Foto galeri properti '{$kosan->title}' dapat dikelola langsung melalui tombol kelola foto pada tabel.");
     }
 }

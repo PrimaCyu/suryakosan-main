@@ -110,6 +110,7 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function(){
         Route::get('/index', 'indexBooking')->name('index');
         Route::put('/approve/{tamu}', 'approveBooking')->name('approve');
         Route::put('/reject/{tamu}', 'rejectBooking')->name('reject');
+        Route::get('/proof/{tamu}', 'viewProof')->name('proof');
     });
 
     // Social Media

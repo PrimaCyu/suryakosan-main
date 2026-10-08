@@ -184,7 +184,7 @@
                                 const deleteButtonHtml = '';
                                 @endif
 
-                                const webUrl = `/kosan/${item.slug || ''}`;
+                                const webUrl = `/kosan/detail/${item.slug || ''}`;
 
                                 const tr = document.createElement('tr');
                                 tr.className = 'align-middle';
@@ -230,6 +230,28 @@
                     })
                     .catch(err => console.error('Error Live Search Kosan:', err));
                 }, 250);
+            });
+
+            // Tekan tombol Enter untuk pencarian server-side lengkap beserta modal
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    window.location.href = `{{ route('admin.product.kosan.index') }}?search=${encodeURIComponent(this.value.trim())}`;
+                }
+            });
+
+            // Fallback klik tombol jika modal belum dimuat di DOM saat pencarian AJAX
+            tbody.addEventListener('click', function(e) {
+                const btn = e.target.closest('button[data-bs-target]');
+                if (btn) {
+                    const targetSelector = btn.getAttribute('data-bs-target');
+                    if (targetSelector && !document.querySelector(targetSelector)) {
+                        e.preventDefault();
+                        const titleEl = btn.closest('tr')?.querySelector('.table-cell-title');
+                        const query = titleEl ? titleEl.textContent.trim() : searchInput.value.trim();
+                        window.location.href = `{{ route('admin.product.kosan.index') }}?search=${encodeURIComponent(query)}`;
+                    }
+                }
             });
         }
 

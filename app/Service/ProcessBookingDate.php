@@ -94,6 +94,9 @@ class ProcessBookingDate
         ];
 
         $filled = array_filter($durationMap, fn($qty) => $qty > 0);
+        if (empty($filled)) {
+            throw new \DomainException('Pilih minimal salah satu paket durasi sewa yang valid.');
+        }
         $isSingleInput = count($filled) === 1;
         $isMultipleInputs = count($filled) > 1;
 
@@ -104,6 +107,12 @@ class ProcessBookingDate
         foreach ($durationMap as $cat => $qty) {
             if ($qty > 0) {
                 $pInfo = $this->getCategoryPriceAndDiscount($prices, $cat);
+
+                // Keamanan Kritis: Tolak jika kamar tidak memiliki tarif untuk jenis durasi ini
+                if ($pInfo['price'] <= 0) {
+                    throw new \DomainException("Kamar ini tidak menyediakan paket sewa per-{$cat}. Silakan pilih paket durasi yang tersedia untuk kamar ini.");
+                }
+
                 $subtotal = $pInfo['price'] * $qty;
                 $totalBasePrice += $subtotal;
 
@@ -123,6 +132,10 @@ class ProcessBookingDate
             }
         }
 
+        if ($totalBasePrice <= 0) {
+            throw new \DomainException('Total biaya sewa dasar tidak valid (Rp 0). Silakan periksa kembali durasi yang dipilih.');
+        }
+
         $cumulativeDiscount = (float) ($kamar->cumulative_discount ?? 0);
         if ($isMultipleInputs && $cumulativeDiscount > 0) {
             if ($cumulativeDiscount <= 100) {
@@ -139,6 +152,10 @@ class ProcessBookingDate
         $priceAfterDiscount = $totalBasePrice - $totalDiscountAmount;
         $ppnAmount = $priceAfterDiscount * 0.12; // PPN 12%
         $grandTotal = $priceAfterDiscount + $ppnAmount;
+
+        if ($grandTotal <= 0) {
+            throw new \DomainException('Total biaya sewa akhir tidak valid (Rp 0). Transaksi booking dibatalkan.');
+        }
 
         return round($grandTotal, 2);
     }

@@ -197,10 +197,8 @@ class HomeController extends Controller
             return Artikel::where('slug', $slug)->firstOrFail();
         });
 
-        $artikel->increment('view');
-
-        // Clear cache setelah increment agar views terupdate
-        Cache::forget("artikel_detail_{$slug}");
+        // Increment view di database secara efisien tanpa menghancurkan cache konten artikel
+        Artikel::where('id', $artikel->id)->increment('view');
 
         $beritaLainnya = Cache::remember("artikel_berita_lainnya_{$artikel->id}", 3600, function () use ($artikel) {
             return Artikel::where('id', '!=', $artikel->id)

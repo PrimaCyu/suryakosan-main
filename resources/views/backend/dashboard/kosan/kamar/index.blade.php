@@ -673,7 +673,8 @@
                                 // Penghuni
                                 let tenantHtml = '<span class="text-muted fs-8">-</span>';
                                 if (item.active_tenant) {
-                                    let phoneLink = item.active_tenant.hp ? `<a href="https://wa.me/${item.active_tenant.hp.replace(/[^0-9]/g, '')}" target="_blank" class="text-success fs-8" title="Chat WhatsApp"><i class="bi bi-whatsapp"></i></a>` : '';
+                                    let tenantPhone = item.active_tenant.telp || item.active_tenant.hp || '';
+                                    let phoneLink = tenantPhone ? `<a href="https://wa.me/${tenantPhone.replace(/[^0-9]/g, '')}" target="_blank" class="text-success fs-8" title="Chat WhatsApp"><i class="bi bi-whatsapp"></i></a>` : '';
                                     let nameShort = item.active_tenant.name.length > 14 ? item.active_tenant.name.substring(0, 14) + '...' : item.active_tenant.name;
                                     let dateHtml = '';
                                     if (item.active_tenant.end_date) {
@@ -780,6 +781,28 @@
                     })
                     .catch(err => console.error('Error Live Search Kamar:', err));
                 }, 250);
+            });
+
+            // Tekan tombol Enter untuk pencarian server-side lengkap beserta modal
+            searchKamarInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    window.location.href = `{{ route('admin.product.kosan.kamar.index', $product_kosan) }}?search=${encodeURIComponent(this.value.trim())}`;
+                }
+            });
+
+            // Fallback klik tombol jika modal belum dimuat di DOM saat pencarian AJAX
+            kamarTbody.addEventListener('click', function(e) {
+                const btn = e.target.closest('button[data-bs-target]');
+                if (btn) {
+                    const targetSelector = btn.getAttribute('data-bs-target');
+                    if (targetSelector && !document.querySelector(targetSelector)) {
+                        e.preventDefault();
+                        const roomName = btn.closest('tr')?.querySelector('.fw-semibold.text-dark')?.textContent?.trim();
+                        const query = roomName || searchKamarInput.value.trim();
+                        window.location.href = `{{ route('admin.product.kosan.kamar.index', $product_kosan) }}?search=${encodeURIComponent(query)}`;
+                    }
+                }
             });
         }
 

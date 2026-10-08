@@ -56,9 +56,9 @@
         </div>
         <div class="text-xs sm:text-sm text-[#5D4A3D] leading-[1.8] bg-white p-4 sm:p-5 rounded-2xl border border-[#EADFD4] shadow-sm space-y-2">
             @if($kamar && !empty(trim(strip_tags($kamar->description ?? ''))))
-                {!! $kamar->description !!}
+                {!! \App\Models\Artikel::sanitizeHtml($kamar->description) !!}
             @elseif($kamar && $kamar->productKosan && !empty(trim(strip_tags($kamar->productKosan->description ?? ''))))
-                {!! $kamar->productKosan->description !!}
+                {!! \App\Models\Artikel::sanitizeHtml($kamar->productKosan->description) !!}
             @else
                 <p>Unit kamar kos nyaman, bersih, dan terang berlokasi di area strategis kawasan {{ $wilayahNama }}. Menawarkan privasi maksimal dengan sirkulasi udara yang baik dan siap huni kapan saja.</p>
             @endif

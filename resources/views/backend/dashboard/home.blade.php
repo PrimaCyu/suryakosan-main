@@ -405,14 +405,19 @@
           </div>
 
           <div class="dash-timeline flex-grow-1 mt-1">
-            @foreach($recentActivities as $act)
+            @forelse($recentActivities as $act)
               <div class="dash-timeline-item">
                 <div class="dash-timeline-dot"></div>
                 <div class="dash-timeline-time">{{ $act['time'] }}</div>
                 <div class="fs-8 fw-semibold text-dark">{{ $act['title'] }}</div>
                 <div class="fs-8 text-muted">{{ $act['property'] }}</div>
               </div>
-            @endforeach
+            @empty
+              <div class="text-center py-4 text-muted fs-8">
+                <i class="bi bi-clock-history display-6 d-block mb-1 text-secondary opacity-50"></i>
+                Belum ada aktivitas operasional tercatat.
+              </div>
+            @endforelse
           </div>
         </div>
       </div>

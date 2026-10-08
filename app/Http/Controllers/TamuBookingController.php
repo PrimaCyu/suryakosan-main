@@ -54,6 +54,9 @@ class TamuBookingController extends Controller
 
                 // 2. Kalkulasi total harga resmi dari sisi backend (Anti Price Tampering)
                 $serverCalculatedPrice = $this->processBookingDates->calculateBookingPrice($kamar, $request);
+                if ($serverCalculatedPrice <= 0) {
+                    throw new \DomainException('Total harga sewa kamar tidak valid (Rp 0). Pemesanan tidak dapat diproses.');
+                }
 
                 $data = [
                     'product_kamar_kosan_id' => $kamar->id,

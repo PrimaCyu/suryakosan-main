@@ -223,10 +223,10 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                     </div>
                     <div class="modal-body text-center p-3">
-                        <img src="{{ asset('storage/' . $item->proof_of_transfer) }}" alt="Bukti Transfer" class="img-fluid rounded-2 border" style="max-height: 380px; object-fit: contain;">
+                        <img src="{{ route('admin.booking.proof', $item->id) }}" alt="Bukti Transfer" class="img-fluid rounded-2 border" style="max-height: 380px; object-fit: contain;">
                     </div>
                     <div class="modal-footer py-2 border-top">
-                        <a href="{{ asset('storage/' . $item->proof_of_transfer) }}" target="_blank" class="btn btn-sm btn-outline-secondary me-auto fs-8">
+                        <a href="{{ route('admin.booking.proof', $item->id) }}" target="_blank" class="btn btn-sm btn-outline-secondary me-auto fs-8">
                             <i class="bi bi-box-arrow-up-right me-1"></i>Buka Gambar Asli
                         </a>
                         <button type="button" class="btn btn-sm btn-secondary fs-8" data-bs-dismiss="modal">Tutup</button>
@@ -370,11 +370,11 @@
                                 <div class="mt-3 pt-3 border-top">
                                     <div class="d-flex align-items-center justify-content-between mb-2">
                                         <span class="fs-8 text-muted">Bukti Pembayaran:</span>
-                                        <a href="{{ asset('storage/' . $item->proof_of_transfer) }}" target="_blank" class="btn btn-xs btn-outline-info fs-8">
+                                        <a href="{{ route('admin.booking.proof', $item->id) }}" target="_blank" class="btn btn-xs btn-outline-info fs-8">
                                             <i class="bi bi-image me-1"></i>Lihat Gambar Asli
                                         </a>
                                     </div>
-                                    <img src="{{ asset('storage/' . $item->proof_of_transfer) }}" alt="Bukti" class="img-fluid rounded-2 border" style="max-height: 120px; object-fit: contain;">
+                                    <img src="{{ route('admin.booking.proof', $item->id) }}" alt="Bukti" class="img-fluid rounded-2 border" style="max-height: 120px; object-fit: contain;">
                                 </div>
                             @endif
                         </div>

@@ -27,7 +27,8 @@ class Tamu extends Model
     protected $casts = [
         'processed_at' => 'datetime',
         'start_date'   => 'date',
-        'end_date'     => 'datetime',
+        'end_date'     => 'date',
+        'total_price'  => 'decimal:2',
     ];
 
     protected static function boot()
@@ -37,6 +38,17 @@ class Tamu extends Model
         static::creating(function ($tamu) {
             if (empty($tamu->access_token)) {
                 $tamu->access_token = bin2hex(random_bytes(32));
+            }
+        });
+
+        static::deleting(function ($tamu) {
+            if ($tamu->proof_of_transfer) {
+                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($tamu->proof_of_transfer)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($tamu->proof_of_transfer);
+                }
+                if (\Illuminate\Support\Facades\Storage::disk('local')->exists($tamu->proof_of_transfer)) {
+                    \Illuminate\Support\Facades\Storage::disk('local')->delete($tamu->proof_of_transfer);
+                }
             }
         });
     }

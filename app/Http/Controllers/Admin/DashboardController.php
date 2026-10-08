@@ -134,16 +134,7 @@ class DashboardController extends Controller
             ];
         }
 
-        // 6-Month Revenue Trend (April 2026 - September 2026 scale)
-        $defaultRevenueByMonth = [
-            4 => 4800000, // April 2026
-            5 => 5400000, // Mei 2026
-            6 => 5100000, // Juni 2026
-            7 => 5900000, // Juli 2026
-            8 => 6200000, // Agustus 2026
-            9 => 6720000, // September 2026
-        ];
-
+        // 6-Month Revenue Trend (Data Riil)
         $revenueTrend = [];
         for ($i = 5; $i >= 0; $i--) {
             $dt = now()->subMonths($i);
@@ -159,12 +150,10 @@ class DashboardController extends Controller
                 })
                 ->sum('total_price');
 
-            $val = $actualRev > 0 ? (int)$actualRev : ($defaultRevenueByMonth[$mNum] ?? (5000000 + (5 - $i) * 350000));
-
             $revenueTrend[] = [
                 'month'      => $mKey,
                 'full_month' => $dt->isoFormat('MMMM Y'),
-                'revenue'    => $val,
+                'revenue'    => (int)$actualRev,
             ];
         }
 
@@ -208,39 +197,7 @@ class DashboardController extends Controller
             }
         }
 
-        // Fallback realistic operational events to complete 4 items
-        $fallbackEvents = [
-            [
-                'time'     => '10:42',
-                'title'    => 'Booking kamar 02 disetujui',
-                'property' => 'Kos Tuwek',
-                'icon'     => 'bi-check-circle',
-            ],
-            [
-                'time'     => '09:18',
-                'title'    => 'Data penyewa baru ditambahkan',
-                'property' => 'Kos Tuwek',
-                'icon'     => 'bi-person-plus',
-            ],
-            [
-                'time'     => 'Kemarin',
-                'title'    => 'Pembayaran sewa diterima',
-                'property' => 'Rp 3.360.000',
-                'icon'     => 'bi-cash-stack',
-            ],
-            [
-                'time'     => 'Kemarin',
-                'title'    => 'Data kamar diperbarui',
-                'property' => 'Kos Tuwek',
-                'icon'     => 'bi-door-closed',
-            ],
-        ];
-
-        foreach ($fallbackEvents as $fb) {
-            if (count($recentActivities) >= 4) break;
-            $recentActivities[] = $fb;
-        }
-        $recentActivities = array_slice($recentActivities, 0, 4);
+        $recentActivities = array_slice($recentActivities, 0, 5);
 
         // 5. Ringkasan Performa Seluruh Properti Cabang
         $propertiesOverview = ProductKosan::with(['productKamarKosan' => function ($q) {
