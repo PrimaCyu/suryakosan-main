@@ -36,3 +36,31 @@
         background: #94a3b8;
     }
 }
+
+/* STRICT MOBILE VIEWPORT STABILIZER (ZERO HORIZONTAL WOBBLE) */
+html {
+    overflow-x: hidden !important;
+    max-width: 100vw;
+    width: 100%;
+    -webkit-text-size-adjust: 100%;
+    touch-action: manipulation;
+}
+
+body {
+    overflow-x: hidden !important;
+    max-width: 100vw;
+    width: 100%;
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* Media Containment to prevent horizontal blowout */
+img, svg, video, canvas {
+    max-width: 100%;
+    height: auto;
+}

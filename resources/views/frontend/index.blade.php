@@ -155,7 +155,7 @@
     <main class="w-full flex-grow">
 
         <!-- 3. HERO SECTION 2.0 (MODERN, IMPACTFUL & HIGH-CONVERTING) -->
-        <section class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-16 md:pb-24">
+        <section class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-16 md:pb-24 overflow-hidden">
             
             <!-- Atmospheric ambient glows -->
             <div class="absolute -top-12 -right-20 w-96 h-96 bg-[#F3A833]/15 rounded-full blur-3xl pointer-events-none"></div>
