@@ -2118,4 +2118,60 @@ p, span, label, input, select, textarea, td, th, .btn, .badge {
   color: #ffffff !important;
 }
 
+/* ==========================================================================
+   RESPONSIVE ENHANCEMENTS & TOUCH ACCESSIBILITY
+   ========================================================================== */
+
+/* Expand touch target to 44x44px for accessibility on all action icons */
+.table-action-compact .btn-action-icon {
+  position: relative;
+}
+.table-action-compact .btn-action-icon::after {
+  content: "";
+  position: absolute;
+  top: -7px;
+  bottom: -7px;
+  left: -7px;
+  right: -7px;
+  pointer-events: auto;
+}
+
+/* Ensure smooth touch horizontal scroll on admin tables */
+.table-responsive {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+@media (max-width: 767.98px) {
+  /* Increase visual action icon dimensions on mobile phones for comfort */
+  .table-action-compact {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    min-width: 140px;
+  }
+  .table-action-compact .btn-action-icon {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    font-size: 0.875rem;
+  }
+  
+  /* Modal adjustments for small screens */
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+  
+  /* Status Filter Tabs horizontal scroll styling */
+  .status-filter-nav {
+    padding-bottom: 4px;
+  }
+  
+  /* Header user profile dropdown */
+  .app-header .dropdown-menu {
+    max-width: calc(100vw - 20px);
+  }
+}
+
+
 

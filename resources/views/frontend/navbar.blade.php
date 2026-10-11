@@ -55,7 +55,7 @@
                     <span class="text-sm sm:text-base md:text-lg font-black tracking-tight text-[#3B2314] group-hover:text-[#E60049] transition-colors">
                         Sinar Citra <span class="text-[#E60049]">Lestari</span>
                     </span>
-                    <span class="text-[9px] sm:text-[10px] font-bold text-[#8E7B6D] tracking-widest uppercase hidden xs:inline-block">
+                    <span class="text-[9px] sm:text-[10px] font-bold text-[#8E7B6D] tracking-widest uppercase hidden sm:inline-block">
                         Residence &amp; Living
                     </span>
                 </div>
@@ -117,6 +117,8 @@
                 onclick="toggleMobileNav()"
                 class="scl-mobile-toggle md:hidden w-10 h-10 rounded-xl bg-white hover:bg-[#E60049]/10 border border-[#E9DDD2] flex items-center justify-center text-[#3B2314] hover:text-[#E60049] transition-all duration-200 shadow-sm active:scale-95"
                 aria-label="Buka Menu Navigasi"
+                aria-expanded="false"
+                aria-controls="mobile-nav"
             >
                 <i id="scl-hamburger-icon" class="fa-solid fa-bars text-base transition-transform duration-200"></i>
             </button>
@@ -168,16 +170,25 @@
     function toggleMobileNav() {
         const nav = document.getElementById('mobile-nav');
         const icon = document.getElementById('scl-hamburger-icon');
+        const btn = document.getElementById('scl-hamburger-btn');
         if (nav) {
             const isHidden = nav.classList.contains('hidden');
             if (isHidden) {
                 nav.classList.remove('hidden');
+                if (btn) {
+                    btn.setAttribute('aria-expanded', 'true');
+                    btn.setAttribute('aria-label', 'Tutup Menu Navigasi');
+                }
                 if (icon) {
                     icon.classList.remove('fa-bars');
                     icon.classList.add('fa-xmark');
                 }
             } else {
                 nav.classList.add('hidden');
+                if (btn) {
+                    btn.setAttribute('aria-expanded', 'false');
+                    btn.setAttribute('aria-label', 'Buka Menu Navigasi');
+                }
                 if (icon) {
                     icon.classList.remove('fa-xmark');
                     icon.classList.add('fa-bars');
@@ -185,4 +196,33 @@
             }
         }
     }
+
+    // Close mobile nav on Escape key or viewport resize
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const nav = document.getElementById('mobile-nav');
+            if (nav && !nav.classList.contains('hidden')) {
+                toggleMobileNav();
+            }
+        }
+    });
+
+    window.addEventListener('resize', function() {
+        if (window.innerWidth >= 768) {
+            const nav = document.getElementById('mobile-nav');
+            const icon = document.getElementById('scl-hamburger-icon');
+            const btn = document.getElementById('scl-hamburger-btn');
+            if (nav && !nav.classList.contains('hidden')) {
+                nav.classList.add('hidden');
+                if (btn) {
+                    btn.setAttribute('aria-expanded', 'false');
+                    btn.setAttribute('aria-label', 'Buka Menu Navigasi');
+                }
+                if (icon) {
+                    icon.classList.remove('fa-xmark');
+                    icon.classList.add('fa-bars');
+                }
+            }
+        }
+    });
 </script>

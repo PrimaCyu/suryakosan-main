@@ -293,20 +293,20 @@
 
         <!-- 4. TRUST BAR / METRIC HIGHLIGHTS -->
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-10 mb-16 relative z-30 reveal">
-            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-[#E9DDD2] grid grid-cols-2 md:grid-cols-4 gap-6 text-center divide-y sm:divide-y-0 sm:divide-x divide-[#E9DDD2]">
-                <div class="pt-3 sm:pt-0">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-[#E9DDD2] grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
+                <div class="py-2 sm:py-0 border-r border-[#E9DDD2]">
                     <div class="text-2xl sm:text-3xl font-black text-[#3B2314]">100%</div>
                     <div class="text-xs text-[#7B6759] font-bold mt-1">Unit Asli & Terverifikasi</div>
                 </div>
-                <div class="pt-3 sm:pt-0">
+                <div class="py-2 sm:py-0 md:border-r border-[#E9DDD2]">
                     <div class="text-2xl sm:text-3xl font-black text-[#00A896]">500+</div>
                     <div class="text-xs text-[#7B6759] font-bold mt-1">Penghuni Aktif & Puas</div>
                 </div>
-                <div class="pt-3 sm:pt-0">
+                <div class="py-2 sm:py-0 border-r border-[#E9DDD2]">
                     <div class="text-2xl sm:text-3xl font-black text-[#F3A833]">24/7</div>
                     <div class="text-xs text-[#7B6759] font-bold mt-1">Keamanan CCTV Terpadu</div>
                 </div>
-                <div class="pt-3 sm:pt-0">
+                <div class="py-2 sm:py-0">
                     <div class="text-2xl sm:text-3xl font-black text-[#E60049]">Rp 0</div>
                     <div class="text-xs text-[#7B6759] font-bold mt-1">Biaya Survei / Bebas Pungli</div>
                 </div>

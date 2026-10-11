@@ -146,14 +146,16 @@
 
         .btn-toggle-eye {
             position: absolute;
-            right: 0.75rem;
+            right: 0.25rem;
+            width: 44px;
+            height: 44px;
             background: transparent;
             border: none;
             color: #64748b;
             cursor: pointer;
-            padding: 0.25rem;
+            padding: 0;
             font-size: 0.95rem;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             transition: color 0.15s ease;

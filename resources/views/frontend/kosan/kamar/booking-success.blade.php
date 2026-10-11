@@ -261,13 +261,13 @@
 
       <!-- ACTION BUTTONS SECTION -->
       <div class="p-6 sm:p-8 bg-[#FFF8F1] border-t border-[#E9DDD2]">
-        <div class="flex flex-col sm:flex-row gap-3 items-center justify-between">
+        <div class="flex flex-col md:flex-row flex-wrap md:flex-nowrap gap-3 items-stretch md:items-center justify-between">
           
           <!-- PDF INVOICE DOWNLOAD -->
           <a
             href="{{ route('booking.download.invoice', $tamu->access_token) }}"
             target="_blank"
-            class="shine w-full sm:w-auto px-6 py-3.5 bg-[#E60049] hover:bg-[#C90040] text-white font-extrabold text-xs sm:text-sm rounded-2xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2.5"
+            class="shine w-full md:w-auto px-6 py-3.5 bg-[#E60049] hover:bg-[#C90040] text-white font-extrabold text-xs sm:text-sm rounded-2xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2.5"
           >
             <i class="fa-solid fa-file-pdf text-base"></i>
             <span>Unduh Bukti Invoice PDF</span>
@@ -289,7 +289,7 @@
             href="{{ $waUrl }}"
             target="_blank"
             rel="noopener noreferrer"
-            class="w-full sm:w-auto px-6 py-3.5 bg-[#00A896] hover:bg-[#008f80] text-white font-extrabold text-xs sm:text-sm rounded-2xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2.5"
+            class="w-full md:w-auto px-6 py-3.5 bg-[#00A896] hover:bg-[#008f80] text-white font-extrabold text-xs sm:text-sm rounded-2xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2.5"
           >
             <i class="fa-brands fa-whatsapp text-base"></i>
             <span>Konfirmasi ke WhatsApp Admin</span>
@@ -298,7 +298,7 @@
           <!-- BACK TO HOME BUTTON -->
           <a
             href="{{ route('home') }}"
-            class="w-full sm:w-auto px-5 py-3.5 bg-white hover:bg-[#EDE4DC] text-[#3B2314] border border-[#E9DDD2] font-extrabold text-xs sm:text-sm rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2"
+            class="w-full md:w-auto px-5 py-3.5 bg-white hover:bg-[#EDE4DC] text-[#3B2314] border border-[#E9DDD2] font-extrabold text-xs sm:text-sm rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2"
           >
             <i class="fa-solid fa-house text-xs"></i>
             <span>Beranda</span>

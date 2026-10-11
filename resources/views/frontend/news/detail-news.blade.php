@@ -124,18 +124,26 @@
       display: block;
     }
     .article-copy table {
+      display: block;
       width: 100%;
+      max-width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
       border-collapse: collapse;
       margin: 1.6rem 0;
       font-size: 0.95rem;
       border-radius: 0.85rem;
-      overflow: hidden;
       border: 1px solid #EADFD6;
+    }
+    .article-copy iframe {
+      max-width: 100% !important;
+      border-radius: 1rem;
     }
     .article-copy th, .article-copy td {
       padding: 0.8rem 1rem;
       border: 1px solid #EADFD6;
       text-align: left;
+      white-space: normal;
     }
     .article-copy th {
       background-color: #F8F2EC;

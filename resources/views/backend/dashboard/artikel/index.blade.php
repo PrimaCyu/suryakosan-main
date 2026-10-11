@@ -84,6 +84,26 @@
         background-color: #f1f5f9 !important;
         border-bottom: 1px solid #cbd5e1 !important;
     }
+
+    @media (max-width: 767.98px) {
+        .note-toolbar {
+            padding: 4px 6px !important;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+        }
+        .note-btn-group {
+            margin: 1px !important;
+        }
+        .note-btn {
+            padding: 3px 6px !important;
+            font-size: 11px !important;
+        }
+        .note-editable {
+            padding: 12px 14px !important;
+            min-height: 200px !important;
+        }
+    }
 </style>
 
 <div class="app-content-header">
@@ -272,7 +292,7 @@
 <!-- 1. MODAL TAMBAH ARTIKEL -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalTambahArtikel" tabindex="-1" aria-labelledby="modalTambahArtikelLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down">
         <form action="{{ route('admin.artikel.insert') }}" method="POST" enctype="multipart/form-data" id="formTambahArtikel" class="modal-content border-0 shadow-lg" style="border-radius: 14px;">
             @csrf
             <div class="modal-header border-bottom py-3 px-4 bg-body-tertiary">
@@ -372,7 +392,7 @@
 <!-- 2. SINGLE UNIFIED MODAL EDIT ARTIKEL -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalEditArtikel" tabindex="-1" aria-labelledby="modalEditArtikelLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down">
         <form action="" method="POST" enctype="multipart/form-data" id="formEditArtikel" class="modal-content border-0 shadow-lg" style="border-radius: 14px;">
             @csrf
             @method('PUT')
@@ -557,7 +577,13 @@
         minHeight: 260,
         dialogsInBody: true,
         dialogsFade: true,
-        toolbar: [
+        toolbar: window.innerWidth < 768 ? [
+            ['style', ['style']],
+            ['font', ['bold', 'italic', 'underline', 'clear']],
+            ['para', ['ul', 'ol']],
+            ['insert', ['link', 'picture']],
+            ['view', ['fullscreen']]
+        ] : [
             ['style', ['style']],
             ['font', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript', 'clear']],
             ['fontsize', ['fontsize']],

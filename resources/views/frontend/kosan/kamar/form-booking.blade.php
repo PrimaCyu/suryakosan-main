@@ -68,7 +68,8 @@
       box-shadow: 0 24px 60px rgba(59,35,20,0.18) !important;
       border: 1px solid var(--line) !important;
       font-family: inherit !important;
-      width: 320px !important;
+      width: min(320px, calc(100vw - 20px)) !important;
+      max-width: calc(100vw - 20px) !important;
       padding: 12px !important;
       box-sizing: border-box !important;
       z-index: 99999 !important;
@@ -259,6 +260,31 @@
       transform: translateX(110%);
     }
 
+    @media (max-width: 360px) {
+      .flatpickr-calendar {
+        width: calc(100vw - 16px) !important;
+        max-width: calc(100vw - 16px) !important;
+        padding: 8px !important;
+        border-radius: 1rem !important;
+      }
+      .flatpickr-day {
+        height: 33px !important;
+        line-height: 31px !important;
+        font-size: 11px !important;
+      }
+      .flatpickr-current-month {
+        font-size: 90% !important;
+      }
+    }
+
+    /* Prevent sticky stepper crowding mobile landscape (< 520px height) */
+    @media (max-height: 520px) {
+      .booking-stepper-sticky {
+        position: relative !important;
+        top: 0 !important;
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .reveal, .payment-option, .shine::after, .input-scl {
         transition: none;
@@ -278,7 +304,7 @@
   @include('frontend.navbar')
 
   <!-- 3. STICKY STEPPER NAVIGASI -->
-  <div class="sticky top-[64px] sm:top-[80px] z-30 bg-[#FFF8F1]/95 backdrop-blur-md border-b border-[#E9DDD2] py-3 shadow-sm">
+  <div class="booking-stepper-sticky sticky top-[64px] sm:top-[80px] z-30 bg-[#FFF8F1]/95 backdrop-blur-md border-b border-[#E9DDD2] py-3 shadow-sm">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between gap-2">
 
@@ -834,6 +860,21 @@
 
   </main>
 
+  <!-- MOBILE BOTTOM STICKY FLOATING ACTION BAR -->
+  <aside class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#E9DDD2] p-3 px-4 shadow-[0_-8px_25px_rgba(59,35,20,0.12)]">
+    <div class="max-w-xl mx-auto flex items-center justify-between gap-3">
+      <div>
+        <span class="text-[10px] uppercase font-black tracking-wider text-[#8E7B6D] block leading-none">Total Pembayaran</span>
+        <div id="mobile-grand-total" class="text-base sm:text-lg font-black text-[#E60049] mt-0.5 leading-tight">Rp 0</div>
+      </div>
+      <button type="button" onclick="document.getElementById('btn-submit-booking').click();"
+        class="shine px-5 py-2.5 bg-[#E60049] hover:bg-[#C90040] text-white font-black rounded-xl text-xs sm:text-sm shadow-md active:scale-95 flex items-center gap-1.5 transition-all">
+        <span>Selesaikan Booking</span>
+        <i class="fa-solid fa-arrow-right text-xs"></i>
+      </button>
+    </div>
+  </aside>
+
   <!-- 4. MODAL POP-UP FAILED BOOKING -->
   @if (session('failed'))
     <div id="flash-failed-modal" class="fixed inset-0 bg-[#3B2314]/70 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
@@ -1072,6 +1113,11 @@
 
       if (grandTotalElem) {
         grandTotalElem.textContent = formatRupiah(grandTotal);
+      }
+
+      const mobileGrandTotal = document.getElementById('mobile-grand-total');
+      if (mobileGrandTotal) {
+        mobileGrandTotal.textContent = formatRupiah(grandTotal);
       }
 
       const bankNominal = document.getElementById('bank-nominal-transfer');

@@ -96,15 +96,22 @@
   }
 
   .dash-header-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 0.5rem;
     width: 100%;
     margin-top: 0.85rem;
   }
+  @media (min-width: 480px) {
+    .dash-header-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+  }
   @media (min-width: 768px) {
     .dash-header-actions {
       display: flex;
+      flex-direction: row;
       align-items: center;
       width: auto;
       margin-top: 0;
