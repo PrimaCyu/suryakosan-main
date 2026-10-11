@@ -20,7 +20,7 @@
     }
   </style>
 </head>
-<body class="bg-[#fffaf7] text-[#3B2314] font-sans antialiased overflow-x-hidden">
+<body class="bg-[#FFF8F1] text-[#3B2314] font-sans antialiased overflow-x-hidden min-h-screen flex flex-col justify-between">
 
   <!-- 1. BAR LOADING -->
   <div id="page-loader" class="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-[#E60049] via-[#F3A833] to-[#00A896] z-[100] transition-all duration-500 ease-out"></div>
@@ -29,7 +29,7 @@
   @include('frontend.navbar')
 
   <!-- MAIN CONTENT CONTAINER -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-8 flex-grow w-full">
 
     @php
       $topArtikels = $artikels->take(3);
@@ -38,12 +38,12 @@
     <!-- 3. HERO CAROUSEL BANNER -->
     @if($topArtikels->count() > 0)
       <section class="reveal grid lg:grid-cols-[0.8fr_1.7fr] gap-5 items-stretch">
-        <div class="rounded-[2rem] bg-[#3B2314] text-[#FFF8F1] p-7 sm:p-9 flex flex-col justify-between min-h-[420px]">
+        <div class="rounded-[2rem] bg-[#3B2314] text-[#FFF8F1] p-6 sm:p-9 flex flex-col justify-between min-h-[300px] sm:min-h-[420px]">
           <div>
             <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F3A833] text-[#3B2314] text-[10px] font-black uppercase tracking-[0.18em]">
               <i class="fa-solid fa-bolt"></i> News & Event
             </div>
-            <h1 class="mt-6 text-3xl sm:text-4xl font-black leading-tight">
+            <h1 class="mt-4 sm:mt-6 text-2xl sm:text-4xl font-black leading-tight">
               Cerita, informasi,<br>
               dan kabar terbaru.
             </h1>
@@ -61,7 +61,7 @@
           </div>
         </div>
 
-        <div class="relative min-h-[420px] rounded-[2rem] overflow-hidden bg-[#EADFD5] shadow-[0_18px_50px_rgba(59,35,20,0.12)]">
+        <div class="relative min-h-[280px] sm:min-h-[420px] rounded-[2rem] overflow-hidden bg-[#EADFD5] shadow-[0_18px_50px_rgba(59,35,20,0.12)]">
           @foreach($topArtikels as $index => $item)
             @php
               $imgUrl = $item->image ? asset('storage/' . $item->image) : 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1400&q=80';
@@ -141,7 +141,7 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="news-grid">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="news-grid">
         @forelse($artikels as $artikel)
           @php
             $imgUrl = $artikel->image ? asset('storage/' . $artikel->image) : 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80';

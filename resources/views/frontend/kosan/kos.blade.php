@@ -20,7 +20,7 @@
     }
   </style>
 </head>
-<body class="bg-[#fffaf7] text-[#3B2314] font-sans antialiased overflow-x-hidden">
+<body class="bg-[#FFF8F1] text-[#3B2314] font-sans antialiased overflow-x-hidden min-h-screen flex flex-col justify-between">
 
   <!-- 1. BAR LOADING -->
   <div id="page-loader" class="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-[#F3A833] via-[#E60049] to-[#00A896] z-[100] transition-all duration-500 ease-out"></div>
@@ -45,7 +45,7 @@
                 <span class="inline-flex items-center gap-2 bg-[#F3A833] text-[#3B2314] px-4 py-2 rounded-full text-[10px] font-extrabold uppercase tracking-wider">
                   <i class="fa-solid fa-compass"></i> Jelajahi kosan
                 </span>
-                <h1 class="mt-7 text-4xl sm:text-5xl font-extrabold tracking-tight leading-[1.05] text-white max-w-2xl">
+                <h1 class="mt-6 sm:mt-7 text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight text-white max-w-2xl">
                   Semua kosan<br><span class="text-[#F3A833]">Terbaik Untukmu.</span>
                 </h1>
                 <p class="mt-5 text-white/70 text-xs sm:text-sm max-w-lg leading-relaxed">
@@ -142,7 +142,7 @@
     </section>
 
     <!-- 4. LISTING KOS GRID SECTION -->
-    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
 
       <div class="flex items-center justify-between reveal">
         <div>
@@ -167,7 +167,7 @@
       @endphp
 
       <!-- Kos Grid Container -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 reveal">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 reveal">
         @forelse($kosanList as $kos)
           @php
             $firstImage = $kos->productImageKosan->first();

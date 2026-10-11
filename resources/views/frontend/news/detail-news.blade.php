@@ -264,7 +264,7 @@
   </style>
 </head>
 
-<body class="bg-[#FFF8F1] text-[#3B2314] font-sans antialiased overflow-x-hidden">
+<body class="bg-[#FFF8F1] text-[#3B2314] font-sans antialiased overflow-x-hidden min-h-screen flex flex-col justify-between">
 
   <!-- 1. BAR LOADING -->
   <div id="page-loader" class="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-[#F3A833] via-[#E60049] to-[#00A896] transition-all duration-500 ease-out"></div>
@@ -277,7 +277,7 @@
   @endphp
 
   <!-- MAIN CONTENT WRAPPER -->
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-8 flex-grow w-full">
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-7 items-start">
 
@@ -469,7 +469,7 @@
   <!-- SECTION REKOMENDASI BERITA BOTTOM -->
   @if($beritaLainnya->count() > 0)
     <section class="bg-[#3B2314] py-14 mt-10 overflow-hidden">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-7 reveal">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-7 reveal">
 
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>

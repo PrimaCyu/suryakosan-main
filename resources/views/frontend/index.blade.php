@@ -155,7 +155,7 @@
     <main class="w-full flex-grow">
 
         <!-- 3. HERO SECTION 2.0 (MODERN, IMPACTFUL & HIGH-CONVERTING) -->
-        <section class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-16 md:pb-24">
+        <section class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-16 md:pb-24">
             
             <!-- Atmospheric ambient glows -->
             <div class="absolute -top-12 -right-20 w-96 h-96 bg-[#F3A833]/15 rounded-full blur-3xl pointer-events-none"></div>
@@ -195,7 +195,7 @@
                         <span>Platform Sewa Kos Pilihan #1 di Bali</span>
                     </div>
 
-                    <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight text-white">
+                    <h1 class="text-2xl sm:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight text-white">
                         Hunian Kos Modern, <br class="hidden sm:inline">
                         <span class="text-[#F3A833]">Nyaman</span> & Bebas Ribet.
                     </h1>

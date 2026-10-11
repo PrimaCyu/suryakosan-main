@@ -60,11 +60,11 @@
   </style>
 </head>
 
-<body class="text-[#3B2314] antialiased min-h-screen flex flex-col justify-between">
+<body class="bg-[#FFF8F1] text-[#3B2314] font-sans antialiased overflow-x-hidden min-h-screen flex flex-col justify-between">
 
   @include('frontend.navbar')
 
-  <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 w-full">
+  <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-8 pb-16 w-full">
 
     <!-- BREADCRUMBS -->
     <nav class="flex items-center gap-2 text-xs text-[#8E7B6D] mb-6">

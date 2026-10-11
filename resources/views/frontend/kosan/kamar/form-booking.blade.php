@@ -293,7 +293,7 @@
   </style>
 </head>
 
-<body class="text-[#3B2314] font-sans antialiased overflow-x-hidden">
+<body class="bg-[#FFF8F1] text-[#3B2314] font-sans antialiased overflow-x-hidden min-h-screen flex flex-col justify-between">
 
   <!-- 1. BAR LOADING -->
   <div id="page-loader"
@@ -305,7 +305,7 @@
 
   <!-- 3. STICKY STEPPER NAVIGASI -->
   <div class="booking-stepper-sticky sticky top-[64px] sm:top-[80px] z-30 bg-[#FFF8F1]/95 backdrop-blur-md border-b border-[#E9DDD2] py-3 shadow-sm">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between gap-2">
 
         <button type="button" onclick="scrollToSection('sec-data-diri')" id="step-btn-1"
@@ -344,7 +344,7 @@
   </div>
 
   <!-- MAIN CONTENT CONTAINER -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-8 flex-grow w-full">
 
     @php
       $namaKosan = $kamar->productKosan->title ?? 'Sinar Citra Lestari';

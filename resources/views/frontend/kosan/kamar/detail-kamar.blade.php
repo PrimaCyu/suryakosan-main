@@ -21,7 +21,7 @@
     @media(prefers-reduced-motion:reduce){.reveal,.scl-hover,.shine:after{transition:none}}
   </style>
 </head>
-<body class="text-[#3B2314] font-sans antialiased overflow-x-hidden">
+<body class="bg-[#FFF8F1] text-[#3B2314] font-sans antialiased overflow-x-hidden min-h-screen flex flex-col justify-between">
   <!-- 1. BAR LOADING -->
   <div id="page-loader" class="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-[#3B2314] via-[#E60049] to-[#F3A833] z-[100] transition-all duration-500 ease-out"></div>
 
@@ -90,7 +90,7 @@
     $monthlyPriceVal = $monthlyPriceObj ? $monthlyPriceObj->price : null;
   @endphp
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-8 space-y-8 sm:space-y-10 flex-grow w-full">
     <!-- 3. BREADCRUMB & TOOLBAR -->
     <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs mb-6">
       <nav class="flex items-center gap-2 text-[#7B6759] font-medium overflow-x-auto no-scrollbar py-1">
@@ -103,13 +103,13 @@
         <span class="font-bold text-[#3B2314] truncate max-w-[160px] sm:max-w-[220px]">{{ $namaKamar }}</span>
       </nav>
 
-      <div class="flex items-center gap-2 self-end sm:self-auto shrink-0">
+      <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end shrink-0">
         <!-- Bookmark / Simpan -->
         <button
           type="button"
           onclick="toggleBookmarkKamar({{ $kamar->id }})"
           id="bookmark-kamar-btn"
-          class="px-3.5 py-2 bg-white hover:bg-[#FFF2E5] text-[#5D483A] border border-[#E9DDD2] rounded-xl font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 active:scale-95"
+          class="flex-1 sm:flex-initial px-3.5 py-2 bg-white hover:bg-[#FFF2E5] text-[#5D483A] border border-[#E9DDD2] rounded-xl font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-1.5 active:scale-95"
           title="Simpan Kamar ini"
         >
           <i class="fa-regular fa-heart text-xs text-[#E60049]"></i>
@@ -120,7 +120,7 @@
         <button
           type="button"
           onclick="copyKamarLink()"
-          class="px-3.5 py-2 bg-white hover:bg-[#FFF2E5] text-[#5D483A] border border-[#E9DDD2] rounded-xl font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 active:scale-95"
+          class="flex-1 sm:flex-initial px-3.5 py-2 bg-white hover:bg-[#FFF2E5] text-[#5D483A] border border-[#E9DDD2] rounded-xl font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-1.5 active:scale-95"
           title="Bagikan Tautan Kamar"
         >
           <i class="fa-solid fa-share-nodes text-xs text-[#00A896]"></i>
@@ -132,7 +132,7 @@
           href="{{ $waUrl }}"
           target="_blank"
           rel="noopener noreferrer"
-          class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 active:scale-95"
+          class="flex-1 sm:flex-initial px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-1.5 active:scale-95 text-center"
           title="Tanya Pengelola via WhatsApp"
         >
           <i class="fa-brands fa-whatsapp text-sm"></i>
