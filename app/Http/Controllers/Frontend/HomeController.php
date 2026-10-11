@@ -46,7 +46,15 @@ class HomeController extends Controller
 
     public function kosanIndex(Request $request)
     {
-        $query = ProductKosan::with(['productImageKosan', 'productKamarKosan.priceKamar']);
+        $today = now()->toDateString();
+        $query = ProductKosan::with([
+            'productImageKosan',
+            'productKamarKosan.priceKamar',
+            'productKamarKosan.tamu' => function ($t) use ($today) {
+                $t->where('status', 'approved')
+                  ->whereDate('end_date', '>=', $today);
+            }
+        ]);
 
         if ($request->has('search') && !empty($request->search)) {
             $search = $this->escapeLike(strtolower($request->search));
@@ -160,7 +168,41 @@ class HomeController extends Controller
         $kamar = ProductKamarKosan::with(['priceKamar', 'productKosan', 'tamu', 'productKamarImageKosan'])
             ->findOrFail($product_kamar_kosan);
 
-        return view('frontend.kosan.kamar.form-booking', compact('kamar'));
+        $bookedRanges = [];
+        $latestBookedEnd = null;
+        if ($kamar && $kamar->tamu) {
+            foreach ($kamar->tamu as $t) {
+                // Abaikan booking pending kadaluarsa (> 2 jam) agar tidak memblokir ketersediaan
+                $isStalePending = ($t->status === 'pending' && $t->created_at && $t->created_at->lt(now()->subHours(2)));
+                if (!$isStalePending && in_array(strtolower($t->status), ['approved', 'pending']) && $t->start_date && $t->end_date) {
+                    $sDate = \Carbon\Carbon::parse($t->start_date)->format('Y-m-d');
+                    $eDate = \Carbon\Carbon::parse($t->end_date)->format('Y-m-d');
+                    $bookedRanges[] = [
+                        'from' => $sDate,
+                        'to'   => $eDate,
+                    ];
+                    if (!$latestBookedEnd || $eDate > $latestBookedEnd) {
+                        $latestBookedEnd = $eDate;
+                    }
+                }
+            }
+        }
+
+        $todayStr = now()->format('Y-m-d');
+        $isTodayBooked = false;
+        foreach ($bookedRanges as $r) {
+            if ($todayStr >= $r['from'] && $todayStr <= $r['to']) {
+                $isTodayBooked = true;
+                break;
+            }
+        }
+
+        $firstAvailableDate = $todayStr;
+        if ($isTodayBooked && $latestBookedEnd) {
+            $firstAvailableDate = \Carbon\Carbon::parse($latestBookedEnd)->addDay()->format('Y-m-d');
+        }
+
+        return view('frontend.kosan.kamar.form-booking', compact('kamar', 'bookedRanges', 'latestBookedEnd', 'isTodayBooked', 'firstAvailableDate'));
     }
 
     /**
@@ -171,10 +213,16 @@ class HomeController extends Controller
         $kamar = ProductKamarKosan::findOrFail($id);
 
         $tamu = $kamar->tamu()
-                        ->whereIn('status', ['approved', 'pending'])
-                        ->whereDate('end_date', '>=', now()->toDateString())
-                        ->select('start_date', 'end_date')
-                        ->get();
+            ->where(function ($q) {
+                $q->where('status', 'approved')
+                  ->orWhere(function ($qp) {
+                      $qp->where('status', 'pending')
+                         ->where('created_at', '>=', now()->subHours(2));
+                  });
+            })
+            ->whereDate('end_date', '>=', now()->toDateString())
+            ->select('start_date', 'end_date')
+            ->get();
 
         return response()->json($tamu);
     }

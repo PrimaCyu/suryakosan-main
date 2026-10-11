@@ -51,8 +51,15 @@ class ProcessBookingDate
 
         // Dua interval waktu [A_start, A_end] dan [B_start, B_end] saling bertabrakan jika:
         // A_start < B_end DAN A_end > B_start
+        // Mitigasi Denial of Inventory: Pending booking hanya mengunci jadwal jika dibuat dalam 2 jam terakhir
         $isBooked = Tamu::where('product_kamar_kosan_id', $product_kamar_kosan)
-            ->whereIn('status', ['pending', 'approved'])
+            ->where(function ($statusQuery) {
+                $statusQuery->where('status', 'approved')
+                            ->orWhere(function ($pendingQuery) {
+                                $pendingQuery->where('status', 'pending')
+                                             ->where('created_at', '>=', now()->subHours(2));
+                            });
+            })
             ->when($ignoreTamuId, function ($query, $id) {
                 return $query->where('id', '!=', $id);
             })

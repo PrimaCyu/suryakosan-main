@@ -113,8 +113,8 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function(){
         Route::get('/proof/{tamu}', 'viewProof')->name('proof');
     });
 
-    // Social Media
-    Route::prefix('/sosial-media')->controller(SosialMediaController::class)->name('sosial.media')->group(function(){
+    // Social Media (Super Admin only)
+    Route::prefix('/sosial-media')->middleware(['super_admin'])->controller(SosialMediaController::class)->name('sosial.media')->group(function(){
         Route::get('/index', 'index')->name('.index');
         Route::get('/search-ajax', 'searchAjax')->name('.search.ajax');
         Route::post('/insert', 'insert')->name('.insert');

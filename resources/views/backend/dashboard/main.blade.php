@@ -30,6 +30,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <meta name="color-scheme" content="light" />
     <meta name="theme-color" content="#ffffff" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
 
     <!--begin::Google Fonts (Plus Jakarta Sans)-->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -390,13 +391,6 @@
                 </a>
               </li>
 
-              <li class="nav-item">
-                <a href="{{ route('admin.sosial.media.index') }}" class="nav-link {{ request()->routeIs('admin.sosial.media.*') ? 'active' : '' }}">
-                  <i class="nav-icon bi bi-share"></i>
-                  <p>Sosial Media</p>
-                </a>
-              </li>
-
               @if(Auth::user()->isSuperAdmin())
               <!-- Super Admin -->
               <li class="nav-header">Super Admin</li>
@@ -405,6 +399,13 @@
                 <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                   <i class="nav-icon bi bi-person-gear"></i>
                   <p>Kelola Admin & Cabang</p>
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="{{ route('admin.sosial.media.index') }}" class="nav-link {{ request()->routeIs('admin.sosial.media.*') ? 'active' : '' }}">
+                  <i class="nav-icon bi bi-share"></i>
+                  <p>Sosial Media</p>
                 </a>
               </li>
               @endif

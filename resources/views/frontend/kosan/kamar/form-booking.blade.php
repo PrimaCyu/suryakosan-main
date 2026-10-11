@@ -348,38 +348,10 @@
 
     @php
       $namaKosan = $kamar->productKosan->title ?? 'Sinar Citra Lestari';
-
-      $bookedRanges = [];
-      $latestBookedEnd = null;
-      if ($kamar && $kamar->tamu) {
-          foreach ($kamar->tamu as $t) {
-              if (in_array(strtolower($t->status), ['approved', 'pending']) && $t->start_date && $t->end_date) {
-                  $sDate = \Carbon\Carbon::parse($t->start_date)->format('Y-m-d');
-                  $eDate = \Carbon\Carbon::parse($t->end_date)->format('Y-m-d');
-                  $bookedRanges[] = [
-                      'from' => $sDate,
-                      'to' => $eDate,
-                  ];
-                  if (!$latestBookedEnd || $eDate > $latestBookedEnd) {
-                      $latestBookedEnd = $eDate;
-                  }
-              }
-          }
-      }
-
-      $todayStr = now()->format('Y-m-d');
-      $isTodayBooked = false;
-      foreach ($bookedRanges as $r) {
-          if ($todayStr >= $r['from'] && $todayStr <= $r['to']) {
-              $isTodayBooked = true;
-              break;
-          }
-      }
-
-      $firstAvailableDate = $todayStr;
-      if ($isTodayBooked && $latestBookedEnd) {
-          $firstAvailableDate = \Carbon\Carbon::parse($latestBookedEnd)->addDay()->format('Y-m-d');
-      }
+      $bookedRanges = $bookedRanges ?? [];
+      $latestBookedEnd = $latestBookedEnd ?? null;
+      $isTodayBooked = $isTodayBooked ?? false;
+      $firstAvailableDate = $firstAvailableDate ?? now()->format('Y-m-d');
     @endphp
 
     <!-- BREADCRUMB -->
@@ -519,6 +491,7 @@
                     </div>
                   </div>
 
+                  @if($kamar->yearly_price)
                   <div class="rounded-2xl border border-[#E9DDD2] bg-white p-4 hover:border-[#00A896] transition-all">
                     <div class="flex items-center justify-between mb-3">
                       <label for="durasi-tahun" class="font-black text-[#3B2314] cursor-pointer flex items-center gap-2">
@@ -535,11 +508,18 @@
                       <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-[#9A887A] pointer-events-none">Tahun</span>
                     </div>
                   </div>
+                  @else
+                  <input type="hidden" id="durasi-tahun" name="tahun" value="0">
+                  @endif
                 </div>
 
                 <p class="mt-3 text-[10px] text-[#8E7B6D] flex items-start gap-2">
                   <i class="fa-solid fa-circle-info text-[#E60049] mt-0.5"></i>
-                  <span>Sewa kos ini khusus bulanan atau tahunan. Masukkan durasi yang diinginkan (minimal 1 bulan atau 1 tahun).</span>
+                  @if($kamar->yearly_price)
+                  <span>Sewa kos ini tersedia pilihan bulanan atau tahunan. Masukkan durasi yang diinginkan (minimal 1 bulan atau 1 tahun).</span>
+                  @else
+                  <span>Sewa kos ini khusus bulanan (Tarif tahunan belum dibuka untuk unit ini). Masukkan durasi sewa bulanan (minimal 1 bulan).</span>
+                  @endif
                 </p>
               </div>
 
@@ -988,7 +968,14 @@
       const submitBtn = document.getElementById('btn-submit-booking');
 
       if (bookingForm && submitBtn) {
-        bookingForm.addEventListener('submit', function() {
+        bookingForm.addEventListener('submit', function(e) {
+          const fileInput = document.getElementById('file-bukti');
+          if (currentPaymentType === 'transfer' && (!fileInput || !fileInput.files || fileInput.files.length === 0)) {
+            e.preventDefault();
+            alert('Silakan unggah bukti transfer / resi pembayaran terlebih dahulu sebelum melanjutkan reservasi.');
+            document.getElementById('file-bukti')?.closest('.border-dashed')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+          }
           submitBtn.disabled = true;
           submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-sm"></i> <span>Memproses Pesanan...</span>';
         });

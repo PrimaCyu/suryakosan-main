@@ -102,7 +102,18 @@ class BookingAdminController extends Controller
             return back()->with('failed', "Tidak dapat menyetujui: Kamar sudah terisi oleh penyewa '{$overlappingApproved->name}' pada periode {$existingStart} s/d {$existingEnd}.");
         }
 
-        \Illuminate\Support\Facades\DB::transaction(function () use ($dataTamu, $user) {
+        // Ambil booking pending lain yang jadwalnya bertabrakan untuk diberi notifikasi penolakan
+        $collidingPending = Tamu::with('productKamarKosan.productKosan')
+            ->where('product_kamar_kosan_id', $dataTamu->product_kamar_kosan_id)
+            ->where('status', 'pending')
+            ->where('id', '!=', $dataTamu->id)
+            ->where(function ($query) use ($dataTamu) {
+                $query->where('start_date', '<', $dataTamu->end_date)
+                      ->where('end_date', '>', $dataTamu->start_date);
+            })
+            ->get();
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($dataTamu, $user, $collidingPending) {
             $dataTamu->update([
                 'status' => 'approved',
                 'processed_by' => $user->id,
@@ -110,20 +121,14 @@ class BookingAdminController extends Controller
                 'rejection_reason' => null,
             ]);
 
-            // Otomatis batalkan booking pending lain yang bertabrakan jadwalnya
-            Tamu::where('product_kamar_kosan_id', $dataTamu->product_kamar_kosan_id)
-                ->where('status', 'pending')
-                ->where('id', '!=', $dataTamu->id)
-                ->where(function ($query) use ($dataTamu) {
-                    $query->where('start_date', '<', $dataTamu->end_date)
-                          ->where('end_date', '>', $dataTamu->start_date);
-                })
-                ->update([
+            foreach ($collidingPending as $cp) {
+                $cp->update([
                     'status' => 'reject',
                     'processed_by' => $user->id,
                     'processed_at' => now(),
                     'rejection_reason' => 'Kamar telah disetujui untuk pemohon booking lain pada periode tanggal yang sama.',
                 ]);
+            }
         });
 
         if ($dataTamu->productKamarKosan && $dataTamu->productKamarKosan->productKosan) {
@@ -133,6 +138,15 @@ class BookingAdminController extends Controller
         Cache::forget('home_kamar_list');
         Cache::forget('home_kosan_list');
 
+        $waSosmed = SosialMedia::where('title', 'like', '%whatsapp%')->orWhere('url', 'like', '%wa.me%')->first();
+        $waNumber = '6281234567890';
+        if ($waSosmed) {
+            preg_match('/[0-9]{9,15}/', $waSosmed->url, $m);
+            if (!empty($m[0])) {
+                $waNumber = $m[0];
+            }
+        }
+
         // Kirim email konfirmasi persetujuan (Approved) beserta lampiran file PDF kwitansi lunas
         try {
             if (!empty($dataTamu->email)) {
@@ -140,19 +154,21 @@ class BookingAdminController extends Controller
                 $pdf = Pdf::loadView('pdf.booking_invoice', ['tamu' => $dataTamu]);
                 $pdfOutput = $pdf->output();
 
-                $waSosmed = SosialMedia::where('title', 'like', '%whatsapp%')->orWhere('url', 'like', '%wa.me%')->first();
-                $waNumber = '6281234567890';
-                if ($waSosmed) {
-                    preg_match('/[0-9]{9,15}/', $waSosmed->url, $m);
-                    if (!empty($m[0])) {
-                        $waNumber = $m[0];
-                    }
-                }
-
                 Mail::to($dataTamu->email)->send(new BookingApprovedMail($dataTamu, $pdfOutput, $waNumber));
             }
         } catch (\Exception $e) {
             Log::error('Gagal mengirim email approved booking ke ' . $dataTamu->email . ': ' . $e->getMessage());
+        }
+
+        // Kirim notifikasi penolakan ke pemohon booking yang bentrok jadwalnya
+        foreach ($collidingPending as $cp) {
+            try {
+                if (!empty($cp->email)) {
+                    Mail::to($cp->email)->send(new BookingRejectedMail($cp, 'Kamar telah disetujui untuk pemohon booking lain pada periode tanggal yang sama.', $waNumber));
+                }
+            } catch (\Exception $e) {
+                Log::error('Gagal mengirim email auto-reject booking ke ' . $cp->email . ': ' . $e->getMessage());
+            }
         }
 
         return back()->with('success', 'Permintaan booking atas nama ' . $dataTamu->name . ' telah disetujui (Approved) oleh ' . $user->name . '. Email konfirmasi resmi & kwitansi PDF telah dikirim ke penyewa.');
@@ -236,12 +252,12 @@ class BookingAdminController extends Controller
             abort(404, 'Bukti pembayaran tidak ditemukan.');
         }
 
-        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($dataTamu->proof_of_transfer)) {
-            return \Illuminate\Support\Facades\Storage::disk('public')->response($dataTamu->proof_of_transfer);
-        }
-
         if (\Illuminate\Support\Facades\Storage::disk('local')->exists($dataTamu->proof_of_transfer)) {
             return \Illuminate\Support\Facades\Storage::disk('local')->response($dataTamu->proof_of_transfer);
+        }
+
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($dataTamu->proof_of_transfer)) {
+            return \Illuminate\Support\Facades\Storage::disk('public')->response($dataTamu->proof_of_transfer);
         }
 
         abort(404, 'File bukti transfer tidak ditemukan di storage.');

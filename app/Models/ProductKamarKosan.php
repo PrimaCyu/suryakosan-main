@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductKamarKosan extends Model
 {
+    use SoftDeletes;
     protected $fillable = ['product_kosan_id','room','description','fasilitas','cumulative_discount','gmaps','views'];
     protected $touches = ['productKosan'];
     protected $appends = ['room_status', 'primary_image'];

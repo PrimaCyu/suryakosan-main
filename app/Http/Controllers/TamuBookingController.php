@@ -30,12 +30,14 @@ class TamuBookingController extends Controller
             'start_date'        => 'required|date',
             'start_time'        => 'required|string',
             'payment_method'    => 'required|string|in:transfer,qris,cash,bca,mandiri,bni',
-            'proof_of_transfer' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'proof_of_transfer' => 'required_unless:payment_method,cash|nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'jam'               => 'nullable|integer|min:0',
             'hari'              => 'nullable|integer|min:0',
             'minggu'            => 'nullable|integer|min:0',
             'bulan'             => 'nullable|integer|min:0',
             'tahun'             => 'nullable|integer|min:0',
+        ], [
+            'proof_of_transfer.required_unless' => 'Lampiran foto bukti transfer/struk pembayaran wajib diunggah untuk metode transfer atau non-tunai.',
         ]);
 
         try {
@@ -72,7 +74,7 @@ class TamuBookingController extends Controller
                 ];
 
                 if ($request->hasFile('proof_of_transfer') && $request->file('proof_of_transfer')->isValid()) {
-                    $path = $request->file('proof_of_transfer')->store('tamu/proof-of-transfer', 'public');
+                    $path = $request->file('proof_of_transfer')->store('tamu/proof-of-transfer', 'local');
                     $data['proof_of_transfer'] = $path;
                 }
 

@@ -192,14 +192,13 @@
 
               <!-- Badges -->
               <div class="absolute top-3.5 left-3.5 flex flex-col items-start gap-1.5 z-10">
+                @php
+                  $availCount = $kos->available_rooms_count;
+                @endphp
                 <span class="bg-[#3B2314]/85 backdrop-blur-md text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider flex items-center gap-2 shadow-lg border border-white/10">
-                  <span class="w-2 h-2 rounded-full {{ is_numeric($kos->tersedia) && $kos->tersedia > 0 ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400' }}"></span>
+                  <span class="w-2 h-2 rounded-full {{ $availCount > 0 ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400' }}"></span>
                   <span>
-                    @if(is_numeric($kos->tersedia))
-                      {{ $kos->tersedia > 0 ? 'Sisa ' . $kos->tersedia . ' Kamar Siap Huni' : 'Kamar Penuh' }}
-                    @else
-                      {{ $kos->tersedia ?? 'Tersedia' }}
-                    @endif
+                    {{ $availCount > 0 ? 'Sisa ' . $availCount . ' Kamar Siap Huni' : 'Kamar Penuh' }}
                   </span>
                 </span>
               </div>

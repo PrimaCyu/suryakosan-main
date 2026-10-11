@@ -35,6 +35,14 @@ class KamarKosanController extends Controller
         }
     }
 
+    private function checkKamarAccess($kosanId, $kamarId)
+    {
+        $this->checkKosanAccess($kosanId);
+        return ProductKamarKosan::where('id', $kamarId)
+            ->where('product_kosan_id', $kosanId)
+            ->firstOrFail();
+    }
+
     // KAMAR
     public function indexKamar($product_kosan, Request $request)
     {
@@ -350,6 +358,10 @@ class KamarKosanController extends Controller
             'product_kosan_id' => $product_kosan
         ])->firstOrFail();
 
+        if ($kamar_kosan->active_tenant) {
+            return back()->with('failed', 'Tidak dapat menghapus kamar karena saat ini masih dihuni oleh penyewa aktif.');
+        }
+
         $kosan = ProductKosan::find($product_kosan);
         $kamar_kosan->delete();
 
@@ -365,7 +377,7 @@ class KamarKosanController extends Controller
     // FASILITAS KAMAR
     public function insertFasilitas($product_kosan, $product_kamar_kosan, Request $request)
     {
-        $this->checkKosanAccess($product_kosan);
+        $kamar = $this->checkKamarAccess($product_kosan, $product_kamar_kosan);
         $request->validate([
             'fasilitasKamar'         => 'required|array|min:1',
             'fasilitasKamar.*.title' => 'required|string|max:255',
@@ -374,12 +386,13 @@ class KamarKosanController extends Controller
         $dataFasilitas = $request->input('fasilitasKamar', []);
         foreach ($dataFasilitas as $item) {
             FasilitasKamar::create([
-                'product_kamar_kosan_id' => $product_kamar_kosan,
+                'product_kamar_kosan_id' => $kamar->id,
                 'title'                  => $item['title']
             ]);
         }
 
-        return back()->with('success', 'fasilitas insert success');
+        \Illuminate\Support\Facades\Cache::forget('home_kamar_list');
+        return back()->with('success', 'Fasilitas kamar berhasil ditambahkan.');
     }
 
     public function updateFasilitas($product_kosan, $product_kamar_kosan, $fasilitas_kamar, Request $request)
@@ -399,7 +412,8 @@ class KamarKosanController extends Controller
             'title'                  => $request->title
         ]);
 
-        return back()->with('success', 'update fasilitas success');
+        \Illuminate\Support\Facades\Cache::forget('home_kamar_list');
+        return back()->with('success', 'Fasilitas kamar berhasil diperbarui.');
     }
 
     public function deleteFasilitas($product_kosan, $product_kamar_kosan, $fasilitas_kamar)
@@ -411,13 +425,14 @@ class KamarKosanController extends Controller
             ->firstOrFail();
 
         $fasilitasKamar->delete();
-        return back()->with('success', 'fasilitas delete success');
+        \Illuminate\Support\Facades\Cache::forget('home_kamar_list');
+        return back()->with('success', 'Fasilitas kamar berhasil dihapus.');
     }
 
     // PRODUCT KAMAR IMAGE KOSAN
     public function insertKamarImage($product_kosan, $product_kamar_kosan, Request $request)
     {
-        $this->checkKosanAccess($product_kosan);
+        $kamar = $this->checkKamarAccess($product_kosan, $product_kamar_kosan);
         $request->validate([
             'images'                 => 'nullable|array',
             'images.*'               => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
@@ -428,7 +443,7 @@ class KamarKosanController extends Controller
         ]);
 
         $uploadedCount = 0;
-        DB::transaction(function () use ($request, $product_kamar_kosan, &$uploadedCount) {
+        DB::transaction(function () use ($request, $kamar, &$uploadedCount) {
             $files = [];
             if ($request->hasFile('images')) {
                 $f = $request->file('images');
@@ -443,7 +458,7 @@ class KamarKosanController extends Controller
                 if ($file && $file->isValid()) {
                     $path = $file->store('kosan/kamar', 'public');
                     ProductKamarImageKosan::create([
-                        'product_kamar_kosan_id' => $product_kamar_kosan,
+                        'product_kamar_kosan_id' => $kamar->id,
                         'image'                  => $path,
                     ]);
                     $uploadedCount++;
@@ -455,7 +470,7 @@ class KamarKosanController extends Controller
                     if (isset($item['image']) && $item['image']->isValid()) {
                         $path = $item['image']->store('kosan/kamar', 'public');
                         ProductKamarImageKosan::create([
-                            'product_kamar_kosan_id' => $product_kamar_kosan,
+                            'product_kamar_kosan_id' => $kamar->id,
                             'image'                  => $path,
                         ]);
                         $uploadedCount++;
@@ -465,6 +480,7 @@ class KamarKosanController extends Controller
         });
 
         if ($uploadedCount > 0) {
+            \Illuminate\Support\Facades\Cache::forget('home_kamar_list');
             return back()->with('success', "Berhasil mengunggah {$uploadedCount} foto kamar.");
         }
 
@@ -484,13 +500,14 @@ class KamarKosanController extends Controller
         }
         $image_kamar->delete();
 
-        return back()->with('success', 'image delete success');
+        \Illuminate\Support\Facades\Cache::forget('home_kamar_list');
+        return back()->with('success', 'Foto kamar berhasil dihapus.');
     }
 
     // PRICE KAMAR
     public function insertPriceKamar($product_kosan, $product_kamar_kosan, Request $request)
     {
-        $this->checkKosanAccess($product_kosan);
+        $kamar = $this->checkKamarAccess($product_kosan, $product_kamar_kosan);
         $request->validate([
             'priceKamar'            => 'required|array|min:1',
             'priceKamar.*.kategori' => 'required|string|in:bulan,tahun,Bulanan,Tahunan',
@@ -509,7 +526,7 @@ class KamarKosanController extends Controller
 
             PriceKamar::updateOrCreate(
                 [
-                    'product_kamar_kosan_id' => $product_kamar_kosan,
+                    'product_kamar_kosan_id' => $kamar->id,
                     'kategori'               => $kategoriNormalized,
                 ],
                 [
@@ -519,12 +536,13 @@ class KamarKosanController extends Controller
             );
 
             if ($kategoriNormalized === 'bulan' && $isSuperAdmin && $disc > 0) {
-                ProductKamarKosan::where('id', $product_kamar_kosan)->update([
+                ProductKamarKosan::where('id', $kamar->id)->update([
                     'cumulative_discount' => $disc
                 ]);
             }
         }
 
+        \Illuminate\Support\Facades\Cache::forget('home_kamar_list');
         return back()->with('success', 'Harga kamar berhasil ditambahkan.');
     }
 
@@ -562,6 +580,7 @@ class KamarKosanController extends Controller
             ]);
         }
 
+        \Illuminate\Support\Facades\Cache::forget('home_kamar_list');
         return back()->with('success', 'Harga kamar berhasil diperbarui.');
     }
 
@@ -574,15 +593,16 @@ class KamarKosanController extends Controller
             ->firstOrFail();
 
         $price_kamar->delete();
-        return back()->with('success', 'price kamar delete success');
+        \Illuminate\Support\Facades\Cache::forget('home_kamar_list');
+        return back()->with('success', 'Tarif kamar berhasil dihapus.');
     }
 
     // TAMU/BOOKING ANGGOTA KAMAR
     public function indexTamu($product_kosan, $product_kamar_kosan)
     {
-        $this->checkKosanAccess($product_kosan);
+        $kamar = $this->checkKamarAccess($product_kosan, $product_kamar_kosan);
         $tamu = Tamu::where([
-            'product_kamar_kosan_id' => $product_kamar_kosan,
+            'product_kamar_kosan_id' => $kamar->id,
             'status'                 => 'approved'
         ])->get();
 
@@ -636,10 +656,15 @@ class KamarKosanController extends Controller
         ];
 
         if ($request->hasFile('proof_of_transfer') && $request->file('proof_of_transfer')->isValid()) {
-            if ($dataTamu->proof_of_transfer && Storage::disk('public')->exists($dataTamu->proof_of_transfer)) {
-                Storage::disk('public')->delete($dataTamu->proof_of_transfer);
+            if ($dataTamu->proof_of_transfer) {
+                if (Storage::disk('local')->exists($dataTamu->proof_of_transfer)) {
+                    Storage::disk('local')->delete($dataTamu->proof_of_transfer);
+                }
+                if (Storage::disk('public')->exists($dataTamu->proof_of_transfer)) {
+                    Storage::disk('public')->delete($dataTamu->proof_of_transfer);
+                }
             }
-            $path = $request->file('proof_of_transfer')->store('tamu/proof-of-transfer', 'public');
+            $path = $request->file('proof_of_transfer')->store('tamu/proof-of-transfer', 'local');
             $data['proof_of_transfer'] = $path;
         }
 
@@ -650,6 +675,7 @@ class KamarKosanController extends Controller
             $kosan->syncAvailableCount();
         }
 
+        \Illuminate\Support\Facades\Cache::forget('home_kamar_list');
         $formattedEndDate = \Carbon\Carbon::parse($bookingDate['end'])->isoFormat('D MMMM Y');
         return back()->with('success', "Masa sewa atas nama {$dataTamu->name} berhasil diperpanjang hingga {$formattedEndDate}.");
     }
@@ -677,6 +703,7 @@ class KamarKosanController extends Controller
             $kosan->syncAvailableCount();
         }
 
+        \Illuminate\Support\Facades\Cache::forget('home_kamar_list');
         return back()->with('success', 'Data penyewa berhasil dihapus.');
     }
 }

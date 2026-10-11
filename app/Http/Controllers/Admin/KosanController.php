@@ -278,6 +278,10 @@ class KosanController extends Controller
         }
 
         $productKosan = ProductKosan::findOrFail($product_kosan);
+        if ($productKosan->occupied_rooms_count > 0) {
+            return back()->with('failed', 'Tidak dapat menghapus properti kosan karena masih terdapat kamar yang dihuni oleh penyewa aktif.');
+        }
+
         $slug = $productKosan->slug;
         $productKosan->delete();
 
