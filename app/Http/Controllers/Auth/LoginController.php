@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Rules\TurnstileRule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,12 +19,20 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
+        $rules = [
+            'email'    => ['required', 'email'],
             'password' => ['required'],
+        ];
+
+        if (config('services.turnstile.enabled', true) && !empty(config('services.turnstile.site_key'))) {
+            $rules['cf-turnstile-response'] = ['required', new TurnstileRule];
+        }
+
+        $validated = $request->validate($rules, [
+            'cf-turnstile-response.required' => 'Verifikasi keamanan bot wajib diselesaikan sebelum masuk.',
         ]);
 
-        if (Auth::attempt($credentials, $request->remember)) {
+        if (Auth::attempt(['email' => $validated['email'], 'password' => $validated['password']], $request->remember)) {
             $request->session()->regenerate();
             return redirect()->intended(route('admin.dashboard'));
         }

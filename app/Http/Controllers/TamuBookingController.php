@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\BookingConfirmationMail;
 use App\Models\ProductKamarKosan;
 use App\Models\Tamu;
+use App\Rules\TurnstileRule;
 use App\Service\ProcessBookingDate;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ class TamuBookingController extends Controller
 
     public function booking($product_kamar_kosan, Request $request)
     {
-        $request->validate([
+        $validationRules = [
             'name'              => 'required|string|max:255',
             'telp'              => 'required|string|max:25',
             'email'             => 'required|email|max:255',
@@ -36,8 +37,15 @@ class TamuBookingController extends Controller
             'minggu'            => 'nullable|integer|min:0',
             'bulan'             => 'nullable|integer|min:0',
             'tahun'             => 'nullable|integer|min:0',
-        ], [
+        ];
+
+        if (config('services.turnstile.enabled', true) && !empty(config('services.turnstile.site_key'))) {
+            $validationRules['cf-turnstile-response'] = ['required', new TurnstileRule];
+        }
+
+        $request->validate($validationRules, [
             'proof_of_transfer.required_unless' => 'Lampiran foto bukti transfer/struk pembayaran wajib diunggah untuk metode transfer atau non-tunai.',
+            'cf-turnstile-response.required'    => 'Verifikasi keamanan bot wajib diselesaikan sebelum konfirmasi booking.',
         ]);
 
         try {

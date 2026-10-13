@@ -9,6 +9,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    @if (config('services.turnstile.enabled', true) && !empty(config('services.turnstile.site_key')))
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    @endif
 
     <style>
         *, *::before, *::after {
@@ -242,6 +245,20 @@
             to { transform: rotate(360deg); }
         }
 
+        .turnstile-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            min-height: 65px;
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        .turnstile-box iframe {
+            max-width: 100% !important;
+        }
+
         .footer-back {
             text-align: center;
             margin-top: 1.5rem;
@@ -407,6 +424,16 @@
                 <a href="javascript:void(0)" class="forgot-link" onclick="openForgotModal()">Lupa kata sandi?</a>
             </div>
 
+            <!-- CLOUDFLARE TURNSTILE CAPTCHA -->
+            @if (config('services.turnstile.enabled', true) && !empty(config('services.turnstile.site_key')))
+                <div class="turnstile-box">
+                    <div class="cf-turnstile"
+                         data-sitekey="{{ config('services.turnstile.site_key') }}"
+                         data-theme="dark"
+                         data-size="flexible"></div>
+                </div>
+            @endif
+
             <!-- SUBMIT BUTTON WITH SPINNER STATE -->
             <button type="submit" class="btn-submit" id="btnSubmit">
                 <span id="btnText">Masuk ke Dashboard</span>
@@ -462,13 +489,14 @@
             const btnArrow = document.getElementById('btnArrow');
 
             if (btn && btnText) {
-                btn.disabled = true;
-                btnText.textContent = 'Memverifikasi...';
-                if (btnArrow) {
-                    btnArrow.className = 'bi bi-arrow-repeat spinner';
-                }
+                setTimeout(() => {
+                    btn.disabled = true;
+                    btnText.textContent = 'Memverifikasi...';
+                    if (btnArrow) {
+                        btnArrow.className = 'bi bi-arrow-repeat spinner';
+                    }
+                }, 10);
             }
-            // Form continues submit
         }
 
         // Modal Forgot Password

@@ -8,6 +8,9 @@
   <link rel="icon" href="{{ asset('scl.png') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  @if (config('services.turnstile.enabled', true) && !empty(config('services.turnstile.site_key')))
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  @endif
 
   <style>
     :root {
@@ -819,8 +822,24 @@
                   <div id="summary-grand-total" class="text-2xl sm:text-3xl font-black text-[#F3A833] mt-1">Rp 0</div>
                 </div>
 
-                <!-- Tombol Submit Form -->
-                <button id="btn-submit-booking" type="submit"
+                @if (config('services.turnstile.enabled', true) && !empty(config('services.turnstile.site_key')))
+                  <!-- Anti-Bot Turnstile Security Widget -->
+                  <div class="rounded-2xl bg-[#FFF8F1] border border-[#E9DDD2] p-3 text-center">
+                    <div class="flex items-center justify-center gap-1.5 mb-2 text-[11px] font-bold text-[#8E7B6D]">
+                      <i class="fa-solid fa-shield-halved text-[#00A896]"></i>
+                      <span>Verifikasi Keamanan Reservasi</span>
+                    </div>
+                    <div class="flex justify-center overflow-hidden rounded-lg">
+                      <div class="cf-turnstile"
+                           data-sitekey="{{ config('services.turnstile.site_key') }}"
+                           data-theme="light"
+                           data-size="flexible"></div>
+                    </div>
+                  </div>
+                @endif
+
+                <!-- Tombol Submit Form (Memicu Review Modal) -->
+                <button id="btn-submit-booking" type="button" onclick="triggerBookingReview()"
                   class="shine w-full py-4 bg-[#E60049] hover:bg-[#C90040] text-white font-black rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 active:scale-[.98] text-xs sm:text-sm">
                   <span>Konfirmasi & Selesaikan Booking</span>
                   <i class="fa-solid fa-arrow-right text-xs"></i>
@@ -855,8 +874,115 @@
     </div>
   </aside>
 
-  <!-- 4. MODAL POP-UP FAILED BOOKING -->
-  @if (session('failed'))
+  <!-- MODAL REVIEW DATA RESERVASI SEBELUM SUBMIT -->
+  <div id="modal-review-booking" 
+       onclick="if(event.target.id === 'modal-review-booking') closeReviewModal();"
+       class="fixed inset-0 z-[1000] hidden items-center justify-center p-3 sm:p-4 bg-[#3B2314]/75 backdrop-blur-sm overflow-y-auto">
+    <div class="bg-white w-full max-w-lg rounded-[2rem] p-5 sm:p-7 shadow-2xl border border-[#E9DDD2] my-auto max-h-[94vh] flex flex-col transform transition-all duration-200">
+      
+      <!-- HEADER MODAL -->
+      <div class="flex items-start justify-between gap-3 pb-4 border-b border-[#E9DDD2]">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-[#00A896]/15 text-[#00A896] flex items-center justify-center text-lg shrink-0">
+            <i class="fa-solid fa-clipboard-check"></i>
+          </div>
+          <div>
+            <h3 class="text-lg sm:text-xl font-black text-[#3B2314] leading-tight">Periksa Data Reservasi</h3>
+            <p class="text-[11px] sm:text-xs text-[#8E7B6D] mt-0.5">Pastikan kontak & tanggal sudah sesuai sebelum memproses tiket.</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeReviewModal()" 
+          class="w-8 h-8 rounded-full bg-[#FFF8F1] hover:bg-[#E9DDD2] text-[#8E7B6D] flex items-center justify-center text-xs transition-colors shrink-0"
+          title="Tutup dialog">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- KONTEN RINCIAN (SCROLLABLE UNTUK DEVICE LAYAR PENDEK) -->
+      <div class="overflow-y-auto py-4 space-y-3 pr-1 text-xs sm:text-sm">
+        
+        <!-- CARD UNIT & JADWAL -->
+        <div class="bg-[#FFF8F1] rounded-2xl p-4 border border-[#E9DDD2] space-y-2">
+          <div class="flex items-center justify-between gap-3 border-b border-[#E9DDD2]/70 pb-2">
+            <span class="text-[11px] font-bold text-[#8E7B6D] shrink-0">Unit Kamar</span>
+            <span class="font-black text-[#3B2314] text-right truncate">{{ $kamar->room }} - {{ $namaKosan }}</span>
+          </div>
+          <div class="flex items-center justify-between gap-3">
+            <span class="text-[11px] font-bold text-[#8E7B6D] shrink-0">Tanggal Check-in</span>
+            <span id="review-modal-tanggal" class="font-extrabold text-[#3B2314] text-right">-</span>
+          </div>
+          <div class="flex items-center justify-between gap-3">
+            <span class="text-[11px] font-bold text-[#8E7B6D] shrink-0">Durasi Sewa</span>
+            <span id="review-modal-durasi" class="font-extrabold text-[#E60049] text-right">-</span>
+          </div>
+        </div>
+
+        <!-- CARD DATA DIRI PENYEWA -->
+        <div class="bg-white rounded-2xl p-4 border border-[#E9DDD2] space-y-2.5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] uppercase tracking-wider font-black text-[#E60049]">
+              <i class="fa-solid fa-address-card mr-1"></i> Data Kontak Penerima Tiket
+            </span>
+            <span class="text-[10px] text-[#00A896] font-bold bg-[#00A896]/10 px-2.5 py-0.5 rounded-full">
+              Penting
+            </span>
+          </div>
+          <div class="space-y-2 pt-1">
+            <div class="flex items-start justify-between gap-3">
+              <span class="text-[11px] font-bold text-[#8E7B6D] shrink-0">Nama Lengkap</span>
+              <span id="review-modal-nama" class="font-extrabold text-[#3B2314] text-right break-words">-</span>
+            </div>
+            <div class="flex items-start justify-between gap-3">
+              <span class="text-[11px] font-bold text-[#8E7B6D] shrink-0">WhatsApp / HP</span>
+              <span id="review-modal-wa" class="font-mono font-extrabold text-[#00A896] text-right break-words">-</span>
+            </div>
+            <div class="flex items-start justify-between gap-3">
+              <span class="text-[11px] font-bold text-[#8E7B6D] shrink-0">Email Penerima</span>
+              <span id="review-modal-email" class="font-extrabold text-[#3B2314] text-right break-words text-xs">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD PEMBAYARAN -->
+        <div class="bg-[#3B2314] text-white rounded-2xl p-4 space-y-2 shadow-md">
+          <div class="flex items-center justify-between gap-3 text-xs">
+            <span class="text-white/60 font-bold shrink-0">Metode Bayar</span>
+            <span id="review-modal-metode" class="font-bold text-white text-right truncate">-</span>
+          </div>
+          <div class="flex items-center justify-between gap-3 pt-2 border-t border-white/10">
+            <span class="text-[10px] uppercase tracking-wider text-white/60 font-bold shrink-0">Total Pembayaran</span>
+            <span id="review-modal-total" class="text-lg sm:text-xl font-black text-[#F3A833] text-right">Rp 0</span>
+          </div>
+        </div>
+
+        <!-- PERINGATAN EMAIL & WA -->
+        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] leading-relaxed flex items-start gap-2">
+          <i class="fa-solid fa-circle-exclamation text-amber-600 mt-0.5 shrink-0"></i>
+          <span>Invoice resmi & tiket kamar kos akan dikirimkan langsung ke email dan WhatsApp di atas.</span>
+        </div>
+
+      </div>
+
+      <!-- FOOTER TOMBOL AKSI -->
+      <div class="pt-3 border-t border-[#E9DDD2] grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <button type="button" onclick="cancelReviewAndEdit()"
+          class="w-full py-3.5 px-4 bg-[#FFF8F1] hover:bg-[#E9DDD2] text-[#5D483A] font-bold rounded-2xl transition-all border border-[#E9DDD2] text-xs sm:text-sm flex items-center justify-center gap-1.5 active:scale-95">
+          <i class="fa-solid fa-pen-to-square text-xs"></i>
+          <span>Ubah Data</span>
+        </button>
+
+        <button type="button" id="btn-modal-confirm-submit" onclick="executeFinalBookingSubmit()"
+          class="shine w-full py-3.5 px-4 bg-[#E60049] hover:bg-[#C90040] text-white font-black rounded-2xl transition-all shadow-md text-xs sm:text-sm flex items-center justify-center gap-1.5 active:scale-95">
+          <span>Ya, Lanjutkan Booking</span>
+          <i class="fa-solid fa-arrow-right text-xs"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 4. MODAL POP-UP FAILED BOOKING / VALIDATION ERROR -->
+  @if (session('failed') || (isset($errors) && $errors->any()))
     <div id="flash-failed-modal" class="fixed inset-0 bg-[#3B2314]/70 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
       <div class="bg-white w-full max-w-md rounded-[2rem] p-6 sm:p-8 shadow-2xl relative space-y-5 border border-[#E9DDD2]">
         <button type="button" onclick="closeFailedModal()"
@@ -868,13 +994,28 @@
           <div class="w-16 h-16 rounded-2xl bg-[#E60049]/10 text-[#E60049] flex items-center justify-center mx-auto mb-4">
             <i class="fa-solid fa-circle-xmark text-3xl"></i>
           </div>
-          <h3 class="text-2xl font-black text-[#3B2314]">Booking Gagal</h3>
-          <p class="text-xs sm:text-sm text-[#7B6759] mt-2 leading-6">{{ session('failed') }}</p>
+          <h3 class="text-2xl font-black text-[#3B2314]">Booking Belum Berhasil</h3>
+          <div class="text-xs sm:text-sm text-[#7B6759] mt-2 leading-6 space-y-1.5 text-left bg-[#FFF8F1] border border-[#E9DDD2] rounded-xl p-3.5">
+            @if (session('failed'))
+              <p class="flex items-start gap-2">
+                <i class="fa-solid fa-circle-exclamation text-[#E60049] mt-0.5 shrink-0"></i>
+                <span>{{ session('failed') }}</span>
+              </p>
+            @endif
+            @if (isset($errors) && $errors->any())
+              @foreach ($errors->all() as $err)
+                <p class="flex items-start gap-2">
+                  <i class="fa-solid fa-circle-exclamation text-[#E60049] mt-0.5 shrink-0"></i>
+                  <span>{{ $err }}</span>
+                </p>
+              @endforeach
+            @endif
+          </div>
         </div>
 
         <button type="button" onclick="closeFailedModal()"
           class="w-full py-3.5 bg-[#E60049] hover:bg-[#C90040] text-white font-black rounded-2xl transition-all shadow-md active:scale-95 text-xs sm:text-sm">
-          Coba Lagi
+          Tutup & Coba Lagi
         </button>
       </div>
     </div>
@@ -1395,21 +1536,188 @@
       });
     };
 
-    const bookingForm = document.getElementById('booking-form');
-    const submitBtn = document.getElementById('btn-submit-booking');
-    if (bookingForm && submitBtn) {
-      bookingForm.addEventListener('submit', function() {
-        submitBtn.disabled = true;
-        submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
-        submitBtn.innerHTML = `
+    // --- FITUR PRE-SUBMISSION CONFIRMATION MODAL ---
+    let isFinalBookingSubmitting = false;
+
+    function formatReviewIndonesianDate(dateStr) {
+      if (!dateStr) return '-';
+      const parts = dateStr.split('-');
+      if (parts.length !== 3) return dateStr;
+      const year = parts[0];
+      const monthIdx = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      const jamVal = document.getElementById('input-jam')?.value || '13:00';
+      return `${day} ${months[monthIdx] || ''} ${year} (pkl ${jamVal} WIB)`;
+    }
+
+    function getReviewPaymentMethodLabel() {
+      if (currentPaymentType === 'cod') {
+        return 'Bayar di Tempat (COD / Tunai)';
+      }
+      const bankSelect = document.getElementById('select-bank');
+      const selectedBankVal = bankSelect ? bankSelect.value : 'qris';
+      switch (selectedBankVal) {
+        case 'qris': return 'QRIS (BCA, Mandiri, Dana, GoPay)';
+        case 'bca': return 'Transfer Bank BCA (1234567890)';
+        case 'mandiri': return 'Transfer Bank Mandiri (0987654321)';
+        case 'bni': return 'Transfer Bank BNI (1111111111)';
+        default: return 'Transfer Online';
+      }
+    }
+
+    function validateBookingFormBeforeReview() {
+      const namaInput = document.getElementById('input-nama');
+      const waInput = document.getElementById('input-wa');
+      const emailInput = document.getElementById('input-email');
+      const tanggalInput = document.getElementById('input-tanggal');
+
+      if (!namaInput || !namaInput.value.trim()) {
+        alert('Silakan isi Nama Lengkap penyewa terlebih dahulu.');
+        scrollToSection('sec-data-diri');
+        if (namaInput) namaInput.focus();
+        return false;
+      }
+
+      if (!waInput || !waInput.value.trim()) {
+        alert('Silakan isi Nomor WhatsApp / HP aktif terlebih dahulu.');
+        scrollToSection('sec-data-diri');
+        if (waInput) waInput.focus();
+        return false;
+      }
+
+      if (!emailInput || !emailInput.value.trim()) {
+        alert('Silakan isi Alamat Email untuk penerimaan invoice & tiket kamar.');
+        scrollToSection('sec-data-diri');
+        if (emailInput) emailInput.focus();
+        return false;
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(emailInput.value.trim())) {
+        alert('Format alamat email tidak valid. Mohon periksa kembali.');
+        scrollToSection('sec-data-diri');
+        emailInput.focus();
+        return false;
+      }
+
+      if (!tanggalInput || !tanggalInput.value.trim()) {
+        alert('Silakan pilih Tanggal Masuk (Check-in) terlebih dahulu.');
+        scrollToSection('sec-durasi');
+        return false;
+      }
+
+      if (currentPaymentType === 'transfer') {
+        const fileBukti = document.getElementById('file-bukti');
+        if (!fileBukti || !fileBukti.files || fileBukti.files.length === 0) {
+          alert('Silakan unggah foto bukti transfer pembayaran terlebih dahulu.');
+          scrollToSection('sec-pembayaran');
+          return false;
+        }
+      }
+
+      @if (config('services.turnstile.enabled', true) && !empty(config('services.turnstile.site_key')))
+        const turnstileInput = document.querySelector('#booking-form [name="cf-turnstile-response"]');
+        if (turnstileInput && !turnstileInput.value) {
+          alert('Harap selesaikan verifikasi keamanan bot (Cloudflare Turnstile) terlebih dahulu.');
+          return false;
+        }
+      @endif
+
+      return true;
+    }
+
+    function triggerBookingReview() {
+      if (!validateBookingFormBeforeReview()) {
+        return;
+      }
+
+      const namaVal = document.getElementById('input-nama')?.value.trim() || '-';
+      const waVal = document.getElementById('input-wa')?.value.trim() || '-';
+      const emailVal = document.getElementById('input-email')?.value.trim() || '-';
+      const tanggalVal = document.getElementById('input-tanggal')?.value.trim() || '';
+      const durasiText = document.getElementById('summary-durasi-text')?.textContent.trim() || '1 Bulan';
+      const grandTotalText = document.getElementById('summary-grand-total')?.textContent.trim() || 'Rp 0';
+
+      document.getElementById('review-modal-nama').textContent = namaVal;
+      document.getElementById('review-modal-wa').textContent = waVal;
+      document.getElementById('review-modal-email').textContent = emailVal;
+      document.getElementById('review-modal-tanggal').textContent = formatReviewIndonesianDate(tanggalVal);
+      document.getElementById('review-modal-durasi').textContent = durasiText;
+      document.getElementById('review-modal-metode').textContent = getReviewPaymentMethodLabel();
+      document.getElementById('review-modal-total').textContent = grandTotalText;
+
+      const modal = document.getElementById('modal-review-booking');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.classList.add('overflow-hidden');
+      }
+    }
+
+    function closeReviewModal() {
+      const modal = document.getElementById('modal-review-booking');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.classList.remove('overflow-hidden');
+      }
+    }
+
+    function cancelReviewAndEdit() {
+      closeReviewModal();
+      scrollToSection('sec-data-diri');
+      setTimeout(() => {
+        const namaInput = document.getElementById('input-nama');
+        if (namaInput) namaInput.focus();
+      }, 450);
+    }
+
+    function executeFinalBookingSubmit() {
+      if (isFinalBookingSubmitting) return;
+      isFinalBookingSubmitting = true;
+
+      const modalSubmitBtn = document.getElementById('btn-modal-confirm-submit');
+      const sidebarSubmitBtn = document.getElementById('btn-submit-booking');
+
+      if (modalSubmitBtn) {
+        modalSubmitBtn.disabled = true;
+        modalSubmitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+        modalSubmitBtn.innerHTML = `
           <svg class="animate-spin mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
           <span>Memproses Reservasi...</span>
         `;
+      }
+
+      if (sidebarSubmitBtn) {
+        sidebarSubmitBtn.disabled = true;
+        sidebarSubmitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+      }
+
+      const bookingForm = document.getElementById('booking-form');
+      if (bookingForm) {
+        bookingForm.submit();
+      }
+    }
+
+    const bookingForm = document.getElementById('booking-form');
+    if (bookingForm) {
+      bookingForm.addEventListener('submit', function(e) {
+        if (!isFinalBookingSubmitting) {
+          e.preventDefault();
+          triggerBookingReview();
+        }
       });
     }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeReviewModal();
+      }
+    });
 
     window.addEventListener('scroll', revealOnScroll, { passive: true });
     window.addEventListener('load', revealOnScroll);
