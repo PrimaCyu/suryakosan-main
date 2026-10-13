@@ -6,7 +6,7 @@
 <h3 align="center">Sistem Informasi Manajemen & Reservasi Hunian Kos Modern</h3>
 
 <p align="center">
-  Platform manajemen properti dan reservasi hunian kos berbasis web yang dirancang khusus untuk mempermudah calon penghuni dalam mencari dan menyewa kamar, sekaligus menyediakan kontrol operasional, audit trail, serta laporan keuangan terpadu bagi pemilik dan pengelola kos.
+  Platform manajemen properti dan reservasi hunian kos berbasis web yang dirancang khusus untuk mempermudah calon penghuni dalam mencari dan menyewa kamar, sekaligus menyediakan kontrol operasional, audit trail, proteksi anti-bot, serta laporan keuangan terpadu bagi pemilik dan pengelola kos.
 </p>
 
 ---
@@ -24,6 +24,7 @@
 4. [Teknologi yang Digunakan (Tech Stack)](#-teknologi-yang-digunakan-tech-stack)
 5. [Struktur Direktori Utama](#-struktur-direktori-utama)
 6. [Panduan Instalasi & Menjalankan Sistem](#-panduan-instalasi--menjalankan-sistem)
+7. [Lisensi & Hak Cipta](#-lisensi--hak-cipta)
 
 ---
 
@@ -32,8 +33,8 @@
 **Sinar Citra Lestari (SCL)** adalah platform manajemen hunian sewa kos terintegrasi di Bali. Aplikasi ini menghubungkan calon penghuni kos dengan pengelola secara langsung tanpa perantara calo. 
 
 Website ini dirancang untuk menjawab dua kebutuhan utama:
-1. **Bagi Calon Penghuni**: Memberikan transparansi informasi mengenai ketersediaan kamar secara *real-time*, rincian tarif sewa (jam, hari, minggu, bulan, tahun), fasilitas lengkap, lokasi interaktif, hingga kemudahan reservasi online yang aman dan terverifikasi.
-2. **Bagi Pengelola / Pemilik Kos**: Memberikan otomasi operasional untuk memantau tingkat okupansi (*occupancy rate*), verifikasi bukti pembayaran, perpanjangan sewa (*tenancy renewal*), pencegahan *double booking*, serta jejak audit (*audit trail*) agar setiap transaksi tercatat dengan akuntabel.
+1. **Bagi Calon Penghuni**: Memberikan transparansi informasi mengenai ketersediaan kamar secara *real-time*, rincian tarif sewa (jam, hari, minggu, bulan, tahun), fasilitas lengkap, lokasi interaktif, hingga kemudahan reservasi online yang aman, bebas bot, dan terverifikasi.
+2. **Bagi Pengelola / Pemilik Kos**: Memberikan otomasi operasional untuk memantau tingkat okupansi (*occupancy rate*), verifikasi bukti pembayaran privat, perpanjangan sewa (*tenancy renewal*), pencegahan *double booking* berbasis database lock, serta jejak audit (*audit trail*) agar setiap transaksi tercatat dengan akuntabel.
 
 ---
 
@@ -47,17 +48,19 @@ Website ini dirancang untuk menjawab dua kebutuhan utama:
   - **Galeri Bento Grid**: Tampilan galeri foto properti modern yang responsif dan dilengkapi mode *Lightbox Layar Penuh* (100% tanpa crop).
   - **Peta Interaktif (Leaflet.js & OpenStreetMap)**: Peta lokasi dengan fitur *layer switcher* (Street View & Citra Satelit Esri), tombol rute Google Maps instan, serta proteksi *gesture mobile* (anti scroll-trap saat pengguna menggulir layar di HP).
   - **Tampilan Unit Kamar Cerdas**: Rincian fasilitas kamar, opsi sewa tahunan hemat, dan tombol dinamis: **Pesan Langsung** jika kamar kosong, atau **Waiting List via WhatsApp** jika kamar sedang penuh.
-  - **Dukungan Format Deskripsi Fleksibel**: Admin dapat memasukkan tata tertib dan aturan kos secara bebas melalui *rich text* tanpa perlu merombak kode program.
+  - **Dukungan Format Deskripsi Fleksibel**: Admin dapat memasukkan tata tertib dan aturan kos secara bebas melalui *rich text* aman (disanitasi anti-XSS).
   - **FAQ Interaktif**: Pertanyaan umum seputar survei lokasi, metode pembayaran, dan tata cara check-in.
 * **Halaman Detail Kamar**:
   - Tampilan dua tingkat fasilitas (*Two-Tier Facilities*): Membedakan fasilitas khusus kamar tidur dengan fasilitas bersama gedung kos.
   - Rekomendasi unit kamar lain di kos yang sama (*Sibling Rooms Cross-Selling*).
-  - Sidebar kalkulator estimasi biaya sewa.
-* **Formulir Reservasi Aman**:
-  - Pemilihan rentang tanggal masuk (*check-in*) dengan Flatpickr Calendar.
+  - Sidebar kalkulator estimasi biaya sewa dinamis.
+* **Formulir Reservasi Aman & Proteksi Bot**:
+  - Pemilihan rentang tanggal masuk (*check-in*) dengan Flatpickr Calendar interaktif.
   - Pilihan durasi fleksibel (kombinasi jam, hari, minggu, bulan, atau tahun).
   - Pilihan metode bayar: Transfer Bank (BCA, Mandiri, BNI), QRIS, maupun Tunai (Cash).
-  - Pengunggahan bukti transfer dengan validasi format dan ukuran file.
+  - Pengunggahan bukti transfer dengan validasi format dan ukuran file maksimal 5MB.
+  - **Proteksi Bot Cloudflare Turnstile**: Smart CAPTCHA yang memverifikasi keaslian browser manusia secara otomatis tanpa puzzle gambar mengganggu.
+  - **Pre-Submission Review Modal**: Dialog konfirmasi sebelum submit untuk meninjau Nama, WhatsApp, Email, Tanggal Check-in, dan Nominal Biaya. Mencegah kesalahan ketik kontak yang berisiko membuat tiket PDF salah kirim.
 * **Halaman Bukti Booking Mandiri**:
   - Setiap pemesanan memiliki tautan akses unik (*Access Token*) yang aman.
   - Penghuni dapat melihat status reservasi kapan saja dan mengunduh ulang bukti booking/invoice PDF.
@@ -91,8 +94,8 @@ Website ini dirancang untuk menjawab dua kebutuhan utama:
 Sistem menerapkan arsitektur notifikasi email berjenjang (*3-stage email workflow*) yang efisien:
 
 1. **Email 1: Tanda Terima Antrean (Tanpa Lampiran PDF)**:
-   - Terkirim seketika setelah penyewa menekan tombol *Booking*.
-   - Memberitahukan bahwa permohonan reservasi telah masuk sistem dan sedang dalam proses verifikasi admin dalam waktu 1x24 jam.
+   - Terkirim seketika setelah penyewa menyelesaikan permohonan reservasi.
+   - Memberitahukan bahwa data telah masuk antrean dan sedang dalam proses verifikasi admin dalam waktu 1x24 jam.
    - *Tidak melampirkan PDF* untuk mencegah penyalahgunaan invoice yang belum sah pembayarannya.
 2. **Email 2A: Pembayaran Disetujui / Approved (DENGAN Lampiran PDF Kwitansi Lunas)**:
    - Terkirim otomatis saat admin menekan tombol **Setujui** di dashboard.
@@ -107,16 +110,23 @@ Sistem menerapkan arsitektur notifikasi email berjenjang (*3-stage email workflo
 
 ### 4. Keamanan & Pencegahan Bug Kritis
 * **Pencegahan Double Booking (Race Condition Prevention)**:
-  - Validasi bentrok tanggal dan insert data dilakukan di dalam `DB::transaction` dengan **Row-Level Lock** (`lockForUpdate()`).
-  - Dua pengguna yang menekan tombol pesan pada detik yang persis sama tidak akan mendapatkan unit kamar yang sama.
+  - Validasi bentrok tanggal dan penyimpanan booking dilakukan di dalam `DB::transaction` dengan **Row-Level Lock** (`lockForUpdate()`).
+  - Ketika sebuah kamar disetujui, reservasi pending lain yang bentrok jadwalnya otomatis ditolak oleh sistem dengan notifikasi pengembalian dana (*auto-rejection*).
+* **Proteksi Privasi Bukti Transfer (Authenticated Private Streaming)**:
+  - Berkas bukti pembayaran tamu disimpan di storage privat (bukan folder public).
+  - Akses gambar dibatasi hanya untuk admin yang sah melalui rute terotentikasi (`admin.tamu.proof`), mencegah kebocoran informasi rekening & mutasi bank tamu ke publik.
+* **Proteksi Bot Cloudflare Turnstile di Login & Booking**:
+  - Halaman login admin (`/login`) dan formulir reservasi kamar (`/kamar/booking/{id}`) diproteksi oleh Cloudflare Turnstile.
+  - Dilengkapi arsitektur *fail-open* dan logging peringatan: jika server Cloudflare mengalami kendala koneksi, pengguna asli tidak akan terkena error fatal 500.
 * **Proteksi IDOR (Insecure Direct Object Reference)**:
   - Seluruh operasi update dan delete pada sub-resource kamar (fasilitas, foto, harga, dan tamu) diikat secara ketat ke `product_kamar_kosan_id` dan `product_kosan_id` milik admin terkait.
 * **Kalkulasi Harga di Sisi Server (Anti Price Tampering)**:
-  - Total biaya sewa dihitung ulang secara mutlak oleh backend berdasarkan durasi dan tarif di database untuk mencegah manipulasi harga dari *inspect element* browser.
+  - Total biaya sewa dihitung ulang secara mutlak oleh backend (`ProcessBookingDate`) berdasarkan durasi dan tarif di database untuk mencegah manipulasi harga dari *inspect element* browser maupun celah Rp 0.
 * **Proteksi Brute-Force & Flooding**:
   - Endpoint login dilindungi *Rate Limiter* (`throttle:5,1`).
   - Endpoint booking dilindungi *Rate Limiter* (`throttle:10,1`).
-* **Pencegahan SQL Wildcard Injection**:
+* **Sanitasi XSS & SQL Wildcard Injection**:
+  - Deskripsi dan input teks publik disanitasi menggunakan `e()` dan `strip_tags()` untuk mencegah serangan Stored XSS.
   - Filter pencarian publik menggunakan fungsi *escapeLike* untuk menetralkan karakter `%` dan `_`.
 
 ---
@@ -142,20 +152,32 @@ Sistem menerapkan arsitektur notifikasi email berjenjang (*3-stage email workflo
        [Klik "Pesan Langsung"]                  [Klik "Waiting List WA"]
                  │                              (Terhubung ke WhatsApp Pengelola)
                  ▼
-       [Isi Form Booking]
+       [Isi Formulir Booking]
        - Nama, No. WhatsApp, Email
        - Tanggal & Jam Check-In
-       - Pilih Durasi (Bulan / Tahun)
+       - Pilih Durasi (Jam/Hari/Minggu/Bulan/Tahun)
+       - Verifikasi Keamanan Cloudflare Turnstile
        - Pilih Metode Pembayaran & Upload Bukti Transfer
                  │
                  ▼
-       [Submit Booking]
+       [Klik "Konfirmasi & Selesaikan Booking"]
                  │
-                 ├───────────────────────────────────────┐
-                 ▼                                       ▼
-       [Halaman Sukses Booking]            [Email 1 Terkirim Otomatis]
-       (Mendapatkan Access Token &          "Tanda Terima Permohonan Booking"
-        Ringkasan Kode Booking)             (Status: Menunggu Verifikasi Admin)
+                 ▼
+       [Pop-up Modal Review Data Reservasi]
+       - Cek kebenaran Nama, WhatsApp, Email, Tanggal, & Total Bayar
+                 │
+          ┌──────┴─────────────────────────────────┐
+          ▼                                        ▼
+   [Klik "Ubah Data"]                    [Klik "Ya, Lanjutkan Booking"]
+   (Kembali ke Form untuk Edit)                    │
+                                                   ▼
+                                         [Proses Transaksi & Simpan]
+                                                   │
+                                 ┌─────────────────┴───────────────────┐
+                                 ▼                                     ▼
+                      [Halaman Sukses Booking]            [Email 1 Terkirim Otomatis]
+                      (Mendapatkan Access Token &          "Tanda Terima Permohonan"
+                       Ringkasan Kode Booking)             (Status: Menunggu Verifikasi)
 ```
 
 ---
@@ -163,13 +185,13 @@ Sistem menerapkan arsitektur notifikasi email berjenjang (*3-stage email workflo
 ### B. Alur Verifikasi Pembayaran & Approval Admin
 
 ```
-[Admin / Superadmin Login]
+[Admin / Superadmin Login] ──► Dilindungi Cloudflare Turnstile & Rate Limiter
             │
             ▼
 [Dashboard / Menu Permintaan Booking]
             │
             ▼
-[Cek Rincian Tamu & Bukti Transfer]
+[Cek Rincian Tamu & Bukti Transfer (Akses Privat Terproteksi)]
             │
       ┌─────┴────────────────────────────────────────────────┐
       ▼                                                      ▼
@@ -177,13 +199,15 @@ Sistem menerapkan arsitektur notifikasi email berjenjang (*3-stage email workflo
       │                                                      │
       ├─ Status diubah menjadi 'approved'                    ├─ Admin pilih / ketik alasan penolakan
       ├─ Kunci kamar tersinkron terisi                       ├─ Status diubah menjadi 'reject'
-      ├─ Audit trail tercatat                                ├─ Audit trail tercatat
-      ├─ Generate PDF Invoice Lunas                          │
-      │                                                      ▼
-      ▼                                            [Email 2B Terkirim Otomatis]
-[Email 2A Terkirim Otomatis]                        - Menampilkan Alasan Penolakan
-- Terlampir PDF Kwitansi Pelunasan Resmi            - Petunjuk Refund / Klarifikasi
-- Informasi Serah Terima Kunci                      - Tombol Bantuan WhatsApp Admin
+      ├─ Booking tumpang tindih ditolak otomatis             ├─ Audit trail tercatat
+      ├─ Audit trail tercatat                                │
+      ├─ Invalidate cache ketersediaan beranda               ▼
+      ├─ Generate PDF Invoice Lunas               [Email 2B Terkirim Otomatis]
+      │                                           - Menampilkan Alasan Penolakan
+      ▼                                           - Petunjuk Refund / Klarifikasi
+[Email 2A Terkirim Otomatis]                      - Tombol Bantuan WhatsApp Admin
+- Terlampir PDF Kwitansi Pelunasan Resmi
+- Informasi Serah Terima Kunci
 - Tombol WhatsApp Pengelola Kos
 ```
 
@@ -192,18 +216,19 @@ Sistem menerapkan arsitektur notifikasi email berjenjang (*3-stage email workflo
 ## 🛠️ Teknologi yang Digunakan (Tech Stack)
 
 ### Backend & Database
-* **Framework**: Laravel 11.x
+* **Framework**: Laravel 12.x
 * **Bahasa**: PHP 8.2 / 8.3+
 * **Database**: MySQL / MariaDB (InnoDB engine)
 * **Dokumen Generator**: `barryvdh/laravel-dompdf` (DomPDF Engine)
 * **Email Service**: Laravel Mailable dengan SMTP (Gmail TLS)
+* **Keamanan Bot**: Cloudflare Turnstile API & Custom Validation Rule
 
 ### Frontend & Styling
 * **Template Engine**: Laravel Blade
 * **CSS Framework**: Tailwind CSS v3 / v4
-* **Ikon**: Font Awesome 6 Pro / Free CDN
+* **Ikon**: Font Awesome 6 Pro / Free CDN & Bootstrap Icons
 * **Peta Digital**: Leaflet.js 1.9.4 dengan OpenStreetMap & Esri World Imagery
-* **Datepicker**: Flatpickr (dengan tema kustom SCL)
+* **Datepicker**: Flatpickr (dengan tema kustom SCL & lokalisasi Indonesia)
 * **Bundler & Tooling**: Vite 7.x
 
 ---
@@ -221,7 +246,7 @@ kosan-main/
 │   │       │   ├── DashboardController.php
 │   │       │   ├── KamarKosanController.php
 │   │       │   └── KosanController.php
-│   │       ├── Auth/               # Controller autentikasi (login/logout)
+│   │       ├── Auth/               # Controller autentikasi (login/logout + Turnstile)
 │   │       ├── Frontend/           # Controller beranda, katalog kos, detail, artikel
 │   │       └── TamuBookingController.php # Pemrosesan booking & download invoice
 │   ├── Mail/                       # Berkas Mailable (Approval, Rejection, Confirmation)
@@ -229,6 +254,8 @@ kosan-main/
 │   │   ├── BookingConfirmationMail.php
 │   │   └── BookingRejectedMail.php
 │   ├── Models/                     # Eloquent Models (ProductKosan, Tamu, PriceKamar, dll.)
+│   ├── Rules/
+│   │   └── TurnstileRule.php       # Rule validasi token Cloudflare Turnstile
 │   └── Service/
 │       └── ProcessBookingDate.php  # Service kalkulasi jadwal & harga sewa
 ├── database/
@@ -237,10 +264,10 @@ kosan-main/
 │   ├── views/
 │   │   ├── backend/                # Tampilan Dashboard & Admin Panel
 │   │   ├── emails/                 # Template email Blade (Approved, Rejected, Confirmation)
-│   │   ├── frontend/               # Tampilan halaman publik (Home, Detail Kos, Detail Kamar)
+│   │   ├── frontend/               # Tampilan publik (Home, Detail Kos, Form Booking + Review Modal)
 │   │   └── pdf/                    # Template bukti booking & kwitansi PDF
 └── routes/
-    └── web.php                     # Rute publik dan rute terproteksi admin
+    └── web.php                     # Rute publik, rute terproteksi admin, dan streaming bukti privat
 ```
 
 ---
@@ -269,7 +296,7 @@ Salin berkas contoh environment:
 ```bash
 cp .env.example .env
 ```
-Buka berkas `.env` dan sesuaikan pengaturan database dan konfigurasi email SMTP:
+Buka berkas `.env` dan sesuaikan pengaturan database, SMTP email, dan kunci Cloudflare Turnstile:
 ```env
 APP_NAME="Sinar Citra Lestari"
 APP_URL=http://127.0.0.1:8000
@@ -290,6 +317,12 @@ MAIL_PASSWORD=app_password_gmail_anda
 MAIL_ENCRYPTION=tls
 MAIL_FROM_ADDRESS="emailanda@gmail.com"
 MAIL_FROM_NAME="${APP_NAME}"
+
+# Konfigurasi Cloudflare Turnstile (Anti-Bot)
+# Gunakan test keys untuk localhost, atau ganti dengan keys asli saat deployment live
+TURNSTILE_ENABLED=true
+TURNSTILE_SITE_KEY=1x00000000000000000000AA
+TURNSTILE_SECRET_KEY=1x00000000000000000000000000000000AA
 ```
 
 ### 5. Generate Application Key & Link Storage
