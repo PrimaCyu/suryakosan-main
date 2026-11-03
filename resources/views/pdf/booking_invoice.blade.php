@@ -251,7 +251,7 @@
                     {{ \Carbon\Carbon::parse($tamu->end_date)->translatedFormat('d M Y') }}
                 </td>
                 <td>
-                    <strong>{{ strtoupper($tamu->payment_method) }}</strong>
+                    <strong>{{ $tamu->payment_method_label }}</strong>
                 </td>
                 <td>
                     @if($tamu->status == 'approved')

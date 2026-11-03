@@ -240,7 +240,7 @@
             <div class="space-y-2 text-xs">
               <div class="flex justify-between text-white/70">
                 <span>Metode Pembayaran</span>
-                <span class="font-bold text-white uppercase">{{ $tamu->payment_method }}</span>
+                <span class="font-bold text-white">{{ $tamu->payment_method_label }}</span>
               </div>
               <div class="flex justify-between text-white/70">
                 <span>Status Verifikasi</span>

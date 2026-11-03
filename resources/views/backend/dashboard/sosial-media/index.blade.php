@@ -62,14 +62,16 @@
                                             <div class="property-icon-box p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
                                                 @php
                                                     $titleLower = strtolower($item->title);
-                                                    $icon = 'bi-share-fill';
-                                                    if (str_contains($titleLower, 'instagram')) $icon = 'bi-instagram';
-                                                    elseif (str_contains($titleLower, 'facebook')) $icon = 'bi-facebook';
+                                                    $icon = 'bi-globe';
+                                                    if (str_contains($titleLower, 'instagram') || $titleLower === 'ig') $icon = 'bi-instagram';
+                                                    elseif (str_contains($titleLower, 'facebook') || $titleLower === 'fb') $icon = 'bi-facebook';
                                                     elseif (str_contains($titleLower, 'tiktok')) $icon = 'bi-tiktok';
-                                                    elseif (str_contains($titleLower, 'youtube')) $icon = 'bi-youtube';
-                                                    elseif (str_contains($titleLower, 'whatsapp')) $icon = 'bi-whatsapp';
+                                                    elseif (str_contains($titleLower, 'youtube') || $titleLower === 'yt') $icon = 'bi-youtube';
+                                                    elseif (str_contains($titleLower, 'whatsapp') || $titleLower === 'wa') $icon = 'bi-whatsapp';
                                                     elseif (str_contains($titleLower, 'twitter') || str_contains($titleLower, 'x')) $icon = 'bi-twitter-x';
                                                     elseif (str_contains($titleLower, 'telegram')) $icon = 'bi-telegram';
+                                                    elseif (str_contains($titleLower, 'linkedin')) $icon = 'bi-linkedin';
+                                                    elseif (str_contains($titleLower, 'discord')) $icon = 'bi-discord';
                                                 @endphp
                                                 <i class="bi {{ $icon }} fs-6"></i>
                                             </div>

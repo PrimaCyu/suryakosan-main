@@ -104,4 +104,16 @@ class Tamu extends Model
         }
         return $clean ?: ($this->telp ?? '');
     }
+
+    /**
+     * Accessor untuk nama metode pembayaran yang ramah pengguna.
+     */
+    public function getPaymentMethodLabelAttribute(): string
+    {
+        if (!$this->payment_method) {
+            return '-';
+        }
+        $method = PaymentMethod::where('code', strtolower($this->payment_method))->first();
+        return $method ? $method->name : strtoupper($this->payment_method);
+    }
 }

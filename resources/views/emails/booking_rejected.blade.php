@@ -198,7 +198,7 @@
                 </div>
                 <div class="info-row">
                     <span class="info-cell-label">Metode Pembayaran:</span>
-                    <span class="info-cell-value">{{ strtoupper($tamu->payment_method) }}</span>
+                    <span class="info-cell-value">{{ $tamu->payment_method_label }}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-cell-label">Nominal:</span>

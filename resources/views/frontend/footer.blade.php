@@ -36,14 +36,20 @@
                     @php
                         $sosmedIconMap = [
                             'instagram' => 'fa-instagram',
+                            'ig'        => 'fa-instagram',
                             'facebook'  => 'fa-facebook-f',
+                            'fb'        => 'fa-facebook-f',
                             'twitter'   => 'fa-twitter',
                             'x'         => 'fa-x-twitter',
                             'youtube'   => 'fa-youtube',
                             'tiktok'    => 'fa-tiktok',
                             'linkedin'  => 'fa-linkedin-in',
                             'whatsapp'  => 'fa-whatsapp',
+                            'wa'        => 'fa-whatsapp',
                             'telegram'  => 'fa-telegram',
+                            'threads'   => 'fa-threads',
+                            'discord'   => 'fa-discord',
+                            'pinterest' => 'fa-pinterest',
                         ];
                     @endphp
 
@@ -54,10 +60,12 @@
                             @php
                                 $titleLower = strtolower(trim($sm->title));
                                 $iconClass = 'fa-globe';
+                                $iconPrefix = 'fa-solid';
 
                                 foreach ($sosmedIconMap as $key => $icon) {
                                     if (str_contains($titleLower, $key)) {
                                         $iconClass = $icon;
+                                        $iconPrefix = 'fa-brands';
                                         break;
                                     }
                                 }
@@ -85,7 +93,7 @@
                                        active:scale-90"
                             >
                                 <i
-                                    class="fa-brands {{ $iconClass }}
+                                    class="{{ $iconPrefix }} {{ $iconClass }}
                                            text-sm
                                            pointer-events-none
                                            select-none
@@ -136,7 +144,30 @@
         </div>
 
         
-        <div class="mt-6 pt-4 border-t border-[#F3A833]/15 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+        @php
+            $footerPaymentMethods = \App\Models\PaymentMethod::where('is_active', true)->orderBy('sort_order', 'asc')->get();
+        @endphp
+        @if($footerPaymentMethods->isNotEmpty())
+        <div class="mt-6 pt-4 border-t border-[#F3A833]/15 flex flex-wrap items-center justify-between gap-2.5">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-[#F8EFE6]/60">Metode Pembayaran Resmi:</span>
+            <div class="flex flex-wrap items-center gap-1.5">
+                @foreach($footerPaymentMethods as $fpm)
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white/10 text-white/90 border border-white/10 shadow-xs">
+                        @if($fpm->type === 'qris')
+                            <i class="fa-solid fa-qrcode text-[#F3A833]"></i>
+                        @elseif($fpm->type === 'cash')
+                            <i class="fa-solid fa-hand-holding-dollar text-[#00A896]"></i>
+                        @else
+                            <i class="fa-solid fa-building-columns text-[#F3A833]"></i>
+                        @endif
+                        <span>{{ $fpm->name }}</span>
+                    </span>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        <div class="mt-4 pt-3 border-t border-[#F3A833]/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
             <p class="text-[10px] sm:text-xs text-[#F8EFE6]/50 mb-0">
                 &copy; {{ date('Y') }} Sinar Citra Lestari. Seluruh hak cipta dilindungi.
             </p>

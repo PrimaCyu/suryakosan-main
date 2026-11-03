@@ -5,481 +5,259 @@
 @php
     $hour = (int)date('H');
     $greeting = $hour < 11 ? 'Selamat Pagi' : ($hour < 15 ? 'Selamat Siang' : ($hour < 18 ? 'Selamat Sore' : 'Selamat Malam'));
+    $sixMonthTotal = collect($revenueTrend ?? [])->sum('revenue');
 @endphp
 
-<style>
-  :root {
-    --dash-serif: 'Lora', Georgia, 'Times New Roman', serif;
-    --dash-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    --dash-navy: #0f172a;
-    --dash-navy-subtle: #1e293b;
-    --dash-teal: #0f766e;
-    --dash-teal-light: #f0fdfa;
-    --dash-border: #e2e8f0;
-    --dash-bg-subtle: #f8fafc;
-    --dash-card-bg: #ffffff;
-    --dash-text-main: #0f172a;
-    --dash-text-muted: #64748b;
-    --dash-radius: 8px;
-    --dash-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
-  }
-
-  .dash-view {
-    font-family: var(--dash-sans);
-    color: var(--dash-text-main);
-  }
-
-  .dash-heading-serif {
-    font-family: var(--dash-serif);
-    letter-spacing: -0.015em;
-  }
-
-  .dash-card {
-    background-color: var(--dash-card-bg);
-    border: 1px solid var(--dash-border);
-    border-radius: var(--dash-radius);
-    box-shadow: var(--dash-shadow);
-  }
-
-  .dash-btn-primary {
-    background-color: var(--dash-navy);
-    color: #ffffff;
-    border: 1px solid var(--dash-navy);
-    border-radius: var(--dash-radius);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    padding: 0.45rem 0.85rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    text-decoration: none;
-    white-space: nowrap !important;
-    transition: all 0.15s ease;
-  }
-  .dash-btn-primary:hover {
-    background-color: var(--dash-navy-subtle);
-    color: #ffffff;
-  }
-
-  .dash-btn-secondary {
-    background-color: #ffffff;
-    color: var(--dash-text-main);
-    border: 1px solid var(--dash-border);
-    border-radius: var(--dash-radius);
-    font-size: 0.8125rem;
-    font-weight: 500;
-    padding: 0.45rem 0.85rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    text-decoration: none;
-    white-space: nowrap !important;
-    transition: all 0.15s ease;
-  }
-  .dash-btn-secondary:hover {
-    background-color: var(--dash-bg-subtle);
-    color: var(--dash-text-main);
-  }
-
-  .dash-header-title {
-    font-size: 1.3rem;
-    font-weight: 700;
-    line-height: 1.25;
-    color: var(--dash-navy);
-  }
-  @media (min-width: 768px) {
-    .dash-header-title {
-      font-size: 1.65rem;
-    }
-  }
-
-  .dash-header-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    width: 100%;
-    margin-top: 0.85rem;
-  }
-  @media (min-width: 480px) {
-    .dash-header-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-  @media (min-width: 768px) {
-    .dash-header-actions {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      width: auto;
-      margin-top: 0;
-      flex-shrink: 0;
-    }
-  }
-
-  .dash-action-link {
-    color: var(--dash-teal);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    white-space: nowrap;
-    transition: color 0.15s ease;
-  }
-  .dash-action-link:hover {
-    color: #115e59;
-    text-decoration: underline;
-  }
-
-  .dash-alert-indicator {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    flex-shrink: 0;
-  }
-  .bg-amber-subtle { background-color: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
-  .bg-danger-subtle { background-color: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-  .bg-warning-subtle { background-color: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
-  .bg-blue-subtle { background-color: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd; }
-
-  .dash-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  .dash-table th {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--dash-text-muted);
-    border-bottom: 1px solid var(--dash-border);
-    padding: 0.65rem 0.85rem;
-    text-align: left;
-    background-color: var(--dash-bg-subtle);
-  }
-  .dash-table td {
-    font-size: 0.8125rem;
-    color: var(--dash-text-main);
-    border-bottom: 1px solid var(--dash-border);
-    padding: 0.75rem 0.85rem;
-    vertical-align: middle;
-  }
-  .dash-table tr:last-child td {
-    border-bottom: none;
-  }
-
-  .progress-thin {
-    height: 5px;
-    background-color: #e2e8f0;
-    border-radius: 9999px;
-    overflow: hidden;
-  }
-  .progress-bar-normal {
-    background-color: var(--dash-teal);
-    height: 100%;
-    border-radius: 9999px;
-  }
-
-  /* Compact Timeline */
-  .dash-timeline {
-    position: relative;
-    padding-left: 1.25rem;
-  }
-  .dash-timeline::before {
-    content: '';
-    position: absolute;
-    top: 8px;
-    bottom: 8px;
-    left: 4px;
-    width: 1.5px;
-    background-color: var(--dash-border);
-  }
-  .dash-timeline-item {
-    position: relative;
-    margin-bottom: 1.15rem;
-  }
-  .dash-timeline-item:last-child {
-    margin-bottom: 0;
-  }
-  .dash-timeline-dot {
-    position: absolute;
-    left: -1.25rem;
-    top: 5px;
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background-color: var(--dash-teal);
-    border: 2px solid #ffffff;
-    box-shadow: 0 0 0 1px var(--dash-border);
-  }
-  .dash-timeline-time {
-    font-size: 0.72rem;
-    color: var(--dash-text-muted);
-    font-weight: 500;
-    margin-bottom: 0.1rem;
-  }
-</style>
-
-<div class="dash-view py-3 px-2 px-md-3">
+<div class="app-content-header">
   <div class="container-fluid">
-
-    <!-- 1. HEADER SECTION (Tenang, Bersih & Profesional) -->
-    <div class="dash-card p-3 p-md-4 mb-3 mb-md-4">
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 gap-md-3">
-        <div class="flex-grow-1 w-100">
-          <div class="d-flex align-items-center flex-wrap gap-2 mb-1.5">
-            <span class="fs-8 text-muted d-inline-flex align-items-center">
-              <i class="bi bi-calendar3 text-secondary me-1.5" style="font-size: 0.82rem;"></i>
-              <span class="d-none d-sm-inline">{{ \Carbon\Carbon::now()->locale('id')->isoFormat('dddd, D MMMM Y') }}</span>
-              <span class="d-sm-none">{{ \Carbon\Carbon::now()->locale('id')->isoFormat('D MMM Y') }}</span>
-            </span>
-            <span class="text-muted opacity-40 mx-0.5">•</span>
-            <span class="badge bg-secondary-subtle text-secondary px-2 py-0.5 rounded-pill" style="font-size: 0.72rem; font-weight: 500;">
-              {{ Auth::user()->isSuperAdmin() ? 'Semua Cabang' : 'Cabang Ditugaskan' }}
-            </span>
-          </div>
-          <h1 class="dash-heading-serif dash-header-title mb-0 text-dark">
-            {{ $greeting }}, {{ Auth::user()->name ?? 'Pengelola' }}
-          </h1>
-          <p class="fs-8 text-muted mb-0 mt-1 d-none d-md-block">
-            Sinar Citra Lestari <span class="mx-1 text-muted opacity-50">•</span> Sistem Pengelolaan Operasional Kos Terpadu
-          </p>
-        </div>
-
-        <div class="dash-header-actions">
-          <a href="{{ route('home') }}" target="_blank" class="dash-btn-secondary" title="Buka website pencarian kos">
-            <i class="bi bi-box-arrow-up-right"></i>
-            <span>Lihat Website</span>
-          </a>
-          <a href="{{ route('admin.booking.index') }}" class="dash-btn-primary" title="Halaman kelola booking">
-            <i class="bi bi-calendar-check"></i>
-            <span>Kelola Booking</span>
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- 2. PERLU TINDAKAN HARI INI (Dynamic Operational Alerts) -->
-    <div class="mb-4">
-      <div class="d-flex align-items-center justify-content-between mb-2">
-        <div class="d-flex align-items-center gap-2">
-          <h2 class="dash-heading-serif h5 mb-0 text-dark">Perlu Tindakan Hari Ini</h2>
+    <div class="page-header-box">
+      <div>
+        <div class="d-flex align-items-center flex-wrap gap-2 mb-1.5">
+          <span class="fs-8 text-muted d-inline-flex align-items-center gap-1.5">
+            <i class="bi bi-calendar3 text-secondary"></i>
+            <span>{{ \Carbon\Carbon::now()->locale('id')->isoFormat('dddd, D MMMM Y') }}</span>
+          </span>
+          <span class="text-muted opacity-50">&bull;</span>
+          <span class="badge badge-subtle-secondary">
+            {{ Auth::user()->isSuperAdmin() ? 'Semua Cabang' : 'Cabang Ditugaskan' }}
+          </span>
           @if(!empty($operationalAlerts) && count($operationalAlerts) > 0)
-            <span class="badge" style="background-color: rgba(15, 118, 110, 0.08); color: var(--dash-teal); border: 1px solid rgba(15, 118, 110, 0.2); font-weight: 600; font-size: 0.75rem; border-radius: var(--dash-radius);">
-              {{ count($operationalAlerts) }} perhatian operasional
+            <span class="badge badge-subtle-warning">
+              <i class="bi bi-exclamation-circle me-1"></i>{{ count($operationalAlerts) }} Perlu Tindakan
             </span>
           @else
-            <span class="badge" style="background-color: var(--dash-bg-subtle); color: var(--dash-text-muted); border: 1px solid var(--dash-border); font-weight: 500; font-size: 0.75rem; border-radius: var(--dash-radius);">
-              Status normal
+            <span class="badge badge-subtle-success">
+              <i class="bi bi-check2-circle me-1"></i>Operasional Normal
             </span>
           @endif
         </div>
-        <span class="fs-8 text-muted d-none d-sm-inline">
-          Ditinjau otomatis berdasarkan tanggal jatuh tempo dan antrean reservasi.
-        </span>
+        <h3 class="mb-0">{{ $greeting }}, {{ Auth::user()->name ?? 'Pengelola' }}</h3>
+        <p class="text-muted">Ringkasan kapasitas hunian, tren pendapatan sewa, dan aktivitas operasional cabang.</p>
       </div>
+      <div class="page-header-actions">
+        <a href="{{ route('admin.product.kosan.index') }}" class="btn btn-light border px-3">
+          <i class="bi bi-buildings"></i>
+          <span>Kelola Properti</span>
+        </a>
+        <a href="{{ route('admin.booking.index') }}" class="btn btn-primary px-3">
+          <i class="bi bi-calendar-check"></i>
+          <span>Kelola Booking</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 
-      @if(!empty($operationalAlerts) && count($operationalAlerts) > 0)
-        <!-- Dynamic Concise Operational Alerts -->
-        <div class="d-flex flex-column gap-2.5">
+<div class="app-content">
+  <div class="container-fluid">
+
+    <!-- 1. PERLU TINDAKAN HARI INI (Hanya tampil jika ada item mendesak) -->
+    @if(!empty($operationalAlerts) && count($operationalAlerts) > 0)
+      <div class="mb-4">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <div class="d-flex align-items-center gap-2">
+            <span class="fs-8 fw-bold text-uppercase text-muted" style="letter-spacing: 0.04em;">Perhatian Operasional</span>
+            <span class="badge badge-subtle-warning">{{ count($operationalAlerts) }} item</span>
+          </div>
+          <span class="fs-8 text-muted d-none d-sm-inline">Prioritas tindak lanjut hari ini</span>
+        </div>
+        <div class="d-flex flex-column gap-2">
           @foreach($operationalAlerts as $alert)
-            <div class="dash-card p-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
-              <div class="d-flex align-items-center gap-3">
-                <div class="dash-alert-indicator {{ $alert['badge_class'] ?? 'bg-amber-subtle' }}">
-                  <i class="bi {{ $alert['icon'] ?? 'bi-info-circle' }}"></i>
+            <div class="card p-3">
+              <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2.5">
+                <div class="d-flex align-items-center gap-2.5">
+                  <div class="dash-alert-indicator {{ $alert['badge_class'] ?? 'bg-amber-subtle' }}">
+                    <i class="bi {{ $alert['icon'] ?? 'bi-info-circle' }}"></i>
+                  </div>
+                  <div>
+                    <div class="fs-7 fw-bold text-dark">{{ $alert['title'] }}</div>
+                    <div class="fs-8 text-muted">{{ $alert['subtitle'] }}</div>
+                  </div>
                 </div>
-                <div>
-                  <h3 class="fs-7 fw-bold text-dark mb-0.5">{{ $alert['title'] }}</h3>
-                  <p class="fs-8 text-muted mb-0">{{ $alert['subtitle'] }}</p>
-                </div>
-              </div>
-              <div class="align-self-end align-self-sm-center">
-                <a href="{{ $alert['action_url'] }}" class="dash-action-link">
+                <a href="{{ $alert['action_url'] }}" class="btn btn-xs btn-light border align-self-end align-self-sm-center px-2.5 py-1.5">
                   <span>{{ $alert['action_label'] }}</span>
+                  <i class="bi bi-arrow-right ms-1"></i>
                 </a>
               </div>
             </div>
           @endforeach
         </div>
-      @else
-        <!-- State Tenang Jika Tidak Ada Hal Mendesak -->
-        <div class="dash-card p-4 text-center">
-          <div class="d-inline-flex align-items-center justify-content-center mb-2" style="color: var(--dash-teal);">
-            <i class="bi bi-check2-circle fs-3"></i>
-          </div>
-          <h3 class="fs-6 fw-bold mb-1 text-dark">✓ Semua Operasional Terkendali</h3>
-          <p class="fs-7 text-muted mb-0" style="max-width: 600px; margin: 0 auto;">
-            Tidak ada pembayaran sewa jatuh tempo ataupun booking baru yang tertunda pagi ini.
-          </p>
-        </div>
-      @endif
-    </div>
+      </div>
+    @endif
 
-    <!-- 3. RINGKASAN OPERASIONAL (4 Cards Kompak & Berhierarki Jelas) -->
-    <div class="mb-4">
-      <div class="mb-2">
-        <h2 class="dash-heading-serif h5 mb-0 text-dark">Ringkasan Operasional</h2>
-        <span class="fs-8 text-muted">Kapasitas hunian dan akumulasi pendapatan resmi.</span>
+    <!-- 2. RINGKASAN STATISTIK UTAMA (4 KPI Cards) -->
+    <div class="kpi-stat-grid">
+      <!-- KPI 1: Tingkat Okupansi -->
+      <div class="kpi-stat-card">
+        <div class="kpi-stat-header">
+          <span class="kpi-stat-label">Tingkat Okupansi</span>
+          <span class="kpi-stat-icon">
+            <i class="bi bi-pie-chart"></i>
+          </span>
+        </div>
+        <div class="kpi-stat-value">{{ $occupancyRate }}%</div>
+        <div class="progress-thin mb-2">
+          <div class="progress-bar-normal" style="width: {{ min(100, $occupancyRate) }}%;"></div>
+        </div>
+        <div class="kpi-stat-meta">
+          <span><strong class="text-dark">{{ $occupiedKamar }}</strong> dari {{ $totalKamar }} kamar terisi</span>
+        </div>
       </div>
 
-      <div class="row g-3">
-        <!-- Metrik 1: Tingkat Okupansi -->
-        <div class="col-6 col-lg-3">
-          <div class="dash-card p-3 p-sm-4 h-100 d-flex flex-column">
-            <span class="fs-8 text-muted d-block mb-1">Tingkat Okupansi</span>
-            <div class="dash-heading-serif h3 mb-2 text-dark">{{ $occupancyRate }}%</div>
-            <div class="progress-thin mb-2">
-              <div class="progress-bar-normal" style="width: {{ min(100, $occupancyRate) }}%;"></div>
-            </div>
-            <span class="fs-8 text-secondary mt-auto">
-              {{ $occupiedKamar }} dari {{ $totalKamar }} unit terisi
-            </span>
-          </div>
+      <!-- KPI 2: Kamar Siap Huni -->
+      <div class="kpi-stat-card">
+        <div class="kpi-stat-header">
+          <span class="kpi-stat-label">Kamar Siap Huni</span>
+          <span class="kpi-stat-icon">
+            <i class="bi bi-door-open"></i>
+          </span>
         </div>
-
-        <!-- Metrik 2: Kamar Siap Huni -->
-        <div class="col-6 col-lg-3">
-          <div class="dash-card p-3 p-sm-4 h-100 d-flex flex-column">
-            <span class="fs-8 text-muted d-block mb-1">Kamar Siap Huni</span>
-            <div class="dash-heading-serif h3 mb-2 text-dark">{{ $availableKamar }} unit</div>
-            <span class="fs-8 text-secondary mt-auto">
-              Tersedia untuk disewakan
-            </span>
-          </div>
+        <div class="kpi-stat-value">{{ $availableKamar }} <span class="fs-6 fw-medium text-muted">unit</span></div>
+        <div class="kpi-stat-meta">
+          @if($availableKamar > 0)
+            <span class="badge badge-subtle-success">Tersedia disewa</span>
+          @else
+            <span class="badge badge-subtle-secondary">Kapasitas penuh</span>
+          @endif
         </div>
+      </div>
 
-        <!-- Metrik 3: Pendapatan Bulan Ini -->
-        <div class="col-6 col-lg-3">
-          <div class="dash-card p-3 p-sm-4 h-100 d-flex flex-column">
-            <span class="fs-8 text-muted d-block mb-1">Pendapatan Bulan Ini</span>
-            <div class="dash-heading-serif h3 mb-2 text-dark">
-              Rp {{ number_format($currentMonthRevenue, 0, ',', '.') }}
-            </div>
-            <span class="fs-8 text-secondary mt-auto">
-              {{ \Carbon\Carbon::now()->isoFormat('MMMM Y') }}
-            </span>
-          </div>
+      <!-- KPI 3: Pendapatan Bulan Ini -->
+      <div class="kpi-stat-card">
+        <div class="kpi-stat-header">
+          <span class="kpi-stat-label">Pendapatan Bulan Ini</span>
+          <span class="kpi-stat-icon">
+            <i class="bi bi-wallet2"></i>
+          </span>
         </div>
+        <div class="kpi-stat-value">Rp {{ number_format($currentMonthRevenue, 0, ',', '.') }}</div>
+        <div class="kpi-stat-meta">
+          <span>Periode {{ \Carbon\Carbon::now()->locale('id')->isoFormat('MMMM Y') }}</span>
+        </div>
+      </div>
 
-        <!-- Metrik 4: Cabang Properti -->
-        <div class="col-6 col-lg-3">
-          <div class="dash-card p-3 p-sm-4 h-100 d-flex flex-column">
-            <span class="fs-8 text-muted d-block mb-1">Cabang Properti</span>
-            <div class="dash-heading-serif h3 mb-2 text-dark">{{ $totalKosan }} lokasi</div>
-            <span class="fs-8 text-secondary mt-auto">
-              Aktif dalam operasional SCL
-            </span>
-          </div>
+      <!-- KPI 4: Cabang Properti -->
+      <div class="kpi-stat-card">
+        <div class="kpi-stat-header">
+          <span class="kpi-stat-label">Cabang Properti</span>
+          <span class="kpi-stat-icon">
+            <i class="bi bi-buildings"></i>
+          </span>
+        </div>
+        <div class="kpi-stat-value">{{ $totalKosan }} <span class="fs-6 fw-medium text-muted">lokasi</span></div>
+        <div class="kpi-stat-meta">
+          <span>Total <strong class="text-dark">{{ $totalKamar }}</strong> unit kamar aktif</span>
         </div>
       </div>
     </div>
 
-    <!-- 4. REVENUE TREND (6 BULAN TERAKHIR) & AKTIVITAS TERBARU -->
+    <!-- 3. GRAFIK PENDAPATAN & AKTIVITAS TERBARU -->
     <div class="row g-3 mb-4">
-      <!-- A. Pendapatan 6 Bulan Terakhir -->
-      <div class="col-12 col-lg-7 col-xl-8">
-        <div class="dash-card p-3 p-sm-4 h-100 d-flex flex-column">
-          <div class="d-flex justify-content-between align-items-center mb-3">
+      <!-- Grafik Pendapatan 6 Bulan Terakhir -->
+      <div class="col-12 col-lg-8">
+        <div class="card h-100">
+          <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
             <div>
-              <h2 class="dash-heading-serif h5 mb-0 text-dark">Pendapatan 6 Bulan Terakhir</h2>
-              <span class="fs-8 text-muted">Tren akumulasi penerimaan sewa kamar per bulan</span>
+              <h5 class="card-title mb-0">Pendapatan 6 Bulan Terakhir</h5>
+              <span class="fs-8 text-muted">Tren akumulasi penerimaan sewa kamar terkonfirmasi</span>
             </div>
-            <span class="fs-8 fw-semibold text-secondary d-none d-sm-inline">
-              Rp (Juta)
-            </span>
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge badge-subtle-secondary tabular-nums">
+                Total 6 Bln: Rp {{ number_format($sixMonthTotal, 0, ',', '.') }}
+              </span>
+            </div>
           </div>
-          <div class="flex-grow-1" style="min-height: 220px; position: relative;">
-            <canvas id="revenueChart"></canvas>
+          <div class="card-body d-flex flex-column justify-content-center">
+            <div style="min-height: 240px; position: relative; width: 100%;">
+              <canvas id="revenueChart"></canvas>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- B. Aktivitas Terbaru -->
-      <div class="col-12 col-lg-5 col-xl-4">
-        <div class="dash-card p-3 p-sm-4 h-100 d-flex flex-column">
-          <div class="d-flex justify-content-between align-items-center mb-3">
+      <!-- Aktivitas Operasional Terbaru -->
+      <div class="col-12 col-lg-4">
+        <div class="card h-100">
+          <div class="card-header d-flex justify-content-between align-items-center">
             <div>
-              <h2 class="dash-heading-serif h5 mb-0 text-dark">Aktivitas Terbaru</h2>
-              <span class="fs-8 text-muted">Perkembangan operasional terkini</span>
+              <h5 class="card-title mb-0">Aktivitas Terbaru</h5>
+              <span class="fs-8 text-muted">Log transaksi & pembaruan unit</span>
             </div>
-            <i class="bi bi-activity text-muted fs-7"></i>
+            <a href="{{ route('admin.booking.index') }}" class="fs-8 fw-semibold text-primary text-decoration-none">
+              Semua
+            </a>
           </div>
-
-          <div class="dash-timeline flex-grow-1 mt-1">
-            @forelse($recentActivities as $act)
-              <div class="dash-timeline-item">
-                <div class="dash-timeline-dot"></div>
-                <div class="dash-timeline-time">{{ $act['time'] }}</div>
-                <div class="fs-8 fw-semibold text-dark">{{ $act['title'] }}</div>
-                <div class="fs-8 text-muted">{{ $act['property'] }}</div>
-              </div>
-            @empty
-              <div class="text-center py-4 text-muted fs-8">
-                <i class="bi bi-clock-history display-6 d-block mb-1 text-secondary opacity-50"></i>
-                Belum ada aktivitas operasional tercatat.
-              </div>
-            @endforelse
+          <div class="card-body">
+            <div class="dash-timeline">
+              @forelse($recentActivities as $act)
+                <div class="dash-timeline-item">
+                  <div class="dash-timeline-dot"></div>
+                  <div class="dash-timeline-time">{{ $act['time'] }}</div>
+                  <div class="fs-8 fw-semibold text-dark">{{ $act['title'] }}</div>
+                  <div class="fs-8 text-muted">{{ $act['property'] }}</div>
+                </div>
+              @empty
+                <div class="text-center py-4 text-muted fs-8">
+                  <i class="bi bi-clock-history fs-3 d-block mb-1.5 text-secondary opacity-50"></i>
+                  Belum ada aktivitas operasional tercatat.
+                </div>
+              @endforelse
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 5. DAFTAR PROPERTI CABANG (Tabel Performa Bersih) -->
-    <div class="mb-4">
-      <div class="d-flex justify-content-between align-items-center mb-2">
+    <!-- 4. DAFTAR PROPERTI CABANG (Tabel Ringkasan Kapasitas) -->
+    <div class="card mb-2">
+      <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
         <div>
-          <h2 class="dash-heading-serif h5 mb-0 text-dark">Daftar Properti Cabang</h2>
-          <span class="fs-8 text-muted">Kapasitas hunian dan performa unit per cabang kos.</span>
+          <h5 class="card-title mb-0">Daftar Properti Cabang</h5>
+          <span class="fs-8 text-muted">Kapasitas hunian dan ketersediaan kamar per lokasi kos</span>
         </div>
-        <a href="{{ route('admin.product.kosan.index') }}" class="dash-btn-secondary fs-8">
+        <a href="{{ route('admin.product.kosan.index') }}" class="btn btn-xs btn-light border px-2.5 py-1.5">
           <span>Kelola Semua Properti</span>
-          <i class="bi bi-arrow-right"></i>
+          <i class="bi bi-arrow-right ms-1"></i>
         </a>
       </div>
 
-      <div class="dash-card overflow-hidden">
+      <div class="card-body p-0">
         <div class="table-responsive">
-          <table class="dash-table">
+          <table class="table align-middle mb-0 table-min-md">
             <thead>
               <tr>
-                <th>Nama Cabang Properti</th>
+                <th class="ps-4">Nama Cabang Properti</th>
                 <th>Wilayah</th>
-                <th>Total Kamar</th>
-                <th>Kamar Terisi</th>
-                <th>Kamar Siap Huni</th>
-                <th style="min-width: 140px;">Tingkat Okupansi</th>
-                <th class="text-end">Aksi</th>
+                <th>Total Unit</th>
+                <th>Terisi</th>
+                <th>Ketersediaan</th>
+                <th style="min-width: 150px;">Okupansi</th>
+                <th class="text-end pe-4">Aksi</th>
               </tr>
             </thead>
             <tbody>
               @forelse($propertiesOverview as $prop)
                 <tr>
-                  <td>
+                  <td class="ps-4">
                     <div class="fw-semibold text-dark">{{ $prop['title'] }}</div>
-                    <span class="fs-8 text-muted">ID Cabang #{{ $prop['id'] }}</span>
+                    <span class="fs-9 text-muted">ID Cabang #{{ $prop['id'] }}</span>
                   </td>
                   <td>
-                    <span class="text-secondary">{{ $prop['wilayah'] }}</span>
+                    <span class="text-secondary fs-8">{{ $prop['wilayah'] }}</span>
                   </td>
-                  <td>
-                    <span class="fw-medium">{{ $prop['rooms_count'] }} unit</span>
+                  <td class="tabular-nums">
+                    <span class="fw-medium">{{ $prop['rooms_count'] }} kamar</span>
                   </td>
-                  <td>
-                    <span class="fw-medium text-dark">{{ $prop['occupied_count'] }} unit</span>
+                  <td class="tabular-nums">
+                    <span class="fw-medium text-dark">{{ $prop['occupied_count'] }} kamar</span>
                   </td>
                   <td>
                     @if($prop['available_count'] > 0)
-                      <span class="fw-semibold" style="color: var(--dash-teal);">
+                      <span class="badge badge-subtle-success">
                         {{ $prop['available_count'] }} unit kosong
                       </span>
                     @else
-                      <span class="fs-8 text-muted">Penuh</span>
+                      <span class="badge badge-subtle-secondary">Penuh</span>
                     @endif
                   </td>
                   <td>
@@ -487,26 +265,31 @@
                       <div class="progress-thin flex-grow-1">
                         <div class="progress-bar-normal" style="width: {{ $prop['occupancy_rate'] }}%;"></div>
                       </div>
-                      <span class="fs-8 fw-semibold text-dark">{{ $prop['occupancy_rate'] }}%</span>
+                      <span class="fs-8 fw-semibold text-dark tabular-nums" style="min-width: 34px;">{{ $prop['occupancy_rate'] }}%</span>
                     </div>
                   </td>
-                  <td class="text-end">
-                    <div class="d-inline-flex gap-1.5">
-                      <a href="{{ route('admin.product.kosan.kamar.index', $prop['id']) }}" class="dash-btn-primary py-1 px-2.5" title="Buka daftar kamar kos ini">
+                  <td class="text-end pe-4">
+                    <div class="action-btn-group">
+                      <a href="{{ route('admin.product.kosan.kamar.index', $prop['id']) }}" class="btn btn-xs btn-primary px-2.5 py-1" title="Buka daftar kamar kos ini">
                         <i class="bi bi-door-open"></i>
                         <span>Kelola Kamar</span>
                       </a>
-                      <a href="{{ route('admin.product.kosan.index') }}" class="dash-btn-secondary py-1 px-2.5" title="Edit data properti">
-                        <i class="bi bi-pencil"></i>
-                        <span>Edit</span>
+                      <a href="{{ route('admin.product.kosan.index') }}" class="btn btn-xs btn-light border px-2 py-1" title="Kelola data properti">
+                        <i class="bi bi-sliders"></i>
                       </a>
                     </div>
                   </td>
                 </tr>
               @empty
                 <tr>
-                  <td colspan="7" class="text-center py-4 text-muted fs-8">
-                    Belum ada data properti kosan yang terdaftar.
+                  <td colspan="7" class="text-center py-5">
+                    <div class="empty-state-box">
+                      <div class="empty-state-icon">
+                        <i class="bi bi-buildings"></i>
+                      </div>
+                      <h6>Belum Ada Properti Terdaftar</h6>
+                      <p>Tambahkan cabang properti kosan pertama Anda untuk mulai memantau kapasitas kamar.</p>
+                    </div>
                   </td>
                 </tr>
               @endforelse
@@ -538,14 +321,14 @@
           data: values,
           borderColor: '#0f766e',
           borderWidth: 2,
-          backgroundColor: 'rgba(15, 118, 110, 0.04)',
+          backgroundColor: 'rgba(15, 118, 110, 0.05)',
           fill: true,
           tension: 0.3,
           pointBackgroundColor: '#ffffff',
           pointBorderColor: '#0f766e',
           pointBorderWidth: 2,
-          pointRadius: 4,
-          pointHoverRadius: 6,
+          pointRadius: 3.5,
+          pointHoverRadius: 5.5,
           pointHoverBackgroundColor: '#0f766e',
           pointHoverBorderColor: '#ffffff',
         }]
@@ -579,6 +362,7 @@
             }
           },
           y: {
+            beginAtZero: true,
             grid: {
               color: '#f1f5f9',
               drawBorder: false
@@ -588,7 +372,13 @@
               color: '#64748b',
               font: { family: 'Plus Jakarta Sans', size: 11 },
               callback: function(value) {
-                return 'Rp ' + (value / 1000000).toFixed(1) + ' jt';
+                if (value >= 1000000) {
+                  return 'Rp ' + (value / 1000000).toFixed(1) + ' jt';
+                }
+                if (value >= 1000) {
+                  return 'Rp ' + (value / 1000).toFixed(0) + ' rb';
+                }
+                return 'Rp ' + value;
               }
             }
           }

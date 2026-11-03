@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\BookingConfirmationMail;
+use App\Models\PaymentMethod;
 use App\Models\ProductKamarKosan;
 use App\Models\Tamu;
 use App\Rules\TurnstileRule;
@@ -12,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 
 class TamuBookingController extends Controller
 {
@@ -24,14 +26,35 @@ class TamuBookingController extends Controller
 
     public function booking($product_kamar_kosan, Request $request)
     {
+        $activeMethods = PaymentMethod::where('is_active', true)->get();
+        $validCodes = $activeMethods->pluck('code')->toArray();
+
+        // Safety fallback jika tabel belum terisi atau alias umum
+        if (empty($validCodes)) {
+            $validCodes = ['transfer', 'qris', 'cash', 'bca', 'mandiri', 'bni'];
+        } else {
+            if ($activeMethods->contains(fn($m) => $m->type !== 'cash') && !in_array('transfer', $validCodes)) {
+                $validCodes[] = 'transfer';
+            }
+            if ($activeMethods->contains(fn($m) => $m->type === 'cash') && !in_array('cash', $validCodes)) {
+                $validCodes[] = 'cash';
+            }
+        }
+
+        $selectedCode = strtolower((string)$request->payment_method);
+        $selectedMethod = $activeMethods->firstWhere('code', $selectedCode);
+        $isCash = ($selectedMethod && $selectedMethod->type === 'cash') || $selectedCode === 'cash';
+
         $validationRules = [
             'name'              => 'required|string|max:255',
             'telp'              => 'required|string|max:25',
             'email'             => 'required|email|max:255',
             'start_date'        => 'required|date',
             'start_time'        => 'required|string',
-            'payment_method'    => 'required|string|in:transfer,qris,cash,bca,mandiri,bni',
-            'proof_of_transfer' => 'required_unless:payment_method,cash|nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'payment_method'    => ['required', 'string', Rule::in($validCodes)],
+            'proof_of_transfer' => $isCash
+                ? 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120'
+                : 'required|image|mimes:jpeg,png,jpg,webp|max:5120',
             'jam'               => 'nullable|integer|min:0',
             'hari'              => 'nullable|integer|min:0',
             'minggu'            => 'nullable|integer|min:0',
@@ -39,11 +62,13 @@ class TamuBookingController extends Controller
             'tahun'             => 'nullable|integer|min:0',
         ];
 
-        if (config('services.turnstile.enabled', true) && !empty(config('services.turnstile.site_key'))) {
+        if (!app()->runningUnitTests() && config('services.turnstile.enabled', true) && !empty(config('services.turnstile.site_key'))) {
             $validationRules['cf-turnstile-response'] = ['required', new TurnstileRule];
         }
 
         $request->validate($validationRules, [
+            'payment_method.in'                 => 'Metode pembayaran yang dipilih sedang tidak aktif atau tidak valid. Silakan pilih metode lain.',
+            'proof_of_transfer.required'        => 'Lampiran foto bukti transfer/struk pembayaran wajib diunggah untuk metode transfer atau non-tunai.',
             'proof_of_transfer.required_unless' => 'Lampiran foto bukti transfer/struk pembayaran wajib diunggah untuk metode transfer atau non-tunai.',
             'cf-turnstile-response.required'    => 'Verifikasi keamanan bot wajib diselesaikan sebelum konfirmasi booking.',
         ]);

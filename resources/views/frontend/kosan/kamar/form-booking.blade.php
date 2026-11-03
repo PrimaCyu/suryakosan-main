@@ -598,6 +598,30 @@
           </section>
 
           <!-- SECTION 3: PEMBAYARAN -->
+          @php
+            $methodsList = isset($paymentMethods) && $paymentMethods->count() > 0 
+                ? $paymentMethods 
+                : \App\Models\PaymentMethod::where('is_active', true)->orderBy('sort_order', 'asc')->get();
+
+            if ($methodsList->isEmpty()) {
+                $methodsList = collect([
+                    (object)['code' => 'qris', 'name' => 'QRIS (Semua Pembayaran)', 'type' => 'qris', 'bank_code' => 'QRIS', 'account_number' => null, 'account_holder' => 'Sinar Citra Lestari', 'qr_image_url' => null, 'instructions' => 'Buka aplikasi m-Banking atau e-Wallet favorit Anda, pilih menu QRIS / Scan.', 'is_active' => true],
+                    (object)['code' => 'bca', 'name' => 'Bank Central Asia (BCA)', 'type' => 'bank', 'bank_code' => 'BCA', 'account_number' => '1234567890', 'account_holder' => 'PT Sinar Citra Lestari', 'qr_image_url' => null, 'instructions' => 'Transfer tepat sesuai nominal tagihan ke rekening BCA kami.', 'is_active' => true],
+                    (object)['code' => 'cash', 'name' => 'Bayar di Tempat (COD)', 'type' => 'cash', 'bank_code' => 'COD', 'account_number' => null, 'account_holder' => null, 'qr_image_url' => null, 'instructions' => 'Pembayaran dilakukan secara langsung kepada pengelola kos saat serah terima kunci di lokasi.', 'is_active' => true],
+                ]);
+            }
+
+            $onlineMethods = $methodsList->filter(fn($m) => $m->type !== 'cash');
+            $cashMethod = $methodsList->firstWhere('type', 'cash');
+            $hasOnline = $onlineMethods->isNotEmpty();
+            $hasCash = !is_null($cashMethod);
+
+            $firstOnline = $onlineMethods->first();
+            $defaultMethod = $hasOnline ? $firstOnline : $cashMethod;
+            $defaultPaymentType = $hasOnline ? 'transfer' : 'cod';
+            $defaultCode = $defaultMethod ? $defaultMethod->code : 'transfer';
+          @endphp
+
           <section id="sec-pembayaran" class="booking-card rounded-[2rem] overflow-hidden reveal">
             <div class="p-6 sm:p-8 border-b border-[#E9DDD2]">
               <span class="text-[10px] uppercase tracking-[.18em] font-black text-[#E60049]">Langkah terakhir</span>
@@ -613,152 +637,214 @@
             </div>
 
             <div class="p-6 sm:p-8 space-y-6">
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <button type="button" onclick="selectPaymentOption('transfer')" id="opt-transfer"
-                  class="payment-option p-5 rounded-2xl border-2 border-[#E60049] bg-[#E60049]/5 text-left shadow-sm">
-                  <span class="flex items-center justify-between gap-3">
-                    <span class="font-black text-sm text-[#3B2314]">TRANSFER ONLINE</span>
-                    <i class="fa-solid fa-circle-check text-[#E60049]"></i>
-                  </span>
-                  <span class="block text-[11px] text-[#7B6759] mt-2">QRIS / Rekening Bank</span>
-                </button>
-
-                <button type="button" onclick="selectPaymentOption('cod')" id="opt-cod"
-                  class="payment-option p-5 rounded-2xl border border-[#E9DDD2] bg-white text-left">
-                  <span class="flex items-center justify-between gap-3">
-                    <span class="font-black text-sm text-[#3B2314]">BAYAR DI TEMPAT (COD)</span>
-                    <i class="fa-regular fa-circle text-[#9A887A]"></i>
-                  </span>
-                  <span class="block text-[11px] text-[#7B6759] mt-2">Bayar saat check-in</span>
-                </button>
-              </div>
-
-              <div id="transfer-method-container" class="space-y-5">
-                <div>
-                  <input type="hidden" name="payment_method" id="input-payment-method" value="qris">
-                  <label class="block font-bold text-xs sm:text-sm text-[#5D483A] mb-2">Pilih Rekening Tujuan</label>
-                  <select id="select-bank" onchange="updateSelectedBank(this.value); toggleQrisDisplay();"
-                    class="input-scl w-full px-4 py-3.5 bg-white border border-[#E9DDD2] rounded-2xl font-medium text-[#3B2314]">
-                    <option value="qris">QRIS (Semua Bank & E-Wallet: BCA, Mandiri, Dana, GoPay)</option>
-                    <option value="bca">BCA: 1234567890 a/n Sinar Citra Lestari</option>
-                    <option value="mandiri">Mandiri: 0987654321 a/n Sinar Citra Lestari</option>
-                    <option value="bni">BNI: 1111111111 a/n Sinar Citra Lestari</option>
-                  </select>
-                </div>
-
-                <!-- BLOK QRIS -->
-                <div id="qris-display" class="rounded-3xl bg-[#3B2314] p-5 sm:p-7 text-center text-white">
-                  <div class="flex flex-col sm:flex-row items-center gap-6">
-                    <div class="shrink-0">
-                      <p class="text-[10px] uppercase tracking-widest text-[#F3A833] font-black mb-3">Pembayaran QRIS</p>
-                      <div class="p-3 bg-white rounded-2xl shadow-xl">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=SCL-Sewa-Kosan"
-                          alt="Kode QRIS Pembayaran" class="w-40 h-40 object-contain">
-                      </div>
-                    </div>
-                    <div class="text-left">
-                      <h3 class="text-xl font-black">Scan & selesaikan pembayaran</h3>
-                      <p class="text-xs leading-6 text-white/65 mt-2">
-                        Buka aplikasi m-Banking atau e-Wallet favorit Anda, pilih menu QRIS / Scan, lalu selesaikan pembayaran sesuai total tagihan.
-                      </p>
-                      <span class="inline-flex items-center gap-2 mt-4 px-3 py-2 rounded-full bg-[#00A896]/15 text-[#6DE2D5] text-[10px] font-bold">
-                        <i class="fa-solid fa-shield-halved"></i> Pembayaran aman
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- BLOK BANK TRANSFER -->
-                <div id="bank-transfer-card" class="hidden rounded-3xl bg-[#3B2314] p-5 sm:p-7 text-white space-y-4 shadow-lg border border-white/10">
-                  <div class="flex items-center justify-between border-b border-white/10 pb-4">
-                    <div class="flex items-center gap-3">
-                      <div class="w-10 h-10 rounded-2xl bg-white text-[#3B2314] font-black flex items-center justify-center text-xs tracking-wider uppercase shadow-md" id="bank-badge-name">
-                        BCA
-                      </div>
-                      <div>
-                        <h3 class="text-sm sm:text-base font-black text-white" id="bank-name-label">Transfer Bank BCA</h3>
-                        <p class="text-[11px] text-white/60">Verifikasi otomatis & konfirmasi instan</p>
-                      </div>
-                    </div>
-                    <span class="px-2.5 py-1 rounded-full bg-[#00A896]/20 text-[#6DE2D5] text-[10px] font-bold">
-                      <i class="fa-solid fa-circle-check mr-1"></i> Aktif
+              <!-- PILIHAN TIPE PEMBAYARAN (ONLINE VS COD) -->
+              @if($hasOnline && $hasCash)
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <button type="button" onclick="selectPaymentOption('transfer')" id="opt-transfer"
+                    class="payment-option p-5 rounded-2xl border-2 border-[#E60049] bg-[#E60049]/5 text-left shadow-sm">
+                    <span class="flex items-center justify-between gap-3">
+                      <span class="font-black text-sm text-[#3B2314]">TRANSFER ONLINE / E-WALLET</span>
+                      <i class="fa-solid fa-circle-check text-[#E60049]"></i>
                     </span>
-                  </div>
+                    <span class="block text-[11px] text-[#7B6759] mt-2">QRIS / Rekening Bank / E-Wallet</span>
+                  </button>
 
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
-                      <span class="text-[10px] uppercase font-bold tracking-wider text-white/50 block">Nomor Rekening Tujuan</span>
-                      <div class="flex items-center justify-between gap-2 mt-1">
-                        <span id="bank-account-number" class="text-base sm:text-lg font-black tracking-wider text-[#F3A833]">1234567890</span>
-                        <button
-                          type="button"
-                          id="btn-copy-rekening"
-                          onclick="copyToClipboard(document.getElementById('bank-account-number').textContent, 'btn-copy-rekening', 'Tersalin! ✅')"
-                          class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-bold text-white transition-all active:scale-95 flex items-center gap-1 shrink-0"
-                          title="Salin Nomor Rekening"
-                        >
-                          <i class="fa-regular fa-copy text-[10px]"></i>
-                          <span>Salin</span>
-                        </button>
-                      </div>
-                      <span class="text-[10px] text-white/60 block mt-1">a/n PT Sinar Citra Lestari</span>
-                    </div>
-
-                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
-                      <span class="text-[10px] uppercase font-bold tracking-wider text-white/50 block">Nominal Harus Ditransfer</span>
-                      <div class="flex items-center justify-between gap-2 mt-1">
-                        <span id="bank-nominal-transfer" class="text-base sm:text-lg font-black text-[#F3A833]">Rp 0</span>
-                        <button
-                          type="button"
-                          id="btn-copy-nominal"
-                          onclick="copyNominalTransfer()"
-                          class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-bold text-white transition-all active:scale-95 flex items-center gap-1 shrink-0"
-                          title="Salin Nominal Transfer"
-                        >
-                          <i class="fa-regular fa-copy text-[10px]"></i>
-                          <span>Salin</span>
-                        </button>
-                      </div>
-                      <span class="text-[10px] text-white/60 block mt-1">Transfer tepat sesuai angka di atas</span>
-                    </div>
-                  </div>
-
-                  <div class="p-3 bg-white/5 rounded-2xl border border-white/10 flex items-start gap-2.5 text-[11px] text-white/70">
-                    <i class="fa-solid fa-circle-info text-[#F3A833] mt-0.5 shrink-0"></i>
-                    <span>Setelah transfer berhasil, simpan dan lampirkan bukti transfer/struk di bawah ini untuk verifikasi admin yang lebih cepat.</span>
-                  </div>
+                  <button type="button" onclick="selectPaymentOption('cod')" id="opt-cod"
+                    class="payment-option p-5 rounded-2xl border border-[#E9DDD2] bg-white text-left">
+                    <span class="flex items-center justify-between gap-3">
+                      <span class="font-black text-sm text-[#3B2314]">BAYAR DI TEMPAT (COD)</span>
+                      <i class="fa-regular fa-circle text-[#9A887A]"></i>
+                    </span>
+                    <span class="block text-[11px] text-[#7B6759] mt-2">Bayar saat check-in di kos</span>
+                  </button>
                 </div>
+              @elseif($hasOnline && !$hasCash)
+                <div class="p-4 rounded-2xl bg-[#E60049]/5 border border-[#E60049]/20 flex items-center justify-between">
+                  <div>
+                    <span class="font-black text-sm text-[#3B2314] block">TRANSFER ONLINE / E-WALLET</span>
+                    <span class="text-[11px] text-[#7B6759]">Selesaikan pembayaran via QRIS, Rekening Bank, atau E-Wallet di bawah.</span>
+                  </div>
+                  <i class="fa-solid fa-circle-check text-[#E60049] text-lg"></i>
+                </div>
+              @elseif(!$hasOnline && $hasCash)
+                <div class="p-4 rounded-2xl bg-[#00A896]/10 border border-[#00A896]/30 flex items-center justify-between">
+                  <div>
+                    <span class="font-black text-sm text-[#3B2314] block">BAYAR DI TEMPAT (TUNAI / COD)</span>
+                    <span class="text-[11px] text-[#7B6759]">Pembayaran dilakukan langsung saat serah terima kunci kamar.</span>
+                  </div>
+                  <i class="fa-solid fa-circle-check text-[#00A896] text-lg"></i>
+                </div>
+              @endif
 
-                <div>
-                  <label class="block font-bold text-xs sm:text-sm text-[#5D483A] mb-2">Unggah Bukti Transfer / Resi <span class="text-[#E60049]">*</span></label>
-                  <div onclick="document.getElementById('file-bukti').click()"
-                    class="border-2 border-dashed border-[#D8C9BC] hover:border-[#E60049] rounded-3xl p-7 text-center bg-[#FFF8F1]/70 hover:bg-[#E60049]/5 transition-all cursor-pointer group">
-                    <input type="file" id="file-bukti" name="proof_of_transfer" accept="image/*" class="hidden" onchange="handleFileUpload(event)">
+              <input type="hidden" name="payment_method" id="input-payment-method" value="{{ $defaultCode }}">
 
-                    <div id="upload-placeholder" class="space-y-2">
-                      <span class="mx-auto w-14 h-14 rounded-2xl bg-[#F3A833]/15 text-[#3B2314] flex items-center justify-center">
-                        <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
-                      </span>
-                      <p class="text-sm font-black text-[#3B2314]">Klik untuk upload bukti pembayaran</p>
-                      <p class="text-[10px] text-[#9A887A]">JPG, PNG, WEBP · Maksimal 5MB</p>
-                    </div>
+              <!-- CONTAINER TRANSFER ONLINE (BANK & QRIS) -->
+              <div id="transfer-method-container" class="{{ $defaultPaymentType === 'transfer' ? '' : 'hidden' }} space-y-5">
+                @if($hasOnline)
+                  <div>
+                    <label class="block font-bold text-xs sm:text-sm text-[#5D483A] mb-2">Pilih Rekening / Saluran Pembayaran</label>
+                    <select id="select-bank" onchange="updateSelectedBank(this.value); toggleQrisDisplay();"
+                      class="input-scl w-full px-4 py-3.5 bg-white border border-[#E9DDD2] rounded-2xl font-medium text-[#3B2314]">
+                      @foreach($onlineMethods as $m)
+                        <option value="{{ $m->code }}" {{ $m->code === $defaultCode ? 'selected' : '' }}>
+                          {{ $m->name }} @if($m->account_number) - {{ $m->account_number }} @endif @if($m->account_holder) (a/n {{ $m->account_holder }}) @endif
+                        </option>
+                      @endforeach
+                    </select>
+                  </div>
 
-                    <div id="upload-preview" class="hidden flex-col items-center justify-center space-y-2">
-                      <img id="preview-img" src="" alt="Bukti Transfer" class="h-32 rounded-xl object-contain border border-[#E9DDD2] shadow-sm">
-                      <span id="preview-filename" class="text-xs font-semibold text-[#3B2314] truncate max-w-full block"></span>
-                      <span class="text-[10px] text-[#00A896] font-bold bg-[#00A896]/10 px-3 py-1 rounded-full">
-                        <i class="fa-solid fa-check mr-1"></i> File Siap Diunggah
-                      </span>
+                  <!-- BLOK QRIS DISPLAY -->
+                  <div id="qris-display" class="{{ $defaultMethod && $defaultMethod->type === 'qris' ? '' : 'hidden' }} rounded-3xl bg-[#3B2314] p-5 sm:p-7 text-center text-white">
+                    <div class="flex flex-col sm:flex-row items-center gap-6">
+                      <div class="shrink-0">
+                        <p class="text-[10px] uppercase tracking-widest text-[#F3A833] font-black mb-3">Pembayaran Barcode QRIS</p>
+                        <!-- Wadah gambar QRIS dengan proteksi distorsi rasio (object-contain aspect-square) -->
+                        <div class="p-3 bg-white rounded-2xl shadow-xl aspect-square w-44 h-44 sm:w-52 sm:h-52 flex items-center justify-center mx-auto overflow-hidden">
+                          @php
+                            $initQrSrc = ($defaultMethod && $defaultMethod->type === 'qris' && $defaultMethod->qr_image_url) 
+                                ? $defaultMethod->qr_image_url 
+                                : ($defaultMethod ? 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=SCL-' . $defaultMethod->code : 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=SCL-Sewa-Kosan');
+                          @endphp
+                          <img id="qris-image-el" src="{{ $initQrSrc }}"
+                            alt="Kode QRIS Pembayaran" class="w-full h-full object-contain">
+                        </div>
+                        <div class="mt-3 flex items-center justify-center gap-2">
+                          <a id="btn-download-qris" href="{{ $initQrSrc }}" download="QRIS-Pembayaran-Kosan.png" target="_blank"
+                             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-[10px] font-bold text-white transition-all active:scale-95">
+                            <i class="fa-solid fa-download text-[9px]"></i>
+                            <span>Simpan QRIS ke Galeri</span>
+                          </a>
+                        </div>
+                      </div>
+                      <div class="text-left space-y-2">
+                        <h3 class="text-xl font-black text-white" id="qris-title-label">
+                          {{ $defaultMethod && $defaultMethod->type === 'qris' ? 'Scan & bayar via ' . $defaultMethod->name : 'Scan & selesaikan pembayaran' }}
+                        </h3>
+                        <p class="text-xs leading-6 text-white/70" id="qris-instructions-label">
+                          {{ ($defaultMethod && $defaultMethod->instructions) ? $defaultMethod->instructions : 'Buka aplikasi m-Banking (BCA, Mandiri, BRI, BNI) atau e-Wallet (GoPay, OVO, DANA, ShopeePay), pilih menu QRIS / Scan, lalu bayar sesuai total tagihan.' }}
+                        </p>
+                        <div class="pt-2 flex flex-wrap items-center gap-2">
+                          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#00A896]/15 text-[#6DE2D5] text-[10px] font-bold">
+                            <i class="fa-solid fa-shield-halved"></i> Pembayaran QRIS Resmi Terverifikasi
+                          </span>
+                          <span class="text-[10px] text-white/50">Mendukung semua bank & e-wallet</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
+
+                  <!-- BLOK BANK / E-WALLET TRANSFER CARD -->
+                  <div id="bank-transfer-card" class="{{ $defaultMethod && $defaultMethod->type !== 'qris' ? '' : 'hidden' }} rounded-3xl bg-[#3B2314] p-5 sm:p-7 text-white space-y-4 shadow-lg border border-white/10">
+                    <div class="flex items-center justify-between border-b border-white/10 pb-4">
+                      <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-2xl bg-white text-[#3B2314] font-black flex items-center justify-center text-xs tracking-wider uppercase shadow-md" id="bank-badge-name">
+                          {{ $defaultMethod ? ($defaultMethod->bank_code ?: strtoupper(substr($defaultMethod->code, 0, 3))) : 'BANK' }}
+                        </div>
+                        <div>
+                          <h3 class="text-sm sm:text-base font-black text-white" id="bank-name-label">
+                            {{ $defaultMethod ? 'Transfer ' . $defaultMethod->name : 'Transfer Bank' }}
+                          </h3>
+                          <p class="text-[11px] text-white/60">Verifikasi manual via bukti resi transfer</p>
+                        </div>
+                      </div>
+                      <span class="px-2.5 py-1 rounded-full bg-[#00A896]/20 text-[#6DE2D5] text-[10px] font-bold">
+                        <i class="fa-solid fa-circle-check mr-1"></i> Aktif
+                      </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-white/50 block">Nomor Rekening / Akun Tujuan</span>
+                        <div class="flex items-center justify-between gap-2 mt-1">
+                          <span id="bank-account-number" class="text-base sm:text-lg font-black tracking-wider text-[#F3A833]">
+                            {{ $defaultMethod->account_number ?? '-' }}
+                          </span>
+                          <button
+                            type="button"
+                            id="btn-copy-rekening"
+                            onclick="copyToClipboard(document.getElementById('bank-account-number').textContent, 'btn-copy-rekening', 'Tersalin! ✅')"
+                            class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-bold text-white transition-all active:scale-95 flex items-center gap-1 shrink-0"
+                            title="Salin Nomor Rekening"
+                          >
+                            <i class="fa-regular fa-copy text-[10px]"></i>
+                            <span>Salin</span>
+                          </button>
+                        </div>
+                        <span id="bank-account-holder" class="text-[10px] text-white/60 block mt-1">
+                          {{ $defaultMethod && $defaultMethod->account_holder ? 'a/n ' . $defaultMethod->account_holder : 'a/n Pengelola Kos' }}
+                        </span>
+                      </div>
+
+                      <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-white/50 block">Nominal Harus Ditransfer</span>
+                        <div class="flex items-center justify-between gap-2 mt-1">
+                          <span id="bank-nominal-transfer" class="text-base sm:text-lg font-black text-[#F3A833]">Rp 0</span>
+                          <button
+                            type="button"
+                            id="btn-copy-nominal"
+                            onclick="copyNominalTransfer()"
+                            class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-bold text-white transition-all active:scale-95 flex items-center gap-1 shrink-0"
+                            title="Salin Nominal Transfer"
+                          >
+                            <i class="fa-regular fa-copy text-[10px]"></i>
+                            <span>Salin</span>
+                          </button>
+                        </div>
+                        <span class="text-[10px] text-white/60 block mt-1">Transfer tepat sesuai angka di atas</span>
+                      </div>
+                    </div>
+
+                    <div id="bank-instructions-box" class="p-3 bg-white/5 rounded-2xl border border-white/10 flex items-start gap-2.5 text-[11px] text-white/70">
+                      <i class="fa-solid fa-circle-info text-[#F3A833] mt-0.5 shrink-0"></i>
+                      <span id="bank-instructions-text">
+                        {{ ($defaultMethod && $defaultMethod->instructions) ? $defaultMethod->instructions : 'Setelah transfer berhasil, simpan dan lampirkan bukti transfer/struk di bawah ini untuk verifikasi admin yang lebih cepat.' }}
+                      </span>
+                    </div>
+
+                    <!-- OPSIONAL QR CODE PADA E-WALLET / REKENING BANK -->
+                    <div id="bank-optional-qr-container" class="{{ ($defaultMethod && $defaultMethod->qr_image_url && $defaultMethod->type !== 'qris') ? '' : 'hidden' }} p-3 bg-white/5 rounded-2xl border border-white/10 text-center">
+                      <span class="text-[10px] text-white/60 block mb-2">Atau scan barcode di bawah:</span>
+                      <div class="p-2 bg-white rounded-xl aspect-square w-36 h-36 mx-auto flex items-center justify-center">
+                        <img id="bank-optional-qr-img" src="{{ $defaultMethod->qr_image_url ?? '' }}" alt="QR" class="w-full h-full object-contain">
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- UPLOAD BUKTI TRANSFER -->
+                  <div>
+                    <label class="block font-bold text-xs sm:text-sm text-[#5D483A] mb-2">Unggah Bukti Transfer / Resi <span class="text-[#E60049]">*</span></label>
+                    <div onclick="document.getElementById('file-bukti').click()"
+                      class="border-2 border-dashed border-[#D8C9BC] hover:border-[#E60049] rounded-3xl p-7 text-center bg-[#FFF8F1]/70 hover:bg-[#E60049]/5 transition-all cursor-pointer group">
+                      <input type="file" id="file-bukti" name="proof_of_transfer" accept="image/*" class="hidden" onchange="handleFileUpload(event)">
+
+                      <div id="upload-placeholder" class="space-y-2">
+                        <span class="mx-auto w-14 h-14 rounded-2xl bg-[#F3A833]/15 text-[#3B2314] flex items-center justify-center">
+                          <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
+                        </span>
+                        <p class="text-sm font-black text-[#3B2314]">Klik untuk upload bukti pembayaran</p>
+                        <p class="text-[10px] text-[#9A887A]">JPG, PNG, WEBP · Maksimal 5MB</p>
+                      </div>
+
+                      <div id="upload-preview" class="hidden flex-col items-center justify-center space-y-2">
+                        <img id="preview-img" src="" alt="Bukti Transfer" class="h-32 rounded-xl object-contain border border-[#E9DDD2] shadow-sm">
+                        <span id="preview-filename" class="text-xs font-semibold text-[#3B2314] truncate max-w-full block"></span>
+                        <span class="text-[10px] text-[#00A896] font-bold bg-[#00A896]/10 px-3 py-1 rounded-full">
+                          <i class="fa-solid fa-check mr-1"></i> File Siap Diunggah
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                @endif
               </div>
 
-              <div id="cod-method-container" class="hidden rounded-3xl bg-[#FFF3D9] border border-[#F3A833]/50 p-5 text-[#5C3D14] text-xs leading-relaxed">
+              <!-- CONTAINER INFORMASI COD / TUNAI -->
+              <div id="cod-method-container" class="{{ $defaultPaymentType === 'cod' ? '' : 'hidden' }} rounded-3xl bg-[#FFF3D9] border border-[#F3A833]/50 p-5 text-[#5C3D14] text-xs leading-relaxed">
                 <span class="font-black block mb-2">
-                  <i class="fa-solid fa-circle-info text-[#E60049] mr-1"></i> Informasi Pembayaran Tunai
+                  <i class="fa-solid fa-circle-info text-[#E60049] mr-1"></i> Informasi Pembayaran Tunai (Bayar di Tempat)
                 </span>
-                <p>Pembayaran dilakukan secara langsung kepada pengelola kos saat serah terima kunci di lokasi. Pastikan nomor kontak aktif untuk konfirmasi.</p>
+                <p id="cod-instructions-text">
+                  {{ $cashMethod->instructions ?? 'Pembayaran dilakukan secara langsung kepada pengelola kos saat serah terima kunci di lokasi. Pastikan nomor kontak WhatsApp aktif untuk konfirmasi jadwal kedatangan.' }}
+                </p>
               </div>
             </div>
           </section>
@@ -1028,7 +1114,8 @@
   <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
 
   <script>
-    let currentPaymentType = 'transfer';
+    let currentPaymentType = '{{ $defaultPaymentType }}';
+    const allPaymentMethods = @json($methodsList->keyBy('code'));
     let uploadedFileBase64 = '';
     let fpInstance = null;
 
@@ -1121,6 +1208,9 @@
           submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-sm"></i> <span>Memproses Pesanan...</span>';
         });
       }
+
+      // Inisialisasi tampilan metode pembayaran QRIS/Bank secara instan
+      toggleQrisDisplay();
     });
 
     function calculateRealtimePrice() {
@@ -1268,12 +1358,6 @@
       }).format(number);
     }
 
-    const bankDetails = {
-      'bca': { name: 'Bank Central Asia (BCA)', code: 'BCA', no: '1234567890' },
-      'mandiri': { name: 'Bank Mandiri', code: 'MDR', no: '0987654321' },
-      'bni': { name: 'Bank Negara Indonesia (BNI)', code: 'BNI', no: '1111111111' }
-    };
-
     window.addEventListener('load', () => {
       const loader = document.getElementById('page-loader');
 
@@ -1295,20 +1379,56 @@
       const bankBadge = document.getElementById('bank-badge-name');
       const bankNameLabel = document.getElementById('bank-name-label');
       const bankAccNo = document.getElementById('bank-account-number');
+      const bankAccHolder = document.getElementById('bank-account-holder');
+      const bankInstructions = document.getElementById('bank-instructions-text');
+      const optionalQrContainer = document.getElementById('bank-optional-qr-container');
+      const optionalQrImg = document.getElementById('bank-optional-qr-img');
+
+      const qrisImageEl = document.getElementById('qris-image-el');
+      const qrisTitleLabel = document.getElementById('qris-title-label');
+      const qrisInstructionsLabel = document.getElementById('qris-instructions-label');
+      const btnDownloadQris = document.getElementById('btn-download-qris');
 
       if (!selectBank) return;
 
-      const val = selectBank.value;
-      if (val === 'qris') {
+      const code = selectBank.value;
+      const method = allPaymentMethods[code];
+      if (!method) return;
+
+      if (method.type === 'qris') {
         if (qrisDisplay) qrisDisplay.classList.remove('hidden');
         if (bankCard) bankCard.classList.add('hidden');
-      } else if (bankDetails[val]) {
+
+        if (qrisTitleLabel) qrisTitleLabel.textContent = `Scan & bayar via ${method.name}`;
+        if (qrisInstructionsLabel && method.instructions) {
+          qrisInstructionsLabel.textContent = method.instructions;
+        }
+
+        const qrSrc = method.qr_image_url || `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=SCL-${encodeURIComponent(method.code)}`;
+        if (qrisImageEl) qrisImageEl.src = qrSrc;
+        if (btnDownloadQris) {
+          btnDownloadQris.href = qrSrc;
+          btnDownloadQris.download = `QRIS-${method.code}.png`;
+        }
+      } else {
+        // Tipe bank atau ewallet
         if (qrisDisplay) qrisDisplay.classList.add('hidden');
         if (bankCard) {
           bankCard.classList.remove('hidden');
-          if (bankBadge) bankBadge.textContent = bankDetails[val].code;
-          if (bankNameLabel) bankNameLabel.textContent = `Transfer ${bankDetails[val].name}`;
-          if (bankAccNo) bankAccNo.textContent = bankDetails[val].no;
+          if (bankBadge) bankBadge.textContent = method.bank_code || method.code.toUpperCase().slice(0, 4);
+          if (bankNameLabel) bankNameLabel.textContent = `Transfer ${method.name}`;
+          if (bankAccNo) bankAccNo.textContent = method.account_number || '-';
+          if (bankAccHolder) bankAccHolder.textContent = method.account_holder ? `a/n ${method.account_holder}` : '';
+          if (bankInstructions && method.instructions) {
+            bankInstructions.textContent = method.instructions;
+          }
+
+          if (method.qr_image_url && optionalQrContainer && optionalQrImg) {
+            optionalQrImg.src = method.qr_image_url;
+            optionalQrContainer.classList.remove('hidden');
+          } else if (optionalQrContainer) {
+            optionalQrContainer.classList.add('hidden');
+          }
         }
       }
     }
@@ -1553,17 +1673,19 @@
 
     function getReviewPaymentMethodLabel() {
       if (currentPaymentType === 'cod') {
-        return 'Bayar di Tempat (COD / Tunai)';
+        const cashM = Object.values(allPaymentMethods).find(m => m.type === 'cash');
+        return cashM ? cashM.name : 'Bayar di Tempat (COD / Tunai)';
       }
       const bankSelect = document.getElementById('select-bank');
-      const selectedBankVal = bankSelect ? bankSelect.value : 'qris';
-      switch (selectedBankVal) {
-        case 'qris': return 'QRIS (BCA, Mandiri, Dana, GoPay)';
-        case 'bca': return 'Transfer Bank BCA (1234567890)';
-        case 'mandiri': return 'Transfer Bank Mandiri (0987654321)';
-        case 'bni': return 'Transfer Bank BNI (1111111111)';
-        default: return 'Transfer Online';
+      const selectedBankVal = bankSelect ? bankSelect.value : '';
+      if (allPaymentMethods[selectedBankVal]) {
+        const m = allPaymentMethods[selectedBankVal];
+        if (m.type === 'qris') {
+          return m.name;
+        }
+        return `${m.name} (${m.account_number || 'Transfer'})`;
       }
+      return 'Transfer Online';
     }
 
     function validateBookingFormBeforeReview() {

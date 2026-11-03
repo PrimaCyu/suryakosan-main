@@ -187,9 +187,18 @@
                         <div class="col-md-6">
                             <label class="form-label">Metode Pembayaran <span class="text-danger">*</span></label>
                             <select name="payment_method" class="form-select" required>
-                                <option value="cash" selected>Tunai / Cash (Di Tempat)</option>
-                                <option value="transfer">Transfer Bank</option>
-                                <option value="qris">QRIS</option>
+                                @php
+                                    $activePayMethods = \App\Models\PaymentMethod::where('is_active', true)->orderBy('sort_order', 'asc')->get();
+                                @endphp
+                                @forelse($activePayMethods as $apm)
+                                    <option value="{{ $apm->code }}" {{ $apm->code === 'cash' ? 'selected' : '' }}>
+                                        {{ $apm->name }} @if($apm->account_number) ({{ $apm->account_number }}) @endif
+                                    </option>
+                                @empty
+                                    <option value="cash" selected>Tunai / Cash (Di Tempat)</option>
+                                    <option value="transfer">Transfer Bank</option>
+                                    <option value="qris">QRIS</option>
+                                @endforelse
                             </select>
                         </div>
                         <div class="col-md-6">

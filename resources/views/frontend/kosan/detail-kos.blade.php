@@ -303,7 +303,13 @@
             if (str_contains(strtolower($sm->title), 'whatsapp') || str_contains($sm->url, 'wa.me')) {
                 preg_match('/[0-9]{9,15}/', $sm->url, $waMatch);
                 if (!empty($waMatch[0])) {
-                    $waNumber = $waMatch[0];
+                    $waDigits = $waMatch[0];
+                    if (str_starts_with($waDigits, '0')) {
+                        $waDigits = '62' . substr($waDigits, 1);
+                    } elseif (str_starts_with($waDigits, '8')) {
+                        $waDigits = '62' . $waDigits;
+                    }
+                    $waNumber = $waDigits;
                     break;
                 }
             }

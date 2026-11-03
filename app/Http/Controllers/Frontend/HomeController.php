@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Artikel;
+use App\Models\PaymentMethod;
 use App\Models\ProductKamarKosan;
 use App\Models\ProductKosan;
 use App\Models\Testimoni;
@@ -202,7 +203,12 @@ class HomeController extends Controller
             $firstAvailableDate = \Carbon\Carbon::parse($latestBookedEnd)->addDay()->format('Y-m-d');
         }
 
-        return view('frontend.kosan.kamar.form-booking', compact('kamar', 'bookedRanges', 'latestBookedEnd', 'isTodayBooked', 'firstAvailableDate'));
+        $paymentMethods = PaymentMethod::where('is_active', true)
+            ->orderBy('sort_order', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        return view('frontend.kosan.kamar.form-booking', compact('kamar', 'bookedRanges', 'latestBookedEnd', 'isTodayBooked', 'firstAvailableDate', 'paymentMethods'));
     }
 
     /**

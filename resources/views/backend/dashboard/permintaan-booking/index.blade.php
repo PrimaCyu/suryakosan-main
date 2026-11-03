@@ -4,13 +4,16 @@
 <div class="app-content-header">
     <div class="container-fluid">
         <div class="page-header-box">
-            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
-                <div>
-                    <h1 class="page-title mb-1">
-                        <i class="bi bi-calendar-check text-secondary me-2"></i>Permintaan Booking
-                    </h1>
-                    <p class="page-subtitle mb-0">Verifikasi pemesanan unit kamar dan pemantauan riwayat transaksi.</p>
-                </div>
+            <div>
+                <h1 class="page-title">
+                    <i class="bi bi-calendar-check text-secondary"></i> Permintaan Booking
+                </h1>
+                <p class="page-subtitle">Verifikasi pemesanan unit kamar, bukti transfer, dan rekam jejak transaksi.</p>
+            </div>
+            <div class="page-header-actions">
+                <span class="badge badge-subtle-warning py-1.5 px-2.5">
+                    <i class="bi bi-hourglass-split me-1"></i>{{ $countPending ?? 0 }} Menunggu Review
+                </span>
             </div>
         </div>
     </div>
@@ -114,8 +117,12 @@
 
                                     <!-- 2. UNIT KAMAR -->
                                     <td>
+                                        @php
+                                            $roomName = $item->productKamarKosan->room ?? '-';
+                                            $roomLabel = str_starts_with(strtolower($roomName), 'kamar') ? $roomName : 'Kamar ' . $roomName;
+                                        @endphp
                                         <div class="table-cell-title">{{ $item->productKamarKosan->productKosan->title ?? '-' }}</div>
-                                        <small class="text-muted fs-8">Kamar {{ $item->productKamarKosan->room ?? '-' }}</small>
+                                        <small class="text-muted fs-8">{{ $roomLabel }}</small>
                                     </td>
 
                                     <!-- 3. PERIODE & BIAYA -->
@@ -350,7 +357,11 @@
                                 </tr>
                                 <tr>
                                     <td class="text-muted ps-0">Unit Kamar:</td>
-                                    <td><span class="badge badge-subtle-primary">Kamar {{ $item->productKamarKosan->room ?? '-' }}</span></td>
+                                    @php
+                                        $modalRoomName = $item->productKamarKosan->room ?? '-';
+                                        $modalRoomLabel = str_starts_with(strtolower($modalRoomName), 'kamar') ? $modalRoomName : 'Kamar ' . $modalRoomName;
+                                    @endphp
+                                    <td><span class="badge badge-subtle-primary">{{ $modalRoomLabel }}</span></td>
                                 </tr>
                                 <tr>
                                     <td class="text-muted ps-0">Periode Sewa:</td>
@@ -362,7 +373,7 @@
                                 </tr>
                                 <tr>
                                     <td class="text-muted ps-0">Metode Bayar:</td>
-                                    <td class="text-dark">{{ ucfirst($item->payment_method ?? 'Transfer') }}</td>
+                                    <td class="text-dark fw-medium">{{ $item->payment_method_label ?? ucfirst($item->payment_method ?? 'Transfer') }}</td>
                                 </tr>
                             </table>
 

@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\BookingAdminController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KamarKosanController;
 use App\Http\Controllers\Admin\KosanController;
+use App\Http\Controllers\Admin\PaymentMethodController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\Auth\LoginController;
@@ -120,6 +121,15 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function(){
         Route::post('/insert', 'insert')->name('.insert');
         Route::put('/update/{sosial_media}', 'update')->name('.update');
         Route::delete('/delete/{sosial_media}', 'delete')->name('.delete');
+    });
+
+    // Payment Methods Management (Super Admin only)
+    Route::prefix('/payment-methods')->middleware(['super_admin'])->controller(PaymentMethodController::class)->name('payment-methods.')->group(function(){
+        Route::get('/', 'index')->name('index');
+        Route::post('/store', 'store')->name('store');
+        Route::put('/update/{paymentMethod}', 'update')->name('update');
+        Route::patch('/toggle/{paymentMethod}', 'toggle')->name('toggle');
+        Route::delete('/destroy/{paymentMethod}', 'destroy')->name('destroy');
     });
 
     // Artikel

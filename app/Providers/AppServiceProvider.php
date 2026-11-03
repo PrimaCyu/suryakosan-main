@@ -30,14 +30,19 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\Artikel::observe(\App\Observers\ArtikelObserver::class);
         \App\Models\Testimoni::observe(\App\Observers\TestimoniObserver::class);
 
-        try {
-            if (\Illuminate\Support\Facades\Schema::hasTable('sosial_media')) {
-                $sosmedList = \App\Models\SosialMedia::all();
-                \Illuminate\Support\Facades\View::share('globalSosmed', $sosmedList);
+        \Illuminate\Support\Facades\View::composer('*', function ($view) {
+            try {
+                if (\Illuminate\Support\Facades\Schema::hasTable('sosial_media')) {
+                    $view->with('globalSosmed', \App\Models\SosialMedia::all());
+                }
+            } catch (\Throwable $e) {
+                // Ignore if DB not ready
             }
+        });
 
-            if (\Illuminate\Support\Facades\Schema::hasTable('tamus')) {
-                \Illuminate\Support\Facades\View::composer('backend.*', function ($view) {
+        \Illuminate\Support\Facades\View::composer('backend.*', function ($view) {
+            try {
+                if (\Illuminate\Support\Facades\Schema::hasTable('tamus')) {
                     $user = auth()->user();
                     if ($user) {
                         $isSuper = $user->isSuperAdmin();
@@ -63,10 +68,10 @@ class AppServiceProvider extends ServiceProvider
 
                     $view->with('pendingBookingCount', $pendingBookingCount);
                     $view->with('navbarPendingBookings', $navbarPendingBookings);
-                });
+                }
+            } catch (\Throwable $e) {
+                // Ignore during initial migrations
             }
-        } catch (\Exception $e) {
-            // Ignore during initial migrations
-        }
+        });
     }
 }

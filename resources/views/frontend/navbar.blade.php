@@ -11,6 +11,11 @@
             // Extract angka dari URL wa.me atau dari field langsung
             $extracted = preg_replace('/[^0-9]/', '', $link);
             if (!empty($extracted)) {
+                if (str_starts_with($extracted, '0')) {
+                    $extracted = '62' . substr($extracted, 1);
+                } elseif (str_starts_with($extracted, '8')) {
+                    $extracted = '62' . $extracted;
+                }
                 $waNumber = $extracted;
             }
         }

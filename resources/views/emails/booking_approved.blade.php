@@ -195,7 +195,7 @@
                 </div>
                 <div class="info-row">
                     <span class="info-cell-label">Metode Pembayaran:</span>
-                    <span class="info-cell-value">{{ strtoupper($tamu->payment_method) }}</span>
+                    <span class="info-cell-value">{{ $tamu->payment_method_label }}</span>
                 </div>
                 <div class="info-row" style="border-top: 1px solid #E9DDD2; padding-top: 8px; margin-top: 4px;">
                     <span class="info-cell-label" style="font-weight: 800; color: #3B2314;">Total Lunas:</span>

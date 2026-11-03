@@ -688,8 +688,29 @@
                     </div>
                     <h3 class="text-lg font-black text-[#3B2314]">2. Reservasi & Bayar Fleksibel</h3>
                     <p class="text-xs text-[#7B6759] mt-2 leading-relaxed">
-                        Tentukan tanggal check-in, lalu bayar dengan QRIS, Transfer Bank BCA/Mandiri/BNI, atau opsi Bayar di Tempat (COD).
+                        Tentukan tanggal check-in, lalu bayar secara aman dengan opsi metode pembayaran yang tersedia:
                     </p>
+                    @php
+                        $homeActiveMethods = \App\Models\PaymentMethod::where('is_active', true)->orderBy('sort_order', 'asc')->get();
+                    @endphp
+                    <div class="mt-3 flex flex-wrap gap-1.5 pt-2 border-t border-[#E9DDD2]/60">
+                        @forelse($homeActiveMethods as $pm)
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#FFF8F1] border border-[#E9DDD2] text-[#3B2314] shadow-2xs">
+                                @if($pm->type === 'qris')
+                                    <i class="fa-solid fa-qrcode text-[#E60049]"></i>
+                                @elseif($pm->type === 'cash')
+                                    <i class="fa-solid fa-hand-holding-dollar text-[#00A896]"></i>
+                                @elseif($pm->type === 'ewallet')
+                                    <i class="fa-solid fa-wallet text-[#00A896]"></i>
+                                @else
+                                    <i class="fa-solid fa-building-columns text-[#F3A833]"></i>
+                                @endif
+                                <span>{{ $pm->name }}</span>
+                            </span>
+                        @empty
+                            <span class="text-[10px] text-[#7B6759]">QRIS, Transfer Bank, Tunai / COD</span>
+                        @endforelse
+                    </div>
                 </div>
 
                 <!-- STEP 3 -->
@@ -893,6 +914,11 @@
                                 if ($waItem && !empty($waItem->url ?? $waItem->link ?? '')) {
                                     $digits = preg_replace('/[^0-9]/', '', $waItem->url ?? $waItem->link ?? '');
                                     if (!empty($digits)) {
+                                        if (str_starts_with($digits, '0')) {
+                                            $digits = '62' . substr($digits, 1);
+                                        } elseif (str_starts_with($digits, '8')) {
+                                            $digits = '62' . $digits;
+                                        }
                                         $adminWa = $digits;
                                     }
                                 }
