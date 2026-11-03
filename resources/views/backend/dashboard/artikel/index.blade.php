@@ -2,40 +2,146 @@
 @section('content')
 
 <style>
-    /* Fix Summernote modal z-index when inside Bootstrap 5 modal */
+    /* ========================================================================= */
+    /* MODERN SAAS STYLING FOR SUMMERNOTE & ARTIKEL DASHBOARD                   */
+    /* ========================================================================= */
+
+    /* Z-Index Fixes: Ensure Summernote dialogs & dropdowns float above Bootstrap 5 modals */
     .note-modal {
         z-index: 1065 !important;
     }
     .note-modal-backdrop {
         z-index: 1060 !important;
     }
+    .note-dropdown-menu {
+        z-index: 1070 !important;
+        border-radius: 10px !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04) !important;
+        padding: 6px !important;
+    }
+    .note-dropdown-item {
+        border-radius: 6px !important;
+        padding: 7px 14px !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        color: #334155 !important;
+        transition: background-color 0.12s ease;
+    }
+    .note-dropdown-item:hover {
+        background-color: #f1f5f9 !important;
+        color: #0f172a !important;
+    }
+
+    /* Editor Frame */
     .note-editor.note-frame {
-        border-color: var(--dash-border, #cbd5e1) !important;
+        border: 1px solid var(--dash-border, #cbd5e1) !important;
         border-radius: 10px !important;
         overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.03);
         background-color: #ffffff;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     }
+    .note-editor.note-frame:focus-within {
+        border-color: #4f46e5 !important;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1) !important;
+    }
+
+    /* Toolbar Styling */
     .note-toolbar {
-        background-color: var(--dash-bg-subtle, #f8fafc) !important;
-        border-bottom: 1px solid var(--dash-border, #e2e8f0) !important;
+        background-color: #f8fafc !important;
+        border-bottom: 1px solid #e2e8f0 !important;
         padding: 6px 10px !important;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 3px;
     }
+    .note-btn-group {
+        display: inline-flex !important;
+        align-items: center !important;
+        margin-right: 4px !important;
+        gap: 1px !important;
+    }
+    .note-btn-group:not(:last-child)::after {
+        content: "";
+        display: inline-block;
+        width: 1px;
+        height: 18px;
+        background-color: #e2e8f0;
+        margin-left: 6px;
+        margin-right: 3px;
+    }
+    .note-btn {
+        border: 1px solid transparent !important;
+        background-color: transparent !important;
+        color: #475569 !important;
+        border-radius: 6px !important;
+        font-size: 13px !important;
+        padding: 5px 9px !important;
+        font-weight: 500 !important;
+        line-height: 1.2 !important;
+        transition: all 0.12s ease-in-out !important;
+    }
+    .note-btn:hover {
+        background-color: #f1f5f9 !important;
+        color: #0f172a !important;
+        border-color: #e2e8f0 !important;
+    }
+    .note-btn.active, .note-btn:active {
+        background-color: #eef2ff !important;
+        color: #4f46e5 !important;
+        border-color: #c7d2fe !important;
+    }
+
+    /* Style dropdown: replace magic wand icon with clear 'Gaya Teks' text */
+    .note-btn.dropdown-toggle .note-icon-magic:before {
+        content: "Gaya Teks " !important;
+        font-family: inherit !important;
+        font-weight: 600 !important;
+        font-size: 12px !important;
+        letter-spacing: -0.01em;
+    }
+
+    /* Content Area */
     .note-editable {
-        min-height: 260px !important;
-        max-height: 440px !important;
+        min-height: 280px !important;
+        max-height: 480px !important;
         overflow-y: auto !important;
         font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
         font-size: 0.95rem !important;
         line-height: 1.85 !important;
         color: #334155 !important;
-        padding: 16px 20px !important;
+        padding: 18px 22px !important;
     }
-    .note-editable h1, .note-editable h2, .note-editable h3 {
+    .note-editable:focus {
+        outline: none !important;
+    }
+    .note-placeholder {
+        padding: 18px 22px !important;
+        font-size: 0.95rem !important;
+        color: #94a3b8 !important;
+    }
+    .note-editable h2 {
+        font-size: 1.45rem;
         font-weight: 700;
         color: #0f172a;
-        margin-top: 1.25rem;
+        margin-top: 1.4rem;
+        margin-bottom: 0.6rem;
+    }
+    .note-editable h3 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-top: 1.2rem;
         margin-bottom: 0.5rem;
+    }
+    .note-editable h4 {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #334155;
+        margin-top: 1rem;
+        margin-bottom: 0.4rem;
     }
     .note-editable p {
         margin-bottom: 1rem;
@@ -52,15 +158,52 @@
     }
     .note-editable blockquote {
         border-left: 4px solid #4f46e5;
-        padding: 8px 16px;
+        padding: 10px 18px;
         background-color: #f8fafc;
         color: #475569;
         font-style: italic;
-        margin: 1rem 0;
+        margin: 1.2rem 0;
         border-radius: 0 8px 8px 0;
     }
+    .note-editable hr {
+        border-top: 1px solid #e2e8f0;
+        margin: 1.5rem 0;
+    }
 
-    /* Fullscreen Mode Optimization for Long-form Writing */
+    /* Summernote Modal (Link Dialog, etc.) */
+    .note-modal .modal-dialog {
+        margin-top: 12vh !important;
+    }
+    .note-modal .modal-content {
+        border-radius: 12px !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    }
+    .note-modal .modal-header {
+        background: #f8fafc !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        padding: 12px 18px !important;
+    }
+    .note-modal .modal-title {
+        font-size: 0.95rem !important;
+        font-weight: 600 !important;
+        color: #0f172a !important;
+    }
+    .note-modal .form-control {
+        font-size: 0.875rem !important;
+        border-radius: 6px !important;
+        border-color: #cbd5e1 !important;
+    }
+    .note-modal .btn-primary {
+        background-color: #0f172a !important;
+        border-color: #0f172a !important;
+        border-radius: 6px !important;
+        font-size: 0.85rem !important;
+        font-weight: 500 !important;
+        padding: 6px 14px !important;
+    }
+
+    /* Fullscreen Distraction-free Writing Canvas */
     .note-editor.note-frame.fullscreen {
         position: fixed !important;
         top: 0 !important;
@@ -72,36 +215,39 @@
         background: #ffffff !important;
     }
     .note-editor.note-frame.fullscreen .note-editable {
-        height: calc(100vh - 110px) !important;
-        max-width: 960px;
+        height: calc(100vh - 95px) !important;
+        max-width: 860px;
         margin: 0 auto;
-        padding: 30px 40px !important;
+        padding: 36px 30px !important;
     }
     .note-editor.note-frame.fullscreen .note-toolbar {
         position: sticky;
         top: 0;
         z-index: 100001;
-        background-color: #f1f5f9 !important;
-        border-bottom: 1px solid #cbd5e1 !important;
+        background-color: #f8fafc !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        padding: 10px 24px !important;
+        justify-content: center;
     }
 
     @media (max-width: 767.98px) {
         .note-toolbar {
             padding: 4px 6px !important;
-            display: flex;
-            flex-wrap: wrap;
             gap: 2px;
         }
         .note-btn-group {
-            margin: 1px !important;
+            margin-right: 2px !important;
+        }
+        .note-btn-group:not(:last-child)::after {
+            display: none;
         }
         .note-btn {
-            padding: 3px 6px !important;
+            padding: 4px 6px !important;
             font-size: 11px !important;
         }
         .note-editable {
-            padding: 12px 14px !important;
-            min-height: 200px !important;
+            padding: 14px !important;
+            min-height: 220px !important;
         }
     }
 </style>
@@ -127,8 +273,6 @@
 <div class="app-content">
     <div class="container-fluid">
         @include('backend.dashboard.kosan.kamar.partials.alerts')
-
-
 
         <!-- MAIN TABLE CARD -->
         <div class="card mb-4 border shadow-sm">
@@ -180,11 +324,11 @@
                         <thead>
                             <tr class="table-light">
                                 <th style="width: 50px" class="text-center">No</th>
-                                <th style="width: 90px" class="text-center">Sampul</th>
+                                <th style="width: 80px" class="text-center">Sampul</th>
                                 <th>Informasi Artikel</th>
                                 <th style="width: 120px" class="text-center">Tayangan</th>
-                                <th style="width: 140px">Tanggal</th>
-                                <th style="width: 150px" class="text-center">Aksi</th>
+                                <th style="width: 130px">Tanggal</th>
+                                <th style="width: 140px" class="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="artikel-tbody">
@@ -197,17 +341,17 @@
                                                 src="{{ asset('storage/' . $item->image) }}"
                                                 alt="{{ $item->title }}"
                                                 class="rounded-2 border shadow-sm"
-                                                style="height: 50px; width: 75px; object-fit: cover;"
+                                                style="height: 46px; width: 68px; object-fit: cover;"
                                                 loading="lazy"
                                             >
                                         @else
-                                            <div class="rounded-2 border bg-light d-flex align-items-center justify-content-center text-muted mx-auto" style="height: 50px; width: 75px;">
-                                                <i class="bi bi-image fs-5 text-secondary opacity-50"></i>
+                                            <div class="rounded-2 border bg-light d-flex align-items-center justify-content-center text-muted mx-auto" style="height: 46px; width: 68px;">
+                                                <i class="bi bi-image fs-6 text-secondary opacity-50"></i>
                                             </div>
                                         @endif
                                     </td>
                                     <td>
-                                        <div class="fw-bold text-body-emphasis mb-0.5" style="font-size: 0.92rem;">
+                                        <div class="fw-semibold text-body-emphasis mb-0.5" style="font-size: 0.92rem;">
                                             {{ $item->title }}
                                         </div>
                                         <div class="text-muted fs-8">
@@ -215,7 +359,7 @@
                                         </div>
                                     </td>
                                     <td class="text-center">
-                                        <span class="text-muted fs-8">
+                                        <span class="text-muted fs-8 tabular-nums">
                                             <i class="bi bi-eye text-muted me-1"></i>{{ number_format($item->view) }}
                                         </span>
                                     </td>
@@ -289,10 +433,10 @@
 </div>
 
 <!-- ========================================================================= -->
-<!-- 1. MODAL TAMBAH ARTIKEL -->
+<!-- 1. MODAL TAMBAH ARTIKEL                                                   -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalTambahArtikel" tabindex="-1" aria-labelledby="modalTambahArtikelLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down" style="max-width: 860px;">
         <form action="{{ route('admin.artikel.insert') }}" method="POST" enctype="multipart/form-data" id="formTambahArtikel" class="modal-content border-0 shadow-lg" style="border-radius: 14px;">
             @csrf
             <div class="modal-header border-bottom py-3 px-4 bg-body-tertiary">
@@ -326,14 +470,14 @@
                     <!-- Gambar Sampul -->
                     <div class="col-12">
                         <label for="image_tambah" class="form-label fw-bold fs-8 text-body-emphasis">
-                            Gambar Sampul / Banner <span class="text-muted fw-normal">(Opsional, Maks. 5MB)</span>
+                            Gambar Sampul / Banner <span class="text-muted fw-normal">(Opsional, Format JPG/PNG/WEBP, Maks. 5MB)</span>
                         </label>
                         <input
                             type="file"
                             name="image"
                             id="image_tambah"
                             class="form-control form-control-sm"
-                            accept="image/*"
+                            accept="image/jpeg,image/png,image/webp,image/gif"
                             onchange="previewImageTambah(event)"
                         >
                         <div id="previewContainerTambah" class="mt-2 d-none position-relative d-inline-block">
@@ -346,9 +490,9 @@
 
                     <!-- Tips Menulis Artikel Singkat -->
                     <div class="col-12">
-                        <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light border text-secondary fs-8">
-                            <i class="bi bi-lightbulb-fill text-warning fs-7 shrink-0"></i>
-                            <span><strong>Tips:</strong> Gunakan <strong>H2 / H3</strong> untuk sub-bab, <strong>List</strong> untuk poin, dan icon <i class="bi bi-arrows-fullscreen"></i> (Fullscreen) di toolbar untuk mengetik leluasa.</span>
+                        <div class="d-flex align-items-center gap-2 p-2.5 rounded-2 bg-light border text-secondary fs-8">
+                            <i class="bi bi-info-circle text-primary fs-7 shrink-0"></i>
+                            <span><strong>Tips Menulis:</strong> Gunakan <strong>Gaya Teks</strong> untuk sub-bab (H2/H3), <strong>Poin</strong> untuk daftar, dan tombol <strong>Fullscreen (⛶)</strong> untuk menulis leluasa tanpa distraksi.</span>
                         </div>
                     </div>
 
@@ -367,11 +511,11 @@
                         <textarea name="deskripsi" id="summernote_deskripsi_tambah" class="form-control"></textarea>
                         <div class="d-flex justify-content-between align-items-center mt-1.5 fs-9 text-muted">
                             <div>
-                                <i class="bi bi-shield-check text-success me-1"></i>Format teks otomatis dibersihkan saat menyalin dari luar (AI / Word).
+                                <i class="bi bi-shield-check text-success me-1"></i>Format otomatis dirapikan saat menyalin dari luar.
                             </div>
                             <div>
                                 <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fs-9 text-secondary" onclick="cleanEditorFormat('tambah')">
-                                    <i class="bi bi-eraser me-1"></i>Bersihkan Gaya Inline
+                                    <i class="bi bi-eraser me-1"></i>Bersihkan Gaya Luar
                                 </button>
                             </div>
                         </div>
@@ -389,10 +533,10 @@
 </div>
 
 <!-- ========================================================================= -->
-<!-- 2. SINGLE UNIFIED MODAL EDIT ARTIKEL -->
+<!-- 2. SINGLE UNIFIED MODAL EDIT ARTIKEL                                      -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalEditArtikel" tabindex="-1" aria-labelledby="modalEditArtikelLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down" style="max-width: 860px;">
         <form action="" method="POST" enctype="multipart/form-data" id="formEditArtikel" class="modal-content border-0 shadow-lg" style="border-radius: 14px;">
             @csrf
             @method('PUT')
@@ -426,29 +570,29 @@
                     <!-- Gambar Sampul -->
                     <div class="col-12">
                         <label for="image_edit" class="form-label fw-bold fs-8 text-body-emphasis">
-                            Ganti Gambar Sampul <span class="text-muted fw-normal">(Biarkan kosong jika tidak ingin mengganti, Maks. 5MB)</span>
+                            Ganti Gambar Sampul <span class="text-muted fw-normal">(Biarkan kosong jika tidak diubah, Maks. 5MB)</span>
                         </label>
                         <input
                             type="file"
                             name="image"
                             id="image_edit"
                             class="form-control form-control-sm"
-                            accept="image/*"
+                            accept="image/jpeg,image/png,image/webp,image/gif"
                             onchange="previewImageEdit(event)"
                         >
                         
                         <!-- Container Preview Gambar Saat Ini / Baru -->
                         <div class="mt-2" id="currentImageContainerEdit">
-                            <small class="d-block text-muted fs-9 mb-1" id="labelPreviewEdit">Gambar Saat Ini:</small>
+                            <small class="d-block text-muted fs-9 mb-1" id="labelPreviewEdit">Gambar Sampul Saat Ini:</small>
                             <img id="imagePreviewEdit" src="#" alt="Preview" class="rounded-2 border shadow-sm" style="max-height: 130px; object-fit: cover;">
                         </div>
                     </div>
 
                     <!-- Tips Menulis Artikel Singkat -->
                     <div class="col-12">
-                        <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light border text-secondary fs-8">
-                            <i class="bi bi-lightbulb-fill text-warning fs-7 shrink-0"></i>
-                            <span><strong>Tips:</strong> Gunakan <strong>H2 / H3</strong> untuk sub-bab, <strong>List</strong> untuk poin, dan icon <i class="bi bi-arrows-fullscreen"></i> (Fullscreen) di toolbar untuk mengetik leluasa.</span>
+                        <div class="d-flex align-items-center gap-2 p-2.5 rounded-2 bg-light border text-secondary fs-8">
+                            <i class="bi bi-info-circle text-primary fs-7 shrink-0"></i>
+                            <span><strong>Tips Menulis:</strong> Gunakan <strong>Gaya Teks</strong> untuk sub-bab (H2/H3), <strong>Poin</strong> untuk daftar, dan tombol <strong>Fullscreen (⛶)</strong> untuk menulis leluasa tanpa distraksi.</span>
                         </div>
                     </div>
 
@@ -467,11 +611,11 @@
                         <textarea name="deskripsi" id="summernote_deskripsi_edit" class="form-control"></textarea>
                         <div class="d-flex justify-content-between align-items-center mt-1.5 fs-9 text-muted">
                             <div>
-                                <i class="bi bi-shield-check text-success me-1"></i>Format teks otomatis dibersihkan saat menyalin dari luar (AI / Word).
+                                <i class="bi bi-shield-check text-success me-1"></i>Format otomatis dirapikan saat menyalin dari luar.
                             </div>
                             <div>
                                 <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fs-9 text-secondary" onclick="cleanEditorFormat('edit')">
-                                    <i class="bi bi-eraser me-1"></i>Bersihkan Gaya Inline
+                                    <i class="bi bi-eraser me-1"></i>Bersihkan Gaya Luar
                                 </button>
                             </div>
                         </div>
@@ -489,7 +633,7 @@
 </div>
 
 <!-- ========================================================================= -->
-<!-- 3. HIDDEN REUSABLE DELETE FORM -->
+<!-- 3. HIDDEN REUSABLE DELETE FORM                                            -->
 <!-- ========================================================================= -->
 <form id="formDeleteArtikel" action="" method="POST" class="d-none">
     @csrf
@@ -497,7 +641,7 @@
 </form>
 
 <!-- ========================================================================= -->
-<!-- 4. JAVASCRIPT LOGIC & SWEETALERT INTEGRATION -->
+<!-- 4. JAVASCRIPT LOGIC & SWEETALERT INTEGRATION                              -->
 <!-- ========================================================================= -->
 <script>
     // Data Map for Instant Modal Population
@@ -521,7 +665,7 @@
     function updateSlugPreview(title, targetElementId) {
         const target = document.getElementById(targetElementId);
         if (!target) return;
-        const slug = title.toLowerCase()
+        const slug = (title || '').toLowerCase()
             .trim()
             .replace(/[^\w\s-]/g, '')
             .replace(/[\s_-]+/g, '-')
@@ -536,12 +680,28 @@
         const imagePreview = document.getElementById('imagePreviewTambah');
 
         if (input.files && input.files[0]) {
+            const file = input.files[0];
+            if (file.size > 5 * 1024 * 1024) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Ukuran Terlalu Besar',
+                        text: 'Maksimal ukuran gambar sampul adalah 5MB.',
+                        confirmButtonColor: '#0f172a'
+                    });
+                } else {
+                    alert('Maksimal ukuran gambar sampul adalah 5MB.');
+                }
+                input.value = '';
+                if (previewContainer) previewContainer.classList.add('d-none');
+                return;
+            }
             const reader = new FileReader();
             reader.onload = function(e) {
                 imagePreview.src = e.target.result;
                 previewContainer.classList.remove('d-none');
             };
-            reader.readAsDataURL(input.files[0]);
+            reader.readAsDataURL(file);
         }
     }
 
@@ -560,50 +720,58 @@
         const label = document.getElementById('labelPreviewEdit');
 
         if (input.files && input.files[0]) {
+            const file = input.files[0];
+            if (file.size > 5 * 1024 * 1024) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Ukuran Terlalu Besar',
+                        text: 'Maksimal ukuran gambar sampul adalah 5MB.',
+                        confirmButtonColor: '#0f172a'
+                    });
+                } else {
+                    alert('Maksimal ukuran gambar sampul adalah 5MB.');
+                }
+                input.value = '';
+                return;
+            }
             const reader = new FileReader();
             reader.onload = function(e) {
                 imagePreview.src = e.target.result;
                 container.classList.remove('d-none');
                 label.textContent = 'Preview Gambar Baru:';
             };
-            reader.readAsDataURL(input.files[0]);
+            reader.readAsDataURL(file);
         }
     }
 
-    // Common Summernote Config for Long-Form Articles
+    // Clean, Curated Summernote Config for Modern Long-Form Articles
     const summernoteConfig = {
         placeholder: 'Tuliskan judul bab, paragraf, poin edukasi, atau panduan lengkap artikel di sini...',
         tabsize: 2,
-        minHeight: 260,
-        dialogsInBody: true,
-        dialogsFade: true,
+        minHeight: 280,
+        dialogsInBody: false,
+        dialogsFade: false,
         toolbar: window.innerWidth < 768 ? [
             ['style', ['style']],
             ['font', ['bold', 'italic', 'underline', 'clear']],
             ['para', ['ul', 'ol']],
-            ['insert', ['link', 'picture']],
+            ['insert', ['link']],
             ['view', ['fullscreen']]
         ] : [
             ['style', ['style']],
-            ['font', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript', 'clear']],
-            ['fontsize', ['fontsize']],
-            ['color', ['color']],
+            ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
             ['para', ['ul', 'ol', 'paragraph']],
-            ['height', ['height']],
-            ['table', ['table']],
-            ['insert', ['link', 'picture', 'video', 'hr']],
+            ['insert', ['link', 'hr']],
             ['view', ['fullscreen', 'codeview', 'undo', 'redo']]
         ],
         styleTags: [
-            'p',
-            { title: 'Judul Utama (H2)', tag: 'h2', className: 'fw-bold fs-4 text-dark', value: 'h2' },
-            { title: 'Sub Judul (H3)', tag: 'h3', className: 'fw-bold fs-5 text-dark', value: 'h3' },
-            { title: 'Sub Bagian (H4)', tag: 'h4', className: 'fw-semibold fs-6 text-dark', value: 'h4' },
-            { title: 'Kutipan Menarik (Quote)', tag: 'blockquote', className: 'blockquote', value: 'blockquote' },
-            { title: 'Blok Kode / Catatan', tag: 'pre', className: 'bg-light p-2', value: 'pre' }
+            { title: 'Normal (Paragraf)', tag: 'p', className: '', value: 'p' },
+            { title: 'Judul Bab (H2)', tag: 'h2', className: 'fw-bold text-dark', value: 'h2' },
+            { title: 'Sub Judul (H3)', tag: 'h3', className: 'fw-bold text-dark', value: 'h3' },
+            { title: 'Sub Bagian (H4)', tag: 'h4', className: 'fw-semibold text-dark', value: 'h4' },
+            { title: 'Kutipan Penting (Quote)', tag: 'blockquote', className: 'blockquote', value: 'blockquote' }
         ],
-        fontSizes: ['11', '12', '13', '14', '15', '16', '18', '20', '24', '28', '32', '36'],
-        lineHeights: ['1.0', '1.2', '1.4', '1.6', '1.8', '2.0'],
         callbacks: {
             onPaste: function (e) {
                 const bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('text/html');
@@ -612,13 +780,14 @@
                     const div = document.createElement('div');
                     div.innerHTML = bufferText;
                     
-                    // Clean aggressive styles that break formatting while keeping semantic tags
+                    // Clean aggressive external styles that break formatting while keeping semantic tags
                     div.querySelectorAll('*').forEach(el => {
                         if (el.style) {
                             el.style.fontFamily = '';
                             el.style.lineHeight = '';
                             el.style.fontSize = '';
                             el.style.backgroundColor = '';
+                            el.style.color = '';
                         }
                         Array.from(el.attributes).forEach(attr => {
                             if (attr.name.startsWith('_ng') || attr.name.startsWith('data-')) {
@@ -642,21 +811,25 @@
 
     function initSummernoteArtikel(selector) {
         const $el = $(selector);
-        if ($el.length && !$el.next('.note-editor').length) {
+        if ($el.length && !$el.data('summernote')) {
             $el.summernote(summernoteConfig);
         }
+    }
+
+    function stripHtmlTags(html) {
+        const tmp = document.createElement('DIV');
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || '';
     }
 
     function updateWordCounter(type) {
         const selector = type === 'edit' ? '#summernote_deskripsi_edit' : '#summernote_deskripsi_tambah';
         const counterEl = document.getElementById(type === 'edit' ? 'counter_edit' : 'counter_tambah');
         const timeEl = document.getElementById(type === 'edit' ? 'time_edit' : 'time_tambah');
-        if (!counterEl || !timeEl || !$(selector).length) return;
+        if (!counterEl || !timeEl || !$(selector).length || !$(selector).data('summernote')) return;
 
         const html = $(selector).summernote('code') || '';
-        const temp = document.createElement('div');
-        temp.innerHTML = html;
-        const text = (temp.textContent || temp.innerText || '').trim();
+        const text = stripHtmlTags(html).trim();
         const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
         const minutes = Math.max(1, Math.ceil(words / 180));
 
@@ -667,7 +840,7 @@
     function cleanEditorFormat(type) {
         const selector = type === 'edit' ? '#summernote_deskripsi_edit' : '#summernote_deskripsi_tambah';
         const $el = $(selector);
-        if (!$el.length) return;
+        if (!$el.length || !$el.data('summernote')) return;
 
         let html = $el.summernote('code');
         const temp = document.createElement('div');
@@ -679,6 +852,7 @@
                 node.style.lineHeight = '';
                 node.style.fontSize = '';
                 node.style.backgroundColor = '';
+                node.style.color = '';
             }
             Array.from(node.attributes).forEach(attr => {
                 if (attr.name.startsWith('_ng') || attr.name.startsWith('data-')) {
@@ -690,27 +864,33 @@
         $el.summernote('code', temp.innerHTML);
         updateWordCounter(type);
 
-        Swal.fire({
-            icon: 'success',
-            title: 'Format Dirapikan',
-            text: 'Gaya inline dan atribut berlebih berhasil dibersihkan.',
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 2000
-        });
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Format Dirapikan',
+                text: 'Gaya inline dan atribut eksternal berhasil dibersihkan.',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
     }
 
     // Open Unified Edit Modal
     function openEditModal(id) {
         const artikel = window.artikelDataMap[id];
         if (!artikel) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Data Tidak Ditemukan',
-                text: 'Detail artikel tidak dapat dimuat.',
-                confirmButtonColor: '#0f172a'
-            });
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Data Tidak Ditemukan',
+                    text: 'Detail artikel tidak dapat dimuat.',
+                    confirmButtonColor: '#0f172a'
+                });
+            } else {
+                alert('Detail artikel tidak dapat dimuat.');
+            }
             return;
         }
 
@@ -733,24 +913,30 @@
         if (artikel.image_url) {
             imgPreview.src = artikel.image_url;
             imgContainer.classList.remove('d-none');
-            labelPreview.textContent = 'Gambar Saat Ini:';
+            labelPreview.textContent = 'Gambar Sampul Saat Ini:';
         } else {
             imgContainer.classList.add('d-none');
         }
 
-        // Initialize Summernote first if needed
-        initSummernoteArtikel('#summernote_deskripsi_edit');
-
-        // Set Summernote content safely
-        $('#summernote_deskripsi_edit').summernote('code', artikel.deskripsi || '');
-        updateWordCounter('edit');
-
         const modalEl = document.getElementById('modalEditArtikel');
         const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+        // Populate editor when modal is shown (or immediately if already visible)
+        $(modalEl).one('shown.bs.modal', function() {
+            initSummernoteArtikel('#summernote_deskripsi_edit');
+            $('#summernote_deskripsi_edit').summernote('code', artikel.deskripsi || '');
+            updateWordCounter('edit');
+        });
+
+        if ($('#summernote_deskripsi_edit').data('summernote')) {
+            $('#summernote_deskripsi_edit').summernote('code', artikel.deskripsi || '');
+            updateWordCounter('edit');
+        }
+
         modal.show();
     }
 
-    // SweetAlert2 Delete Confirmation with Fallback
+    // SweetAlert2 Delete Confirmation
     function confirmDelete(id, title) {
         const artikel = window.artikelDataMap[id];
         const deleteUrl = artikel ? artikel.delete_url : `{{ url('admin/artikel/delete') }}/${id}`;
@@ -802,40 +988,68 @@
             updateWordCounter('tambah');
         });
 
+        // Reset Tambah modal on hide so reopened modal is clean
+        $('#modalTambahArtikel').on('hidden.bs.modal', function () {
+            const form = document.getElementById('formTambahArtikel');
+            if (form) form.reset();
+            removePreviewTambah();
+            if ($('#summernote_deskripsi_tambah').data('summernote')) {
+                $('#summernote_deskripsi_tambah').summernote('code', '');
+            }
+            updateSlugPreview('', 'slug-preview-tambah');
+            updateWordCounter('tambah');
+        });
+
         // Initialize Summernote for Edit
         $('#modalEditArtikel').on('shown.bs.modal', function () {
             initSummernoteArtikel('#summernote_deskripsi_edit');
             updateWordCounter('edit');
         });
 
-        // Form Validation on Submit: Prevent empty Summernote and sync content
+        // Form Validation on Submit: Synchronize Summernote and prevent empty submission
         document.getElementById('formTambahArtikel').addEventListener('submit', function(e) {
-            const editor = $('#summernote_deskripsi_tambah');
-            editor.val(editor.summernote('code'));
-            const content = editor.summernote('isEmpty');
-            if (content) {
-                e.preventDefault();
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Konten Belum Diisi',
-                    text: 'Silakan isi konten atau naskah artikel sebelum mempublikasikan.',
-                    confirmButtonColor: '#0f172a'
-                });
+            const $editor = $('#summernote_deskripsi_tambah');
+            if ($editor.data('summernote')) {
+                const code = $editor.summernote('code');
+                $editor.val(code);
+                const text = stripHtmlTags(code).trim();
+                if ($editor.summernote('isEmpty') || !text) {
+                    e.preventDefault();
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Konten Belum Diisi',
+                            text: 'Silakan isi konten atau naskah artikel sebelum mempublikasikan.',
+                            confirmButtonColor: '#0f172a'
+                        });
+                    } else {
+                        alert('Silakan isi konten atau naskah artikel sebelum mempublikasikan.');
+                    }
+                    return false;
+                }
             }
         });
 
         document.getElementById('formEditArtikel').addEventListener('submit', function(e) {
-            const editor = $('#summernote_deskripsi_edit');
-            editor.val(editor.summernote('code'));
-            const content = editor.summernote('isEmpty');
-            if (content) {
-                e.preventDefault();
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Konten Belum Diisi',
-                    text: 'Silakan isi konten atau naskah artikel sebelum menyimpan.',
-                    confirmButtonColor: '#0f172a'
-                });
+            const $editor = $('#summernote_deskripsi_edit');
+            if ($editor.data('summernote')) {
+                const code = $editor.summernote('code');
+                $editor.val(code);
+                const text = stripHtmlTags(code).trim();
+                if ($editor.summernote('isEmpty') || !text) {
+                    e.preventDefault();
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Konten Belum Diisi',
+                            text: 'Silakan isi konten atau naskah artikel sebelum menyimpan.',
+                            confirmButtonColor: '#0f172a'
+                        });
+                    } else {
+                        alert('Silakan isi konten atau naskah artikel sebelum menyimpan.');
+                    }
+                    return false;
+                }
             }
         });
 
@@ -904,12 +1118,11 @@
                                 window.artikelDataMap[item.id] = item;
 
                                 const imageHtml = item.image_url
-                                    ? `<img src="${item.image_url}" alt="${item.title}" class="rounded-2 border shadow-sm" style="height: 50px; width: 75px; object-fit: cover;">`
-                                    : `<div class="rounded-2 border bg-light d-flex align-items-center justify-content-center text-muted mx-auto" style="height: 50px; width: 75px;">
-                                           <i class="bi bi-image fs-5 text-secondary opacity-50"></i>
+                                    ? `<img src="${item.image_url}" alt="${item.title}" class="rounded-2 border shadow-sm" style="height: 46px; width: 68px; object-fit: cover;">`
+                                    : `<div class="rounded-2 border bg-light d-flex align-items-center justify-content-center text-muted mx-auto" style="height: 46px; width: 68px;">
+                                           <i class="bi bi-image fs-6 text-secondary opacity-50"></i>
                                        </div>`;
 
-                                const safeTitle = (item.title || '').replace(/"/g, '&quot;');
                                 const escapedTitle = (item.title || '').replace(/'/g, "\\'");
 
                                 const tr = document.createElement('tr');
@@ -918,7 +1131,7 @@
                                     <td class="text-center fw-semibold text-muted">${index + 1}</td>
                                     <td class="text-center">${imageHtml}</td>
                                     <td>
-                                        <div class="fw-bold text-body-emphasis mb-0.5" style="font-size: 0.92rem;">
+                                        <div class="fw-semibold text-body-emphasis mb-0.5" style="font-size: 0.92rem;">
                                             ${item.title}
                                         </div>
                                         <div class="text-muted fs-8">
@@ -926,7 +1139,7 @@
                                         </div>
                                     </td>
                                     <td class="text-center">
-                                        <span class="text-muted fs-8">
+                                        <span class="text-muted fs-8 tabular-nums">
                                             <i class="bi bi-eye text-muted me-1"></i>${Number(item.view || 0).toLocaleString('id-ID')}
                                         </span>
                                     </td>

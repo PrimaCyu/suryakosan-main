@@ -528,7 +528,14 @@
 
     <script>
       $(document).ready(function() {
-        $('#modalTambah, #modalTambahArtikel').on('shown.bs.modal', function () {
+        // Prevent Bootstrap 5 modal from stealing focus from Summernote dialogs (e.g. Link dialog)
+        $(document).on('focusin', function(e) {
+          if ($(e.target).closest('.note-modal, .note-editor').length) {
+            e.stopImmediatePropagation();
+          }
+        });
+
+        $('#modalTambah').on('shown.bs.modal', function () {
           $(this).find('.summernote-init, #summernote_description').summernote({
             placeholder: 'Tuliskan deskripsi lengkap & informasi detail...',
             tabsize: 2,
@@ -545,7 +552,7 @@
           });
         });
 
-        $('#modalTambah, #modalTambahArtikel').on('hidden.bs.modal', function () {
+        $('#modalTambah').on('hidden.bs.modal', function () {
           $(this).find('.summernote-init, #summernote_description').summernote('destroy');
         });
 
