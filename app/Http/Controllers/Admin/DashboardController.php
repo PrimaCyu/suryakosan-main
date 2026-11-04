@@ -52,7 +52,7 @@ class DashboardController extends Controller
             })
             ->sum('total_price');
 
-        // 3. Tindakan Hari Ini Bagian 1: Booking Baru Menunggu Konfirmasi (Pending)
+        // 3. Tindakan Mendesak: Booking Baru Menunggu Persetujuan (Pending)
         $pendingBookings = Tamu::with(['productKamarKosan.productKosan'])
             ->where('status', 'pending')
             ->when(!$isSuper, function ($q) use ($assignedIds) {
@@ -62,75 +62,21 @@ class DashboardController extends Controller
             ->get();
 
         $pendingBookingsCount = $pendingBookings->count();
+        $expiringOrOverdueCount = 0;
+        $expiringOrOverdueTenancies = collect();
+        $totalUrgentActions = $pendingBookingsCount;
 
-        // 4. Tindakan Hari Ini Bagian 2: Sewa & Pembayaran Jatuh Tempo (H-7 s/d H+30 Overdue)
-        $expiringOrOverdueTenancies = Tamu::with(['productKamarKosan.productKosan'])
-            ->where('status', 'approved')
-            ->whereDate('end_date', '<=', now()->addDays(7)->toDateString())
-            ->whereDate('end_date', '>=', now()->subDays(30)->toDateString())
-            ->when(!$isSuper, function ($q) use ($assignedIds) {
-                $q->whereHas('productKamarKosan', fn($sub) => $sub->whereIn('product_kosan_id', $assignedIds));
-            })
-            ->orderBy('end_date', 'asc')
-            ->get();
-
-        $expiringOrOverdueCount = $expiringOrOverdueTenancies->count();
-        $totalUrgentActions = $pendingBookingsCount + $expiringOrOverdueCount;
-
-        // Structured Operational Alerts
+        // Structured Operational Alerts: Hanya muncul jika ada booking baru yang perlu tindakan admin
         $operationalAlerts = [];
         if ($pendingBookingsCount > 0) {
             $operationalAlerts[] = [
                 'type' => 'pending_booking',
                 'title' => $pendingBookingsCount . ' Booking Menunggu Persetujuan',
-                'subtitle' => 'Reservasi unit kamar baru membutuhkan verifikasi data & persetujuan pengelola.',
-                'action_label' => 'Lihat Booking →',
+                'subtitle' => 'Reservasi kamar baru membutuhkan verifikasi bukti pembayaran dan persetujuan pengelola.',
+                'action_label' => 'Tinjau Booking →',
                 'action_url' => route('admin.booking.index'),
                 'icon' => 'bi-calendar-check',
                 'badge_class' => 'bg-amber-subtle text-amber',
-            ];
-        }
-
-        // Overdue payments (end_date < today)
-        $overdueCount = $expiringOrOverdueTenancies->filter(function ($t) {
-            try {
-                return \Carbon\Carbon::parse($t->end_date)->isPast();
-            } catch (\Exception $e) {
-                return false;
-            }
-        })->count();
-
-        if ($overdueCount > 0) {
-            $operationalAlerts[] = [
-                'type' => 'overdue_payment',
-                'title' => $overdueCount . ' Pembayaran Terlambat',
-                'subtitle' => 'Masa sewa kamar telah melewati tanggal jatuh tempo pembayaran.',
-                'action_label' => 'Lihat Pembayaran →',
-                'action_url' => route('admin.booking.index'),
-                'icon' => 'bi-exclamation-circle',
-                'badge_class' => 'bg-danger-subtle text-danger',
-            ];
-        }
-
-        // Expiring soon payments (end_date between today and today + 7 days)
-        $expiringSoonCount = $expiringOrOverdueTenancies->filter(function ($t) {
-            try {
-                $end = \Carbon\Carbon::parse($t->end_date);
-                return $end->isFuture() && $end->diffInDays(now()) <= 7;
-            } catch (\Exception $e) {
-                return false;
-            }
-        })->count();
-
-        if ($expiringSoonCount > 0) {
-            $operationalAlerts[] = [
-                'type' => 'expiring_soon',
-                'title' => $expiringSoonCount . ' Pembayaran Mendekati Jatuh Tempo',
-                'subtitle' => 'Masa sewa penghuni akan berakhir dalam kurun waktu 7 hari ke depan.',
-                'action_label' => 'Lihat Pembayaran →',
-                'action_url' => route('admin.booking.index'),
-                'icon' => 'bi-clock-history',
-                'badge_class' => 'bg-warning-subtle text-warning-emphasis',
             ];
         }
 
