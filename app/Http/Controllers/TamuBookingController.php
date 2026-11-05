@@ -1,0 +1,154 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Mail\BookingConfirmationMail;
+use App\Models\PaymentMethod;
+use App\Models\ProductKamarKosan;
+use App\Models\Tamu;
+use App\Rules\TurnstileRule;
+use App\Service\ProcessBookingDate;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
+
+class TamuBookingController extends Controller
+{
+    protected $processBookingDates;
+
+    public function __construct(ProcessBookingDate $processBookingDates)
+    {
+        $this->processBookingDates = $processBookingDates;
+    }
+
+    public function booking($product_kamar_kosan, Request $request)
+    {
+        $activeMethods = PaymentMethod::where('is_active', true)->get();
+        $validCodes = $activeMethods->pluck('code')->toArray();
+
+        // Safety fallback jika tabel belum terisi atau alias umum
+        if (empty($validCodes)) {
+            $validCodes = ['transfer', 'qris', 'cash', 'bca', 'mandiri', 'bni'];
+        } else {
+            if ($activeMethods->contains(fn($m) => $m->type !== 'cash') && !in_array('transfer', $validCodes)) {
+                $validCodes[] = 'transfer';
+            }
+            if ($activeMethods->contains(fn($m) => $m->type === 'cash') && !in_array('cash', $validCodes)) {
+                $validCodes[] = 'cash';
+            }
+        }
+
+        $selectedCode = strtolower((string)$request->payment_method);
+        $selectedMethod = $activeMethods->firstWhere('code', $selectedCode);
+        $isCash = ($selectedMethod && $selectedMethod->type === 'cash') || $selectedCode === 'cash';
+
+        $validationRules = [
+            'name'              => 'required|string|max:255',
+            'telp'              => 'required|string|max:25',
+            'email'             => 'required|email|max:255',
+            'start_date'        => 'required|date',
+            'start_time'        => 'required|string',
+            'payment_method'    => ['required', 'string', Rule::in($validCodes)],
+            'proof_of_transfer' => $isCash
+                ? 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120'
+                : 'required|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'jam'               => 'nullable|integer|min:0',
+            'hari'              => 'nullable|integer|min:0',
+            'minggu'            => 'nullable|integer|min:0',
+            'bulan'             => 'nullable|integer|min:0',
+            'tahun'             => 'nullable|integer|min:0',
+        ];
+
+        if (!app()->runningUnitTests() && config('services.turnstile.enabled', true) && !empty(config('services.turnstile.site_key'))) {
+            $validationRules['cf-turnstile-response'] = ['required', new TurnstileRule];
+        }
+
+        $request->validate($validationRules, [
+            'payment_method.in'                 => 'Metode pembayaran yang dipilih sedang tidak aktif atau tidak valid. Silakan pilih metode lain.',
+            'proof_of_transfer.required'        => 'Lampiran foto bukti transfer/struk pembayaran wajib diunggah untuk metode transfer atau non-tunai.',
+            'proof_of_transfer.required_unless' => 'Lampiran foto bukti transfer/struk pembayaran wajib diunggah untuk metode transfer atau non-tunai.',
+            'cf-turnstile-response.required'    => 'Verifikasi keamanan bot wajib diselesaikan sebelum konfirmasi booking.',
+        ]);
+
+        try {
+            $tamu = DB::transaction(function () use ($product_kamar_kosan, $request) {
+                // Kunci baris data kamar untuk mencegah race condition / double booking konkuren
+                $kamar = ProductKamarKosan::with(['priceKamar', 'productKosan'])
+                    ->where('id', $product_kamar_kosan)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                // 1. Validasi ketersediaan jadwal kamar secara atomic di dalam lock
+                $bookingDate = $this->processBookingDates->calculateBookingRange($kamar->id, $request);
+                if (isset($bookingDate['status']) && $bookingDate['status'] === false) {
+                    throw new \DomainException($bookingDate['message']);
+                }
+
+                // 2. Kalkulasi total harga resmi dari sisi backend (Anti Price Tampering)
+                $serverCalculatedPrice = $this->processBookingDates->calculateBookingPrice($kamar, $request);
+                if ($serverCalculatedPrice <= 0) {
+                    throw new \DomainException('Total harga sewa kamar tidak valid (Rp 0). Pemesanan tidak dapat diproses.');
+                }
+
+                $data = [
+                    'product_kamar_kosan_id' => $kamar->id,
+                    'name'                   => strip_tags($request->name),
+                    'telp'                   => strip_tags($request->telp),
+                    'email'                  => filter_var($request->email, FILTER_SANITIZE_EMAIL),
+                    'start_time'             => $request->start_time,
+                    'start_date'             => $bookingDate['start'],
+                    'end_date'               => $bookingDate['end'],
+                    'payment_method'         => strtolower($request->payment_method),
+                    'total_price'            => $serverCalculatedPrice,
+                    'status'                 => 'pending',
+                ];
+
+                if ($request->hasFile('proof_of_transfer') && $request->file('proof_of_transfer')->isValid()) {
+                    $path = $request->file('proof_of_transfer')->store('tamu/proof-of-transfer', 'local');
+                    $data['proof_of_transfer'] = $path;
+                }
+
+                return Tamu::create($data);
+            });
+        } catch (\DomainException $e) {
+            return back()->withInput()->with('failed', $e->getMessage());
+        } catch (\Exception $e) {
+            Log::error('Error saat proses transaksi booking: ' . $e->getMessage());
+            return back()->withInput()->with('failed', 'Terjadi kendala saat memproses booking Anda. Silakan coba beberapa saat lagi.');
+        }
+
+        // 3. Bersihkan cache ketersediaan beranda
+        \Illuminate\Support\Facades\Cache::forget('home_kamar_list');
+
+        // 4. Kirim email tanda terima permohonan booking (tanpa lampiran PDF; PDF resmi dikirim saat disetujui)
+        try {
+            $tamu->load(['productKamarKosan.productKosan']);
+            Mail::to($tamu->email)->send(new BookingConfirmationMail($tamu));
+        } catch (\Exception $e) {
+            Log::error('Gagal mengirim email konfirmasi booking awal: ' . $e->getMessage());
+        }
+
+        return redirect()->route('booking.success', $tamu->access_token)->with('success', 'Booking Berhasil! Simpan bukti reservasi ini.');
+    }
+
+    public function bookingSuccess(string $token)
+    {
+        $tamu = Tamu::where('access_token', $token)->firstOrFail();
+        $tamu->load(['productKamarKosan.productKosan', 'productKamarKosan.priceKamar', 'productKamarKosan.productKamarImageKosan']);
+        return view('frontend.kosan.kamar.booking-success', compact('tamu'));
+    }
+
+    public function downloadInvoice(string $token)
+    {
+        $tamu = Tamu::where('access_token', $token)->firstOrFail();
+        $tamu->load(['productKamarKosan.productKosan']);
+        $pdf = Pdf::loadView('pdf.booking_invoice', compact('tamu'));
+        $filename = 'Invoice-Booking-' . str_pad($tamu->id, 5, '0', STR_PAD_LEFT) . '.pdf';
+        return $pdf->download($filename);
+    }
+}
+
+

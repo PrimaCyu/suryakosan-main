@@ -1,0 +1,153 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class ProductKamarKosan extends Model
+{
+    use SoftDeletes;
+    protected $fillable = ['product_kosan_id','room','description','fasilitas','cumulative_discount','gmaps','views'];
+    protected $touches = ['productKosan'];
+    protected $appends = ['room_status', 'primary_image'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($kamar) {
+            foreach ($kamar->productKamarImageKosan as $kamarImage) {
+                $kamarImage->delete();
+            }
+        });
+    }
+
+    public function productKosan(){
+        return $this->belongsTo(ProductKosan::class,'product_kosan_id');
+    }
+
+    public function productKamarImageKosan(){
+        return $this->hasMany(ProductKamarImageKosan::class);
+    }
+
+    public function priceKamar(){
+        return $this->hasMany(PriceKamar::class);
+    }
+
+    public function tamu(){
+        return $this->hasMany(Tamu::class,'product_kamar_kosan_id');
+    }
+
+    /**
+     * Penyewa aktif yang sedang menempati kamar hari ini (status approved & dalam rentang sewa).
+     */
+    public function getActiveTenantAttribute()
+    {
+        $today = now()->toDateString();
+        if ($this->relationLoaded('tamu')) {
+            return $this->tamu
+                ->where('status', 'approved')
+                ->filter(function ($t) use ($today) {
+                    try {
+                        $start = \Carbon\Carbon::parse($t->start_date)->toDateString();
+                        $end = \Carbon\Carbon::parse($t->end_date)->toDateString();
+                        return $start <= $today && $end >= $today;
+                    } catch (\Exception $e) {
+                        return false;
+                    }
+                })
+                ->sortByDesc('end_date')
+                ->first();
+        }
+
+        return $this->tamu()
+            ->where('status', 'approved')
+            ->whereDate('start_date', '<=', $today)
+            ->whereDate('end_date', '>=', $today)
+            ->orderByDesc('end_date')
+            ->first();
+    }
+
+    /**
+     * Booking approved untuk jadwal masa depan (belum masuk periode sewa).
+     */
+    public function getUpcomingTenantAttribute()
+    {
+        $today = now()->toDateString();
+        if ($this->relationLoaded('tamu')) {
+            return $this->tamu
+                ->where('status', 'approved')
+                ->filter(function ($t) use ($today) {
+                    return \Carbon\Carbon::parse($t->start_date)->toDateString() > $today;
+                })
+                ->sortBy('start_date')
+                ->first();
+        }
+
+        return $this->tamu()
+            ->where('status', 'approved')
+            ->whereDate('start_date', '>', $today)
+            ->orderBy('start_date', 'asc')
+            ->first();
+    }
+
+    /**
+     * Booking pending (menunggu verifikasi/persetujuan admin).
+     */
+    public function getPendingTenantAttribute()
+    {
+        if ($this->relationLoaded('tamu')) {
+            return $this->tamu->where('status', 'pending')->sortByDesc('created_at')->first();
+        }
+
+        return $this->tamu()->where('status', 'pending')->orderByDesc('created_at')->first();
+    }
+
+    /**
+     * Status ketersediaan kamar riil: 'terisi' | 'pending' | 'kosong'.
+     */
+    public function getRoomStatusAttribute(): string
+    {
+        if ($this->active_tenant) {
+            return 'terisi';
+        }
+        if ($this->pending_tenant) {
+            return 'pending';
+        }
+        return 'kosong';
+    }
+
+    /**
+     * Data harga bulanan.
+     */
+    public function getMonthlyPriceAttribute()
+    {
+        if ($this->relationLoaded('priceKamar')) {
+            return $this->priceKamar->where('kategori', 'bulan')->first();
+        }
+        return $this->priceKamar()->where('kategori', 'bulan')->first();
+    }
+
+    /**
+     * Data harga tahunan.
+     */
+    public function getYearlyPriceAttribute()
+    {
+        if ($this->relationLoaded('priceKamar')) {
+            return $this->priceKamar->where('kategori', 'tahun')->first();
+        }
+        return $this->priceKamar()->where('kategori', 'tahun')->first();
+    }
+
+    /**
+     * Foto utama kamar.
+     */
+    public function getPrimaryImageAttribute()
+    {
+        if ($this->relationLoaded('productKamarImageKosan')) {
+            return $this->productKamarImageKosan->first();
+        }
+        return $this->productKamarImageKosan()->first();
+    }
+}

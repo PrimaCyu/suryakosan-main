@@ -1,0 +1,416 @@
+<!-- TAB 1: DATA KOS-KOSAN -->
+<div class="tab-pane fade show active" id="tab-kosan" role="tabpanel" aria-labelledby="tab-kosan-btn">
+    <div class="card mb-4">
+        <div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+            <div>
+                <h5 class="card-title mb-0 fs-6 fw-bold">
+                    <i class="bi bi-house-door text-secondary me-2"></i>Daftar Properti Kosan
+                </h5>
+                <p class="text-muted fs-8 mb-0">Total {{ $product_kosan->total() }} properti kos terdaftar.</p>
+            </div>
+            <div class="search-box-responsive">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-transparent border-end-0 text-muted">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" id="admin-search-kosan" class="form-control border-start-0 ps-0" placeholder="Cari nama, wilayah, fasilitas..." value="{{ request('search') }}" autocomplete="off">
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <!-- TABEL UTAMA -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 table-min-lg" id="table-kosan-list">
+                    <thead>
+                        <tr>
+                            <th style="width: 45px" class="text-center">No</th>
+                            <th>Nama Kosan</th>
+                            <th>Wilayah</th>
+                            <th>Fasilitas Unggulan</th>
+                            <th class="text-center">Views</th>
+                            <th class="text-center">Kamar</th>
+                            <th class="text-center text-nowrap" style="width: 240px">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="kosan-tbody">
+                        @forelse ($product_kosan as $index => $item)
+                            <tr class="align-middle">
+                                <td class="text-center fw-semibold text-muted">{{ $product_kosan->firstItem() + $index }}</td>
+                                <td>
+                                    <div class="table-cell-title">{{ $item->title }}</div>
+                                    <small class="table-cell-sub">Slug: {{ $item->slug }}</small>
+                                </td>
+                                <td>
+                                    @if($item->wilayah)
+                                        <div class="text-secondary fs-8">
+                                            <i class="bi bi-geo-alt text-muted me-1"></i>{{ $item->wilayah }}
+                                        </div>
+                                    @else
+                                        <span class="text-muted fs-8">-</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($item->fasilitas)
+                                        <div class="text-muted fs-8 text-truncate" style="max-width: 220px;" title="{{ $item->fasilitas }}">
+                                            {{ $item->fasilitas }}
+                                        </div>
+                                    @else
+                                        <span class="text-muted fs-8">-</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-muted fs-8">
+                                        <i class="bi bi-eye text-muted me-1"></i>{{ number_format($item->view ?? 0) }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    @php
+                                        $totalRooms = $item->total_rooms_count;
+                                        $occupiedRooms = $item->occupied_rooms_count;
+                                        $availRooms = $item->available_rooms_count;
+                                        $occRate = $item->occupancy_rate;
+                                    @endphp
+                                    @if($totalRooms > 0)
+                                        <div>
+                                            <span class="fw-semibold fs-8 {{ $availRooms > 0 ? 'text-success' : 'text-danger' }}">
+                                                {{ $availRooms }} Kosong
+                                            </span>
+                                            <span class="text-muted fs-8">/ {{ $totalRooms }} Unit</span>
+                                        </div>
+                                        <div class="progress mt-1 mx-auto" style="height: 3px; max-width: 85px;">
+                                            <div class="progress-bar {{ $occRate >= 80 ? 'bg-danger' : ($occRate >= 50 ? 'bg-primary' : 'bg-success') }}" style="width: {{ $occRate }}%"></div>
+                                        </div>
+                                    @else
+                                        <span class="text-muted fs-8">{{ $item->tersedia ?? 0 }} Unit</span>
+                                    @endif
+                                </td>
+                                <td class="text-center text-nowrap">
+                                    <div class="d-inline-flex align-items-center gap-1.5">
+                                        <!-- Kamar Button (Primary CTA) -->
+                                        <a href="{{ route('admin.product.kosan.kamar.index', $item->id) }}" class="btn btn-sm btn-outline-primary py-1 px-2.5 rounded-2" style="font-size: 0.8rem;" title="Kelola Unit Kamar">
+                                            <i class="bi bi-door-open me-1"></i>Kamar
+                                        </a>
+
+                                        <!-- Edit Button (Direct CTA) -->
+                                        <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2.5 rounded-2" style="font-size: 0.8rem;" data-bs-toggle="modal" data-bs-target="#modalEdit{{ $item->id }}" title="Edit Info Kosan">
+                                            <i class="bi bi-pencil me-1"></i>Edit
+                                        </button>
+
+                                        <!-- Galeri Foto (Icon button minimalis) -->
+                                        <button type="button" class="btn btn-sm btn-light border py-1 px-2 rounded-2 text-secondary" data-bs-toggle="modal" data-bs-target="#modalImageKosan{{ $item->id }}" title="Kelola Galeri Foto">
+                                            <i class="bi bi-images"></i>
+                                        </button>
+
+                                        <!-- Buka di Web (Icon button minimalis) -->
+                                        <a href="{{ route('kosan.detail', $item->slug) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-light border py-1 px-2 rounded-2 text-secondary" title="Lihat Halaman Web">
+                                            <i class="bi bi-box-arrow-up-right"></i>
+                                        </a>
+
+                                        @if(Auth::user()->isSuperAdmin())
+                                        <!-- Hapus Kosan (Icon button merah lembut) -->
+                                        <button type="button" class="btn btn-sm btn-light border border-danger-subtle py-1 px-2 rounded-2 text-danger" data-bs-toggle="modal" data-bs-target="#modalDelete{{ $item->id }}" title="Hapus Kosan">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-5">
+                                    <div class="py-4">
+                                        <i class="bi bi-houses display-6 d-block mb-2 text-secondary opacity-50"></i>
+                                        <h6 class="fw-bold text-dark mb-1">
+                                            @if(Auth::user()->isSuperAdmin())
+                                                Belum Ada Data Kos-Kosan Terdaftar
+                                            @else
+                                                Belum Ada Properti Kos yang Ditugaskan
+                                            @endif
+                                        </h6>
+                                        <p class="text-muted fs-8 mb-3" style="max-width: 480px; margin: auto;">
+                                            @if(Auth::user()->isSuperAdmin())
+                                                Mulai tambahkan kos-kosan baru dengan mengklik tombol <strong>Tambah Kosan Baru</strong> di atas.
+                                            @else
+                                                Akun Anda berstatus <strong>Admin Cabang</strong>. Anda hanya dapat mengelola properti kos yang telah ditugaskan secara resmi oleh Super Admin. Silakan hubungi Super Admin untuk penugasan properti cabang.
+                                            @endif
+                                        </p>
+                                        @if(Auth::user()->isSuperAdmin())
+                                            <button type="button" class="btn btn-sm btn-primary px-3 rounded-pill" data-bs-toggle="modal" data-bs-target="#modalTambah">
+                                                <i class="bi bi-plus-lg me-1"></i> Tambah Kosan Sekarang
+                                            </button>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <!-- END TABEL UTAMA -->
+        </div>
+
+        <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <small class="text-muted fs-8">
+                Menampilkan {{ $product_kosan->firstItem() ?? 0 }} - {{ $product_kosan->lastItem() ?? 0 }} dari {{ $product_kosan->total() }} kosan
+            </small>
+            <div>
+                {{ $product_kosan->appends(request()->except('kosan_page'))->links('pagination::bootstrap-5') }}
+            </div>
+        </div>
+
+        <!-- KUMPULAN MODAL -->
+        @foreach ($product_kosan as $item)
+
+            <!-- MODAL EDIT KOSAN -->
+            <div class="modal fade modalEditKosan" id="modalEdit{{ $item->id }}" tabindex="-1" aria-labelledby="modalEditLabel{{ $item->id }}" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                    <form action="{{ route('admin.product.kosan.update', $item->id) }}" method="POST" enctype="multipart/form-data" class="modal-content border-0 shadow-lg">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalEditLabel{{ $item->id }}">
+                                <i class="bi bi-pencil-square text-secondary me-2"></i> Edit Kosan: {{ $item->title }}
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                        </div>
+                        <div class="modal-body p-3 p-md-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="edit_title_{{ $item->id }}" class="form-label">
+                                        Nama Kos / Judul <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" name="title" id="edit_title_{{ $item->id }}" class="form-control" value="{{ old('title', $item->title) }}" required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="select_wilayah_edit_{{ $item->id }}" class="form-label fw-semibold">
+                                        Wilayah (Bali) <span class="text-danger">*</span>
+                                    </label>
+                                    <select name="wilayah" id="select_wilayah_edit_{{ $item->id }}" class="form-select select-wilayah-edit" required>
+                                        <option value="" disabled>-- Pilih Kab / Kota (Bali) --</option>
+                                        @php
+                                            $baliRegencies = ['Denpasar', 'Badung', 'Gianyar', 'Tabanan', 'Buleleng', 'Karangasem', 'Klungkung', 'Bangli', 'Jembrana'];
+                                        @endphp
+                                        @foreach($baliRegencies as $reg)
+                                            <option value="{{ $reg }}" {{ (old('wilayah', $item->wilayah) == $reg) ? 'selected' : '' }}>{{ $reg }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="edit_gmaps_{{ $item->id }}" class="form-label">
+                                        Link Lokasi Google Maps / Embed <span class="badge bg-secondary-subtle text-secondary fs-8 ms-1">Opsional</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent text-muted"><i class="bi bi-geo-alt-fill text-danger"></i></span>
+                                        <input type="text"
+                                               name="gmaps"
+                                               id="edit_gmaps_{{ $item->id }}"
+                                               class="form-control"
+                                               value="{{ old('gmaps', $item->gmaps) }}"
+                                               placeholder="https://maps.app.goo.gl/... atau <iframe src=...>">
+                                    </div>
+                                    <div class="form-text fs-8 text-muted">Salin tautan bagikan Google Maps atau kode sematan embed (iframe) untuk menampilkan peta lokasi presisi.</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="edit_tersedia_{{ $item->id }}" class="form-label">Jumlah Kamar Tersedia</label>
+                                    <input type="number" name="tersedia" id="edit_tersedia_{{ $item->id }}" class="form-control" value="{{ old('tersedia', $item->tersedia) }}" min="0" placeholder="0">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="edit_view_{{ $item->id }}" class="form-label">Jumlah Views Awal</label>
+                                    <input type="number" name="view" id="edit_view_{{ $item->id }}" class="form-control" value="{{ old('view', $item->view ?? 0) }}" min="0" placeholder="0">
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="edit_description_{{ $item->id }}" class="form-label">Deskripsi Lengkap Kosan</label>
+                                    <textarea name="description" id="edit_description_{{ $item->id }}" class="form-control summernote-edit" rows="3">{{ old('description', $item->description) }}</textarea>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label mb-1">Fasilitas Bersama / Properti Kos</label>
+                                    <p class="text-muted fs-8 mb-2">Centang fasilitas umum yang tersedia di properti kos ini:</p>
+                                    <div class="p-3 rounded-3 bg-body-tertiary border">
+                                        @php
+                                            $selectedFasilitas = $item->fasilitas ? array_map('trim', explode(',', $item->fasilitas)) : [];
+                                            $daftarFasilitas = [
+                                                'WiFi Cepat / Internet', 'Dapur Bersama', 'Parkir Motor Luas', 'Parkir Mobil',
+                                                'CCTV 24 Jam', 'Penjaga Kos / Security', 'Mesin Cuci Bersama', 'Kulkas Bersama',
+                                                'Ruang Tamu / Santai', 'Akses Kunci 24 Jam', 'Dispenser Air Minum', 'Area Jemuran Luas'
+                                            ];
+                                        @endphp
+                                        <div class="row g-2">
+                                            @foreach($daftarFasilitas as $fIndex => $fas)
+                                                <div class="col-md-4 col-6">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="fasilitas[]" value="{{ $fas }}" id="edit_fas_{{ $item->id }}_{{ $fIndex }}" {{ in_array($fas, $selectedFasilitas) ? 'checked' : '' }}>
+                                                        <label class="form-check-label fs-8" for="edit_fas_{{ $item->id }}_{{ $fIndex }}">
+                                                            {{ $fas }}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label mb-0">Tambah Foto Galeri / Denah</label>
+                                        <span class="badge bg-primary-subtle text-primary fs-8">Bisa Multi-Foto</span>
+                                    </div>
+                                    <input type="file" name="images[]" class="form-control" accept="image/*" multiple>
+                                    <div class="form-text fs-8 text-muted">Pilih satu atau lebih foto baru untuk ditambahkan ke galeri foto kos ini.</div>
+                                    @if($item->image)
+                                        <div class="mt-2">
+                                            <small class="text-muted d-block mb-1">Denah Saat Ini:</small>
+                                            <img src="{{ asset('storage/' . $item->image) }}" alt="Denah" class="rounded-2 border" style="max-height: 90px; object-fit: contain;">
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-sm btn-primary">
+                                <i class="bi bi-check-lg me-1"></i> Simpan Perubahan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- MODAL DELETE KOSAN -->
+            @if(Auth::user()->isSuperAdmin())
+            <div class="modal fade" id="modalDelete{{ $item->id }}" tabindex="-1" aria-labelledby="modalDeleteLabel{{ $item->id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-sm">
+                    <div class="modal-content border-0 shadow-lg">
+                        <div class="modal-body p-4">
+                            <h6 class="fw-bold text-dark mb-2">Hapus Properti Kosan?</h6>
+                            <p class="text-muted fs-8 mb-0">
+                                Kosan <strong>"{{ $item->title }}"</strong> beserta seluruh unit kamar di dalamnya akan dihapus secara permanen.
+                            </p>
+                        </div>
+                        <div class="modal-footer d-flex justify-content-end border-top-0 pt-0 pb-3">
+                            <button type="button" class="btn btn-sm btn-secondary px-3" data-bs-dismiss="modal">Batal</button>
+                            <form action="{{ route('admin.product.kosan.delete', $item->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger px-3">
+                                    <i class="bi bi-trash me-1"></i> Ya, Hapus
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            <!-- MODAL IMAGE GALLERY KOSAN -->
+            <div class="modal fade" id="modalImageKosan{{ $item->id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content border-0 shadow-lg">
+                        <div class="modal-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="modal-title mb-0">
+                                    <i class="bi bi-images text-secondary me-2"></i> Galeri Foto: {{ $item->title }}
+                                </h5>
+                                <p class="text-muted fs-8 mb-0">Kelola dan unggah koleksi foto promosi untuk unit kosan ini</p>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <!-- Header Info / Stats -->
+                            <div class="d-flex align-items-center justify-content-between mb-3 pb-1 border-bottom">
+                                <div class="d-flex align-items-center gap-2">
+                                    <h6 class="fw-bold fs-7 mb-0 text-dark">Foto Galeri Tersimpan</h6>
+                                    <span class="badge badge-subtle-primary rounded-pill px-2.5">
+                                        {{ $item->productImageKosan ? $item->productImageKosan->count() : 0 }} Foto
+                                    </span>
+                                </div>
+                                <span class="fs-8 text-muted">
+                                    <i class="bi bi-shield-check text-success me-1"></i>Tampil di detail publik kos
+                                </span>
+                            </div>
+
+                            <!-- Existing Images Gallery Grid -->
+                            @if($item->productImageKosan && $item->productImageKosan->count() > 0)
+                                <div class="gallery-grid mb-4">
+                                    @foreach($item->productImageKosan as $imgIndex => $img)
+                                        <div class="gallery-item-card">
+                                            <span class="badge-photo-num">#{{ $imgIndex + 1 }}</span>
+                                            <img src="{{ asset('storage/' . $img->image) }}" alt="Foto Kosan {{ $imgIndex + 1 }}" loading="lazy">
+                                            <div class="gallery-item-overlay">
+                                                <a href="{{ asset('storage/' . $img->image) }}" target="_blank" class="btn btn-sm btn-light py-1 px-2 rounded-circle shadow-sm" title="Lihat Foto Ukuran Penuh">
+                                                    <i class="bi bi-arrows-fullscreen fs-8"></i>
+                                                </a>
+                                                <form action="{{ route('admin.product.kosan.image.delete', $img->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus foto galeri ini?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger py-1 px-2 rounded-circle shadow-sm" title="Hapus Foto">
+                                                        <i class="bi bi-trash fs-8"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="text-center py-4 px-3 mb-4 rounded-3 border bg-light bg-opacity-50">
+                                    <div class="d-inline-flex p-3 rounded-circle bg-white text-secondary shadow-sm mb-2">
+                                        <i class="bi bi-images fs-2 text-muted"></i>
+                                    </div>
+                                    <h6 class="fs-7 fw-bold text-dark mb-1">Belum Ada Foto Galeri</h6>
+                                    <p class="fs-8 text-muted mb-0" style="max-width: 400px; margin: auto;">
+                                        Unggah foto-foto terbaik properti kos Anda (tampak fasad depan, lorong, area santai, dapur umum) untuk menarik calon penyewa.
+                                    </p>
+                                </div>
+                            @endif
+
+                            <!-- Form Upload Foto Baru (Modern Drag & Drop Zone) -->
+                            <div class="d-flex align-items-center justify-content-between mb-2 pt-2">
+                                <h6 class="fw-bold fs-7 mb-0 text-dark">
+                                    <i class="bi bi-cloud-arrow-up-fill text-teal me-1"></i> Unggah Foto Baru
+                                </h6>
+                                <span class="badge badge-subtle-success fs-8">Maks. 5 MB / File • Multi-Upload</span>
+                            </div>
+
+                            <form action="{{ route('admin.product.kosan.image.insert', $item->id) }}" method="POST" enctype="multipart/form-data" class="gallery-upload-form" id="galleryUploadForm{{ $item->id }}">
+                                @csrf
+                                <div class="gallery-dropzone" onclick="document.getElementById('fileInputKosan{{ $item->id }}').click()">
+                                    <div class="dropzone-icon">
+                                        <i class="bi bi-cloud-arrow-up"></i>
+                                    </div>
+                                    <h6 class="fw-bold fs-7 text-dark mb-1">
+                                        Klik untuk Pilih Foto atau Seret & Lepas File ke Sini
+                                    </h6>
+                                    <p class="fs-8 text-muted mb-0">
+                                        Bisa memilih lebih dari 1 file foto sekaligus. Format: <strong>JPG, PNG, WEBP</strong>
+                                    </p>
+                                    <input type="file" name="images[]" id="fileInputKosan{{ $item->id }}" class="d-none gallery-file-input" multiple accept="image/jpeg,image/png,image/webp,image/jpg" data-target="previewContainerKosan{{ $item->id }}" data-btn="btnUploadKosan{{ $item->id }}">
+                                </div>
+
+                                <!-- Live Preview Thumbnails -->
+                                <div id="previewContainerKosan{{ $item->id }}" class="preview-grid d-none"></div>
+
+                                <div class="d-flex justify-content-between align-items-center mt-3 pt-2">
+                                    <small class="text-muted fs-8" id="fileCountTextKosan{{ $item->id }}">Belum ada file dipilih.</small>
+                                    <button type="submit" class="btn btn-sm btn-primary px-4 py-2 rounded-pill shadow-sm" id="btnUploadKosan{{ $item->id }}" disabled>
+                                        <i class="bi bi-cloud-arrow-up-fill me-1"></i> Upload Foto Sekarang
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer bg-light py-2">
+                            <button type="button" class="btn btn-sm btn-secondary rounded-pill px-3" data-bs-dismiss="modal">Tutup</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        @endforeach
+
+    </div>
+</div>
